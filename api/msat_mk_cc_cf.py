@@ -19,7 +19,9 @@
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
 #   Allard Berends (AB),  2013-02-24 13:07
+#   Gerben Welter  (GW),  2013-04-28 22:04
 # HISTORY
+#   2013-04-28 22:04, GW added support for SELinux.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
@@ -270,8 +272,9 @@ else:
   if not options.configpath_dir:
     path_info['contents'] = xmlrpclib.Binary(content)
 
-if options.configpath_context:
-  path_info['selinux_ctx'] = options.configpath_context
+if options.satellite_version in ['5.4', '5.5']:
+  if options.configpath_context:
+    path_info['selinux_ctx'] = options.configpath_context
 
 try:
   rc = client.configchannel.createOrUpdatePath(
