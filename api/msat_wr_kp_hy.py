@@ -171,7 +171,7 @@ script_path = os.path.join(save_path, script)
 f = open(script_path, 'w')
 os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
-subprocess.Popen([satellite_api_dir + '/msat_wr_kp.py', '--kickstart-label', options.kickstart_label], stdout=f, stderr=subprocess.STDOUT)
+subprocess.Popen([satellite_api_dir + '/msat_wr_kp.py', '--kickstart-label', options.kickstart_label, '--satellite-url', options.satellite_url , '--satellite-login', options.satellite_login , '--satellite-password', options.satellite_password], stdout=f, stderr=subprocess.STDOUT)
 f.close()
 
 try:
@@ -221,7 +221,7 @@ for a in akeys:
   f = open(script_path, 'w')
   os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
-  subprocess.Popen([satellite_api_dir + '/msat_wr_ak.py', '--activationkey-label', a['key']], stdout=f, stderr=subprocess.STDOUT)
+  subprocess.Popen([satellite_api_dir + '/msat_wr_ak.py', '--activationkey-label', a['key'], '--satellite-url', options.satellite_url , '--satellite-login', options.satellite_login , '--satellite-password', options.satellite_password], stdout=f, stderr=subprocess.STDOUT)
   f.close()
   try:
     config_channels = client.activationkey.listConfigChannels(

@@ -140,13 +140,12 @@ parser.add_option(
   help = "kickstart label"
 )
 (options, args) = config.get_conf(parser)
-
 if options.satellite_url is None:
   parser.error('Error: specify URL, -u or --satellite-url')
 if options.satellite_login is None:
-  parser.error('Error: specify login, -l or --login')
+  parser.error('Error: specify login, -a or --satellite-login')
 if options.satellite_password is None:
-  parser.error('Error: specify password, -p or --password')
+  parser.error('Error: specify password, -p or --satellite-password')
 if options.kickstart_label is None:
   parser.error('specify kickstart label, -l or --kickstart-label. Use list_kickstart_profiles.py to find all kickstart labels.')
 
