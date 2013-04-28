@@ -15,7 +15,11 @@
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
 #   Allard Berends (AB), 2013-02-24 13:07
+#   Gerben Welter (GW),  2013-04-28 23:16
 # HISTORY
+#   2013-04-28 23:16, GW corrected the calling of other msat
+#   scripts in the subprocess calls. The specified command
+#   line parameters are now included.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
@@ -63,7 +67,7 @@ def scan_for_snippet(snippets, contents, level):
       f = open(script_path, 'w')
       os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
-      subprocess.Popen([satellite_api_dir + '/msat_wr_cs.py', '--snippet-name', m.group(1)], stdout=f, stderr=subprocess.STDOUT)
+      subprocess.Popen([satellite_api_dir + '/msat_wr_cs.py', '--snippet-name', m.group(1), '--satellite-url', options.satellite_url , '--satellite-login', options.satellite_login , '--satellite-password', options.satellite_password], stdout=f, stderr=subprocess.STDOUT)
       f.close()
       scan_for_snippet(snippets, snippets[m.group(1)], level + 1)
 
@@ -239,7 +243,7 @@ for a in akeys:
     f = open(script_path, 'w')
     os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
-    subprocess.Popen([satellite_api_dir + '/msat_wr_cc.py', '--configchannel-label', cc['label'], '--configchannel-existence', 'yes'], stdout=f, stderr=subprocess.STDOUT)
+    subprocess.Popen([satellite_api_dir + '/msat_wr_cc.py', '--configchannel-label', cc['label'], '--satellite-url', options.satellite_url , '--satellite-login', options.satellite_login , '--satellite-password', options.satellite_password, '--configchannel-existence', 'yes'], stdout=f, stderr=subprocess.STDOUT)
     f.close()
 
 client.auth.logout(key)

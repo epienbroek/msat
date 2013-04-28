@@ -22,7 +22,10 @@
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
 #   Allard Berends (AB), 2013-02-24 13:07
+#   Gerben Welter (GW),  2013-04-28 23:17
 # HISTORY
+#   2013-04-28 23:17, GW corrected some of the command line
+#   parameters.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
