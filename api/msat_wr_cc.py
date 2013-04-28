@@ -15,7 +15,9 @@
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
 #   Allard Berends (AB), 2013-02-24 13:07
+#   Gerben Welter (GW),  2013-04-28 22:40
 # HISTORY
+#   2013-04-28 22:40, GW added SELinux context support.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 #
@@ -264,8 +266,12 @@ for f in files:
   print "  --configpath-group %s \\" % (f['group'], )
   try:
     print "  --configpath-context '%s' \\" % (f['selinux_ctx'], )
-  except:
-    print "  --configpath-context '' \\"
+  except KeyError, e:
+    # AB: we use pass here since we don't want to clutter up
+    # peoples code with empty SELinux contexts when they
+    # might not be using SELinux at all.
+    #print "  --configpath-context '' \\"
+    pass
   if f['type'] == 'file':
     print "  --configpath-permissions %s \\" % (f['permissions_mode'], )
   else:
