@@ -250,6 +250,10 @@ msat_mk_cc_cf.py \\
 
   print >> fd, "  --configpath-user %s \\" % (f['owner'], )
   print >> fd, "  --configpath-group %s \\" % (f['group'], )
+  try:
+    print >> fd, "  --configpath-context '%s' \\" % (f['selinux_ctx'], )
+  except:
+    print >> fd, "  --configpath-context '' \\"
   if f['type'] == 'file':
     print >> fd, "  --configpath-permissions %s \\" % (f['permissions_mode'], )
   else:

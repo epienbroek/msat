@@ -262,6 +262,10 @@ for f in files:
 
   print "  --configpath-user %s \\" % (f['owner'], )
   print "  --configpath-group %s \\" % (f['group'], )
+  try:
+    print "  --configpath-context '%s' \\" % (f['selinux_ctx'], )
+  except:
+    print "  --configpath-context '' \\"
   if f['type'] == 'file':
     print "  --configpath-permissions %s \\" % (f['permissions_mode'], )
   else:

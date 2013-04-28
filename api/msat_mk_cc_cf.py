@@ -204,6 +204,16 @@ parser.add_option(
   default = '|}',
   help = "end-delimter of a macro in a config file, [default: \'%default\']"
 )
+parser.add_option(
+  "-Z",
+  "--configpath-context",
+  action = "callback",
+  callback = config.parse_string,
+  dest = "configpath_context",
+  type = "string",
+  default = None,
+  help = "SELinux context of a config file, [default: \'%default\']"
+)
 (options, args) = config.get_conf(parser)
 
 if options.configchannel_label is None:
@@ -239,11 +249,13 @@ if not options.configpath_dir:
 # Note, always use Base64 encoding. Otherwise the
 # end-of-line at the end of the config file is gone.
 # iptables, motd, etc. break.
+
 path_info = {
-  'owner':                 options.configpath_user,
-  'group':                 options.configpath_group,
-  'permissions':           options.configpath_permissions,
+  'owner':       options.configpath_user,
+  'group':       options.configpath_group,
+  'permissions': options.configpath_permissions,
 }
+
 if not options.configpath_dir:
   path_info['macro-start-delimiter'] = options.configpath_startdelimiter
   path_info['macro-end-delimiter']   = options.configpath_enddelimiter
@@ -257,6 +269,9 @@ if options.satellite_version == '5.5':
 else:
   if not options.configpath_dir:
     path_info['contents'] = xmlrpclib.Binary(content)
+
+if options.configpath_context:
+  path_info['selinux_ctx'] = options.configpath_context
 
 try:
   rc = client.configchannel.createOrUpdatePath(
