@@ -222,6 +222,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.exit(1)
 
 print "  --configchannel-description '%s' \\" % (details['description'], )
 print "  --configchannel-name '%s'" % (details['name'], )
@@ -236,6 +237,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.exit(1)
 
 filelist = [f['path'] for f in files]
 
@@ -248,6 +250,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.exit(1)
 
 for f in files:
   print "msat_mk_cc_cf.py \\"
@@ -288,11 +291,13 @@ for f in files:
       print
       print
       print f['content']
+      sys.exit(1)
     else:
       try:
         c = escape_quote(f['contents'])
       except UnicodeEncodeError, e:
         print >> sys.stderr, "ERROR: %s: %s: unicode characters not supported" % (options.configchannel_label, f['path'])
+        sys.exit(1)
       else:
         print c
     print "EOF__BLAH__EOF"

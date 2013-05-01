@@ -236,7 +236,7 @@ client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
 content = 'NULL'
-if not options.configpath_dir:
+if not options.configpath_dir and not options.configpath_link:
   if options.configpath_content == '-':
     f = sys.stdin
   else:
@@ -252,24 +252,29 @@ if not options.configpath_dir:
 # end-of-line at the end of the config file is gone.
 # iptables, motd, etc. break.
 
-path_info = {
-  'owner':       options.configpath_user,
-  'group':       options.configpath_group,
-  'permissions': options.configpath_permissions,
-}
+if options.configpath_link:
+  path_info = {
+    'target_path': options.configpath_link,
+  }
+else:
+  path_info = {
+    'owner':       options.configpath_user,
+    'group':       options.configpath_group,
+    'permissions': options.configpath_permissions,
+  }
 
-if not options.configpath_dir:
+if not options.configpath_dir and not options.configpath_link:
   path_info['macro-start-delimiter'] = options.configpath_startdelimiter
   path_info['macro-end-delimiter']   = options.configpath_enddelimiter
 
 if options.satellite_version == '5.5':
-  if not options.configpath_dir:
+  if not options.configpath_dir and not options.configpath_link:
     path_info['contents']       = base64.standard_b64encode(content)
     path_info['contents_enc64'] = True
     path_info['binary']         = False
   path_info['revision']       = ''
 else:
-  if not options.configpath_dir:
+  if not options.configpath_dir and not options.configpath_link:
     path_info['contents'] = xmlrpclib.Binary(content)
 
 if options.satellite_version in ['5.4', '5.5']:
@@ -277,13 +282,21 @@ if options.satellite_version in ['5.4', '5.5']:
     path_info['selinux_ctx'] = options.configpath_context
 
 try:
-  rc = client.configchannel.createOrUpdatePath(
-    key, 
-    options.configchannel_label,
-    options.configpath_path,
-    options.configpath_dir,
-    path_info
-  )
+  if options.configpath_link:
+    rc = client.configchannel.createOrUpdateSymlink(
+      key, 
+      options.configchannel_label,
+      options.configpath_link,
+      path_info
+    )
+  else:
+    rc = client.configchannel.createOrUpdatePath(
+      key, 
+      options.configchannel_label,
+      options.configpath_path,
+      options.configpath_dir,
+      path_info
+    )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
