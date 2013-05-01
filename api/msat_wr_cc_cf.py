@@ -247,11 +247,15 @@ msat_mk_cc_cf.py \\
   if f['type'] == 'file':
     print >> fd, "  --configpath-dir false \\"
     print >> fd, "  --configpath-content - \\"
-  else:
+  elif f['type'] == 'directory':
     print >> fd, "  --configpath-dir true \\"
+  else:
+    pass
 
-  print >> fd, "  --configpath-user %s \\" % (f['owner'], )
-  print >> fd, "  --configpath-group %s \\" % (f['group'], )
+  if f['type'] == 'file' or f['type'] == 'directory':
+    print >> fd, "  --configpath-user %s \\" % (f['owner'], )
+    print >> fd, "  --configpath-group %s \\" % (f['group'], )
+
   try:
     print >> fd, "  --configpath-context '%s' \\" % (f['selinux_ctx'], )
   except KeyError, e:
@@ -262,11 +266,13 @@ msat_mk_cc_cf.py \\
     pass
   if f['type'] == 'file':
     print >> fd, "  --configpath-permissions %s \\" % (f['permissions_mode'], )
-  else:
+  elif f['type'] == 'directory':
     print >> fd, "  --configpath-permissions %s" % (f['permissions_mode'], )
+  else:
+    print >> fd, "  --configpath-link %s" % (f['target_path'], )
+
   if f['type'] == 'file':
     print >> fd, "  --configpath-startdelimiter '%s' \\" % (f['macro-start-delimiter'], )
-  if f['type'] == 'file':
     print >> fd, "  --configpath-enddelimiter '%s' << 'EOF__BLAH__EOF'" % (f['macro-end-delimiter'], )
     if f['binary']:
       print >> sys.stderr, "ERROR: %s: %s: binary config files not supported" % (options.configchannel_label, f['path'])

@@ -139,6 +139,15 @@ parser.add_option(
   help = "path of file or dir"
 )
 parser.add_option(
+  "--configpath-link",
+  action = "callback", 
+  callback = config.parse_string,
+  dest = "configpath_link",
+  type = "string",
+  default = None,
+  help = "link of file or dir"
+)
+parser.add_option(
   "-d",
   "--configpath-dir",
   action = "callback", 
@@ -207,7 +216,7 @@ parser.add_option(
   help = "end-delimter of a macro in a config file, [default: \'%default\']"
 )
 parser.add_option(
-  "-Z",
+  "-z",
   "--configpath-context",
   action = "callback",
   callback = config.parse_string,
@@ -222,21 +231,36 @@ if options.configchannel_label is None:
   parser.error('Error: specify label, -l or --configchannel-label')
 if options.configpath_path is None:
   parser.error('Error: specify path, -p or --configpath-path')
-if not options.configpath_dir and options.configpath_content is None:
-  parser.error('Error: specify config file path, -c or --configpath-content')
-if options.configpath_user is None:
-  parser.error('Error: specify user, -u or --configpath-user')
-if options.configpath_group is None:
-  parser.error('Error: specify group, -g or --configpath-group')
-if options.configpath_permissions is None:
-  parser.error('Error: specify file permissions, -f or --configpath-permissions')
+
+# AB: determine if we deal with a file, dir or symlink
+type = None
+if options.configpath_link:
+  type = 'link'
+elif options.configpath_dir:
+  type = 'dir'
+else:
+  type = 'file'
+
+if type == 'link':
+  pass
+else:
+  # AB: conditions for file and dir.
+  if options.configpath_user is None:
+    parser.error('Error: specify user, -u or --configpath-user')
+  if options.configpath_group is None:
+    parser.error('Error: specify group, -g or --configpath-group')
+  if options.configpath_permissions is None:
+    parser.error('Error: specify file permissions, -f or --configpath-permissions')
+  if type == 'file':
+    if options.configpath_content is None:
+      parser.error('Error: specify config file path, -c or --configpath-content')
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
-content = 'NULL'
-if not options.configpath_dir and not options.configpath_link:
+if type == 'file':
+  content = 'NULL'
   if options.configpath_content == '-':
     f = sys.stdin
   else:
@@ -252,9 +276,9 @@ if not options.configpath_dir and not options.configpath_link:
 # end-of-line at the end of the config file is gone.
 # iptables, motd, etc. break.
 
-if options.configpath_link:
+if type == 'link':
   path_info = {
-    'target_path': options.configpath_link,
+    'target_path': options.configpath_path,
   }
 else:
   path_info = {
@@ -263,18 +287,18 @@ else:
     'permissions': options.configpath_permissions,
   }
 
-if not options.configpath_dir and not options.configpath_link:
+if type == 'file':
   path_info['macro-start-delimiter'] = options.configpath_startdelimiter
   path_info['macro-end-delimiter']   = options.configpath_enddelimiter
 
 if options.satellite_version == '5.5':
-  if not options.configpath_dir and not options.configpath_link:
+  if type == 'file':
     path_info['contents']       = base64.standard_b64encode(content)
     path_info['contents_enc64'] = True
     path_info['binary']         = False
   path_info['revision']       = ''
 else:
-  if not options.configpath_dir and not options.configpath_link:
+  if type == 'file':
     path_info['contents'] = xmlrpclib.Binary(content)
 
 if options.satellite_version in ['5.4', '5.5']:
@@ -282,7 +306,7 @@ if options.satellite_version in ['5.4', '5.5']:
     path_info['selinux_ctx'] = options.configpath_context
 
 try:
-  if options.configpath_link:
+  if type == 'link':
     rc = client.configchannel.createOrUpdateSymlink(
       key, 
       options.configchannel_label,

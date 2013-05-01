@@ -262,11 +262,14 @@ for f in files:
   if f['type'] == 'file':
     print "  --configpath-dir false \\"
     print "  --configpath-content - \\"
-  else:
+  elif f['type'] == 'directory':
     print "  --configpath-dir true \\"
+  else:
+    pass
 
-  print "  --configpath-user %s \\" % (f['owner'], )
-  print "  --configpath-group %s \\" % (f['group'], )
+  if f['type'] == 'file' or f['type'] == 'directory':
+    print "  --configpath-user %s \\" % (f['owner'], )
+    print "  --configpath-group %s \\" % (f['group'], )
   try:
     print "  --configpath-context '%s' \\" % (f['selinux_ctx'], )
   except KeyError, e:
@@ -277,8 +280,11 @@ for f in files:
     pass
   if f['type'] == 'file':
     print "  --configpath-permissions %s \\" % (f['permissions_mode'], )
-  else:
+  elif f['type'] == 'directory':
     print "  --configpath-permissions %s" % (f['permissions_mode'], )
+  else:
+    print "  --configpath-link %s" % (f['target_path'], )
+
   if f['type'] == 'file':
     print "  --configpath-startdelimiter '%s' \\" % (f['macro-start-delimiter'], )
   if f['type'] == 'file':
