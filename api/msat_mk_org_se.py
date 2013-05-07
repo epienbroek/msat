@@ -2,26 +2,28 @@
 
 #
 # SCRIPT
-#   msat_ls_orgs.py
+#   msat_mk_org_se.py
 # DESCRIPTION
+#   This script sets the system entitlements for the
+#   specified organization.
 # DEPENDENCIES
 #   You need a Satellite server running to which this client
 #   can connect.
 # FAILURE
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
-#   Allard Berends (AB),  2013-02-24 13:07
+#   Allard Berends (AB), 2013-05-07 16:39
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
-#   msat_ls_orgs.py is free software; you can redistribute it
+#   msat_mk_org_se.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
 #   Foundation; either version 3 of the License, or (at your
 #   option) any later version.
 #
-#   msat_ls_orgs.py is distributed in the hope that it will be
+#   msat_mk_org_se.py is distributed in the hope that it will be
 #   useful, but WITHOUT ANY WARRANTY; without even the
 #   implied warranty of MERCHANTABILITY or FITNESS FOR A
 #   PARTICULAR PURPOSE. See the GNU General Public License
@@ -39,9 +41,9 @@ import optparse
 import sys
 import xmlrpclib
 
-usage = '''list organizations'''
+usage = '''set system entitlements of org'''
 
-description = '''This script lists the organizations available on the Satellite server.'''
+description = '''This script sets the system entitlements of the specified organization.'''
 
 parser = optparse.OptionParser(
   usage = usage,
@@ -97,21 +99,49 @@ parser.add_option(
   default = None,
   help = "password belonging to Satellite admin account",
 )
+parser.add_option(
+  "-o",
+  "--org-number",
+  action = "callback",
+  callback = config.parse_int,
+  dest = "org_number",
+  type = "int",
+  default = None,
+  help = "Satellite organization number. Use msat_ls_orgs.py to find org numbers",
+)
+parser.add_option(
+  "--org-se",
+  action = "callback",
+  callback = config.parse_string,
+  dest = "org_se",
+  type = "string",
+  default = None,
+  help = "comma separated list of arg=value pairs of software channel entitlements",
+)
 (options, args) = config.get_conf(parser)
+
+if not options.org_number:
+  parser.error('Error: specify organization number, -o or --org-number')
+if not options.org_se:
+  parser.error('Error: specify software channel entitlements arg=value pairs, --org-se')
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
-try:
-  orgs = client.org.listOrgs(
-    key,
-  )
-except xmlrpclib.Fault, e:
-  print >> sys.stderr, str(e)
-  sys.exit(1)
+ses = options.org_se.split(',')
 
-for i in orgs:
-  print "%5d %-20.20s" % (i['id'], i['name'])
+for i in ses:
+  arg, val = i.split('=')
+  try:
+    se = client.org.setSystemEntitlements(
+      key,
+      options.org_number,
+      arg,
+      int(val),
+    )
+  except xmlrpclib.Fault, e:
+    print >> sys.stderr, str(e)
+    sys.exit(1)
 
 client.auth.logout(key)
