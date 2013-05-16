@@ -1,0 +1,458 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="msat-list" lang="en-US">
+	<title>List commands</title>
+	 <para>
+		This section provides information on the commands that can be used to list information of the data elements. Data elements are, for example, config files, config channels, activation keys, and kickstart profiles.
+	</para>
+	 <para>
+		The list of commands is: 
+		<variablelist>
+			<varlistentry>
+				<term><command>msat_ls_ak_cc.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the config channels which are referenced by the specified activation key.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_ak_kp.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the kickstart profiles that link to the specified activation key.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_ak.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the activation keys defined by the organization on which one logs in. Organization is determined by the user account used to log in to the Satellite by the API scripts.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_cc_ak.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the activation keys that link to the specified config channel.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_cc_cf.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the configuration files belonging to the specified config channel.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_cc.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the config channels belonging to the organization on which one is logged in.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_cf_cc.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the config channels containing the specified config file.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_cs.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the custom Cobbler snippets belonging to the organization to which one is logged in.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp_ak.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the activation keys, referenced by the specified kickstart profile.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp_co.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the custom options belonging to the specified kickstart profile.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp_cs.py</command></term>
+				 <listitem>
+					<para>
+						This command lists cobbler snippet names, referenced by the specified kickstart profile or indirectly by other cobbler snippets.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp_hy.py</command></term>
+				 <listitem>
+					<para>
+						This command lists all the data elements connected to the specified kickstart profile. The output is displayed hierarchically.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp_sys.py</command></term>
+				 <listitem>
+					<para>
+						This command lists all the systems in Cobbler that use the specified kickstart profile.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_kp.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the organization's kickstart profiles.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_sc.py</command></term>
+				 <listitem>
+					<para>
+						This command lists the software channels available to the organization to which one is logged in.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+			 <varlistentry>
+				<term><command>msat_ls_sys.py</command></term>
+				 <listitem>
+					<para>
+						This command lists all the systems registered to the Satellite organization.
+					</para>
+
+				</listitem>
+
+			</varlistentry>
+
+		</variablelist>
+
+	</para>
+	 <para>
+		To illustrate the usage of the above commands, we show a number of examples here. The commands only work if a working Satellite server is available.
+	</para>
+	 <para>
+		On the Satellite server we have configured a kickstart profile that references a number of Cobbler snippets, activation keys and indirectly config channels with config files. The hierarchy is: 
+<screen>
+<emphasis>name</emphasis>                                    <emphasis>type</emphasis>
+dl380g5-server-6-1_0                    kp
+  support-1_0                           cs
+    ssh-generics-1_0                    cs
+    ldap-cert-symlink-1_0               cs
+    support-runlevel-1_0                cs
+      support-runlevel-base-1_0         cs
+      support-runlevel-gen-1_0          cs
+      support-runlevel-hpgen8-1_0       cs
+  1-support-rpms-6-1_0                  ak
+  1-dl380g5-server-6-1_0                ak
+    dl380g5-server-6-1_0                cc
+    hpsim-6-1_0                         cc
+      /etc/hosts                        cf
+      /etc/snmp/snmpd.conf              cf
+      /etc/sudoers.d/hpsmhd             cf
+      /etc/sysconfig/iptables           cf
+      /etc/sysconfig/snmpd.options      cf
+      /opt/hp/hpsmh/conf/smhpd.xml      cf
+    support-6-1_0                       cc
+      /etc/cron.d/nightly_ntp_sync      cf
+      /etc/cron.d/sysstat               cf
+      /etc/profile.d/itl.sh             cf
+    ntp-6-1_0                           cc
+      /etc/ntp.conf                     cf
+    ldap-6-1_0                          cc
+      /etc/ldap.conf                    cf
+      /etc/openldap/ldap.conf           cf
+    hypertape-6-1_0                     cc
+    hpomw-6-1_0                         cc
+    splunk-6-1_0                        cc
+    ssh-6-1_0                           cc
+      /root/.ssh/authorized_keys        cf
+    base-6-1_0                          cc
+      /etc/hosts                        cf
+      /etc/motd                         cf
+      /etc/nsswitch.conf                cf
+      /etc/openldap/cacerts/my-ca.crt   cf
+      /etc/pam.d/system-auth-ac         cf
+      /etc/sudoers                      cf
+      /etc/sysconfig/iptables           cf
+      /etc/sysconfig/rhn/rhnsd          cf
+</screen>
+
+	</para>
+	 <para>
+		The config channels referenced by the <emphasis>1-dl380g5-server-6-1_0</emphasis> activation keys are displayed in order. The first one displayed has the highest order or rating. This is om imporance when 2 or more config channels contain the same config file. For example, hpsim-6-1_0 and base-6-1_0 both have an <filename>/etc/hosts</filename> file. The one of hpsim-6-1_0 has preference. 
+<screen>
+&sw1p; <userinput>msat_ls_ak_cc.py -l 1-dl380g5-server-6-1_0</userinput>
+dl380g5-server-6-1_0
+hpsim-6-1_0
+support-6-1_0
+ntp-6-1_0
+ldap-6-1_0
+hypertape-6-1_0
+hpomw-6-1_0
+splunk-6-1_0
+ssh-6-1_0
+base-6-1_0
+</screen>
+
+	</para>
+	 <para>
+		All the activation keys are displayed. 
+<screen>
+&sw1p; <userinput>msat_ls_ak.py</userinput>
+1-support-rpms-6-1_0
+1-dl380g5-server-6-1_0
+</screen>
+
+	</para>
+	 <para>
+		Show the paths of the config files belonging to config channel <emphasis>base-6-1_0</emphasis>. 
+<screen>
+&sw1p; <userinput>msat_ls_cc_cf.py -l base-6-1_0</userinput>
+/etc/hosts
+/etc/motd
+/etc/nsswitch.conf
+/etc/openldap/cacerts/my-ca.crt
+/etc/pam.d/system-auth-ac
+/etc/sudoers
+/etc/sysconfig/iptables
+/etc/sysconfig/rhn/rhnsd
+</screen>
+
+	</para>
+	 <para>
+		List all the config channel of the Satellite organization. 
+<screen>
+&sw1p; <userinput>msat_ls_cc.py</userinput> 
+base-6-1_0
+dl380g5-server-6-1_0
+hpomw-6-1_0
+hpsim-6-1_0
+hypertape-6-1_0
+ldap-6-1_0
+ntp-6-1_0
+splunk-6-1_0
+ssh-6-1_0
+support-6-1_0
+</screen>
+
+	</para>
+	 <para>
+		List the information of all custom Cobbler snippets. The standard Cobbler snippets are not shown. The standard snippets are used to configure the network, register to the Satellite, etc. The custom Cobbler snippets are the ones we have created ourselves. 
+<screen>
+&sw1p; <userinput>msat_ls_cs.py</userinput> 
+name: ldap-cert-symlink-1_0
+contents:
+--------------------
+# AB: triggered by /etc/openldap/cacerts/my-ca.crt config
+# file.
+ODIR=\$(/bin/pwd)
+cd /etc/openldap/cacerts
+HASH=\$(/usr/bin/openssl x509 -in my-ca.crt -noout -hash).0
+ln -s my-ca.crt \$HASH
+cd \$ODIR
+--------------------
+fragment: $SNIPPET('spacewalk/1/ldap-cert-symlink-1_0')
+file:
+/var/lib/cobbler/snippets/spacewalk/1/ldap-cert-symlink-1_0
+
+
+name: support-runlevel-hpgen8-1_0
+contents:
+--------------------
+# * Hardware monitoring service (HP-SIM, only with HP
+#   hardware)
+#/sbin/chkconfig snmpd on
+#/sbin/chkconfig hp-ilo on
+#/sbin/chkconfig hp-health on
+#/sbin/chkconfig hp-snmp-agents on
+#/sbin/chkconfig hp-asrd on
+#/sbin/chkconfig hpsmhd on
+--------------------
+fragment:
+$SNIPPET('spacewalk/1/support-runlevel-hpgen8-1_0')
+file:
+/var/lib/cobbler/snippets/spacewalk/1/support-runlevel-hpgen8-1_0
+
+
+.. remainder skipped ..
+</screen>
+
+	</para>
+	 <para>
+		Show the activation keys, referenced by the specified kickstart profile. 
+<screen>
+&sw1p; <userinput>msat_ls_kp_ak.py -l dl380g5-server-6-1_0</userinput>
+1-support-rpms-6-1_0
+1-dl380g5-server-6-1_0
+</screen>
+
+	</para>
+	 <para>
+		Show the custom options defined for the specified kickstart profile. Here, we have defined none. 
+<screen>
+&sw1p; <userinput>msat_ls_kp_co.py -l dl380g5-server-6-1_0</userinput>
+.. no output ..
+</screen>
+
+	</para>
+	 <para>
+		Shows the referenced Cobbler snippets of the specified kickstart profile. The indentation shows the hierarchy of the references. This way, one can quickly determine by which Cobbler snippet another Cobbler snippet is referenced. 
+<screen>
+&sw1p; <userinput>msat_ls_kp_cs.py -l dl380g5-server-6-1_0</userinput>
+support-1_0
+  ssh-generics-1_0
+  ldap-cert-symlink-1_0
+  support-runlevel-1_0
+    support-runlevel-base-1_0
+    support-runlevel-gen-1_0
+    support-runlevel-hpgen8-1_0
+</screen>
+
+	</para>
+	 <para>
+		List hierarchically the data elements connected to the specified kickstart profile. The purpose of this command is to help the administrator to quickly compare different type of systems as defined by their kickstart profiles. If more details are needed, like the list of RPM's, or the contents of the config files, then the advice is to use the msat_wr_* commands. These commands write the data element creation scripts to stdout. 
+<screen>
+&sw1p; <userinput>msat_ls_kp_hy.py -l dl380g5-server-6-1_0</userinput>
+dl380g5-server-6-1_0
+  support-1_0
+    ssh-generics-1_0
+    ldap-cert-symlink-1_0
+    support-runlevel-1_0
+      support-runlevel-base-1_0
+      support-runlevel-gen-1_0
+      support-runlevel-hpgen8-1_0
+  1-support-rpms-6-1_0
+  1-dl380g5-server-6-1_0
+    dl380g5-server-6-1_0
+    hpsim-6-1_0
+      /etc/hosts
+      /etc/snmp/snmpd.conf
+      /etc/sudoers.d/hpsmhd
+      /etc/sysconfig/iptables
+      /etc/sysconfig/snmpd.options
+      /opt/hp/hpsmh/conf/smhpd.xml
+    support-6-1_0
+      /etc/cron.d/nightly_ntp_sync
+      /etc/cron.d/sysstat
+      /etc/profile.d/itl.sh
+    ntp-6-1_0
+      /etc/ntp.conf
+    ldap-6-1_0
+      /etc/ldap.conf
+      /etc/openldap/ldap.conf
+    hypertape-6-1_0
+    hpomw-6-1_0
+    splunk-6-1_0
+    ssh-6-1_0
+      /root/.ssh/authorized_keys
+    base-6-1_0
+      /etc/hosts
+      /etc/motd
+      /etc/nsswitch.conf
+      /etc/openldap/cacerts/my-ca.crt
+      /etc/pam.d/system-auth-ac
+      /etc/sudoers
+      /etc/sysconfig/iptables
+      /etc/sysconfig/rhn/rhnsd
+</screen>
+
+	</para>
+	 <para>
+		List all the systems in Cobbler that use the specified kickstart profile. 
+<screen>
+&sw1p; <userinput>msat_ls_kp_sys.py -l app-6-3_2</userinput> 
+test01
+</screen>
+
+	</para>
+	 <para>
+		List all the kickstart profiles of the Satellite organization. 
+<screen>
+&sw1p; <userinput>msat_ls_kp.py</userinput> 
+app-6-3_2
+dl380g5-server-6-1_0
+</screen>
+
+	</para>
+	 <para>
+		List all the software channels of the Satellite organization. 
+<screen>
+&sw1p; <userinput>msat_ls_sc.py</userinput> 
+hpomw-6
+hypertape-6
+rhel-x86_64-server-rs-6
+redhat-rhn-proxy-5.4-server-x86_64-6
+rhel-x86_64-server-6
+support-rpms-6
+rhel-x86_64-server-ha-6
+rhel-x86_64-server-6-rhdirserv-9
+hpsim-6
+rhel-x86_64-server-optional-6
+rhel-x86_64-server-supplementary-6
+rhel-x86_64-server-lb-6
+rhn-tools-rhel-x86_64-server-6
+redhat-rhn-proxy-5.5-server-x86_64-6
+splunk-6
+</screen>
+
+	</para>
+	 <para>
+		List all the registered systems of the Satellite organization. 
+<screen>
+&sw1p; <userinput>msat_ls_sys.py</userinput> 
+id: 1000010000, name: test01.example.org
+</screen>
+
+	</para>
+
+</section>
+
+

@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+  <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+  %BOOK_ENTITIES;
+]>
+<section id="msat-make">
+  <title>Make commands</title>
+  <para>
+    This section provides information on the commands that
+    can be used to make data elements on the Satellite
+    server. Data elements are, for example, config files,
+    config channels, activation keys, cobbler snippets, and
+    kickstart profiles.
+  </para>
+
+  <para>
+    The list of commands is:
+    <variablelist>
+      <varlistentry>
+        <term><command>msat_mk_ak.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified activation
+            key.  Note that, if it connects to 1 or more
+            config channels, these must be created first.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_cc_cf.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified config file
+            in the specified config channel. Note that the
+            config channel must exist prior to adding config
+            files to it.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_cc.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified config
+            channel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_cs.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified cobbler
+            snippet.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_kp.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified kickstart
+            profile.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_sc.py</command></term>
+        <listitem>
+          <para>
+            This command creates the specified software
+            channel.  With the already available
+            <command>rhnpush</command> one can add RPM's to
+            the software channel. In this section we will
+            not show an example of this command.  To get
+            more information, do: <command>msat_mk_sc.py
+            -h</command>
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_mk_sc_org.py</command></term>
+        <listitem>
+          <para>
+            This command makes the specified software
+            channel shared to the specified Satellite
+            organization. This way, the Satellite admin can
+            share software channels to Satellite
+            organizations. In this section we will not show
+            an example of this command. To get more
+            information, do: <command>msat_mk_sc_org.py
+            -h</command>
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para>
+    To illustrate the usage of the above commands, we show
+    some examples here. The commands need a functional
+    Spacewalk or Satellite server.
+  </para>
+
+  <para>
+    On the Satellite server we will create a simple
+    kickstart profile that references one Cobbler snippet,
+    one activation key and indirectly one config channel
+    with config files. The hierarchy is:
+    <screen>
+<emphasis>name</emphasis>                            <emphasis>type</emphasis>
+simple                          kp
+  simple                        cs
+  1-simple                      ak
+    simple                      cc
+      /etc/hosts                cf
+      /etc/init/serial.conf     cf
+      /etc/sysconfig/iptables   cf
+    </screen>
+  </para>
+
+  <para>
+    The order in which we create the Satellite
+    datastructures is:
+    <itemizedlist>
+      <listitem>
+        <para>
+          The config channel <emphasis>simple</emphasis>.
+          Once it exists, we can create the config files:
+          <itemizedlist>
+            <listitem>
+              <para>
+                <filename>/etc/hosts</filename>. In case DNS
+                does not function properly, we want at least
+                be able to find the NTP time servers.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <filename>/etc/init/serial.conf</filename>.
+                We add a serial interface for the KVM
+                (Kernel Virtualization Module) machine. This
+                way we have access to the guest machine via
+                the host machine. So, network is not needed
+                to log in.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <filename>/etc/sysconfig/iptables</filename>.
+                A minimal firewall configuration that allows
+                us to connect to the machine via SSH.
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The activation key <emphasis>1-simple</emphasis>.
+          Note that in the script the activation key label
+          is specified without the '1-'.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The Cobbler snippet <emphasis>simple</emphasis>.
+          It is not absolutely needed prior to the creation
+          of the kickstart profile, but when the kickstart
+          file is generated, it must be present.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The kickstart profile <emphasis>simple</emphasis>.
+          This is the last element to create. Note that we
+          assume that all software channels and all
+          referenced RPM's are present.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    The actual commands to create the above elements are
+    shown below. Normally we place these commands in bash
+    scripts.  Here, we just paste them to the command line
+    for demonstration purposes.
+  </para>
+
+
+  <para>
+    First create the <emphasis>simple</emphasis> config
+    channel.
+    <screen>
+&sw1p; <userinput>msat_mk_cc.py \</userinput>
+<userinput>  --configchannel-label simple \</userinput>
+<userinput>  --configchannel-description simple \</userinput>
+<userinput>  --configchannel-name simple</userinput>
+.. cc simple created ..
+    </screen>
+  </para>
+
+  <para>
+    Now, we create the 3 config files.
+    <screen>
+&sw1p; <userinput>msat_mk_cc_cf.py \</userinput>
+<userinput>  --configchannel-label simple \</userinput>
+<userinput>  --configpath-path /etc/hosts \</userinput>
+<userinput>  --configpath-dir false \</userinput>
+<userinput>  --configpath-content - \</userinput>
+<userinput>  --configpath-user root \</userinput>
+<userinput>  --configpath-group root \</userinput>
+<userinput>  --configpath-permissions 644 \</userinput>
+<userinput>  --configpath-startdelimiter '{|' \</userinput>
+<userinput>  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'</userinput>
+<userinput># Do not remove the following line, or various programs</userinput>
+<userinput># that require network functionality will fail.</userinput>
+<userinput>127.0.0.1         localhost.localdomain localhost</userinput>
+<userinput></userinput>
+<userinput># Provisioning via Satellite</userinput>
+<userinput>172.16.30.198     psat.example.org psat</userinput>
+<userinput></userinput>
+<userinput># Time service via NTP</userinput>
+<userinput>172.16.30.10      ntp1.example.org ntp1</userinput>
+<userinput>172.16.30.11      ntp2.example.org ntp2</userinput>
+<userinput>EOF__BLAH__EOF</userinput>
+.. cf /etc/hosts created in cc simple ..
+
+&sw1p; <userinput>msat_mk_cc_cf.py \</userinput>
+<userinput>  --configchannel-label simple \</userinput>
+<userinput>  --configpath-path /etc/sysconfig/iptables \</userinput>
+<userinput>  --configpath-dir false \</userinput>
+<userinput>  --configpath-content - \</userinput>
+<userinput>  --configpath-user root \</userinput>
+<userinput>  --configpath-group root \</userinput>
+<userinput>  --configpath-permissions 644 \</userinput>
+<userinput>  --configpath-startdelimiter '{|' \</userinput>
+<userinput>  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'</userinput>
+<userinput>*filter</userinput>
+<userinput>:INPUT ACCEPT [0:0]</userinput>
+<userinput>:FORWARD ACCEPT [0:0]</userinput>
+<userinput>:OUTPUT ACCEPT [0:0]</userinput>
+<userinput>:RH-Firewall-1-INPUT - [0:0]</userinput>
+<userinput>-A INPUT -j RH-Firewall-1-INPUT</userinput>
+<userinput>-A FORWARD -j RH-Firewall-1-INPUT</userinput>
+<userinput>-A RH-Firewall-1-INPUT -i lo -j ACCEPT</userinput>
+<userinput>-A RH-Firewall-1-INPUT -m icmp -p icmp --icmp-type any -j ACCEPT</userinput>
+<userinput>-A RH-Firewall-1-INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</userinput>
+<userinput>-A RH-Firewall-1-INPUT -m tcp -p tcp --dport 22 -m comment --comment "SSH" -j ACCEPT</userinput>
+<userinput>-A RH-Firewall-1-INPUT -j REJECT --reject-with icmp-host-prohibited</userinput>
+<userinput>COMMIT</userinput>
+<userinput>EOF__BLAH__EOF</userinput>
+.. cf /etc/sysconfig/iptables created in cc simple ..
+
+&sw1p; <userinput>msat_mk_cc_cf.py \</userinput>
+<userinput>  --configchannel-label simple \</userinput>
+<userinput>  --configpath-path /etc/init/serial.conf \</userinput>
+<userinput>  --configpath-dir false \</userinput>
+<userinput>  --configpath-content - \</userinput>
+<userinput>  --configpath-user root \</userinput>
+<userinput>  --configpath-group root \</userinput>
+<userinput>  --configpath-permissions 644 \</userinput>
+<userinput>  --configpath-startdelimiter '{|' \</userinput>
+<userinput>  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'</userinput>
+<userinput># Automatically start a configured serial console</userinput>
+<userinput>#</userinput>
+<userinput># How this works:</userinput>
+<userinput>#</userinput>
+<userinput># On boot, a udev helper examines /dev/console. If a serial console is the</userinput>
+<userinput># primary console (last console on the commandline in grub),  the event</userinput>
+<userinput># 'fedora.serial-console-available &lt;port name&gt; &lt;speed&gt;' is emitted, which</userinput>
+<userinput># triggers this script. It waits for the runlevel to finish, ensures</userinput>
+<userinput># the proper port is in /etc/securetty, and starts the getty.</userinput>
+<userinput>#</userinput>
+<userinput># If your serial console is not the primary console, or you want a getty</userinput>
+<userinput># on serial even if it's not the consce $DEV</userinput>
+<userinput>#respawn</userinput>
+<userinput>#pre-start exec /sbin/securetty $DEV</userinput>
+<userinput>#exec /sbin/agetty /dev/$DEV $SPEED vt100-nav</userinput>
+<userinput>EOF__BLAH__EOF</userinput>
+.. cf /etc/init/serial.conf created in cc simple ..
+    </screen>
+  </para>
+
+  <para>
+    Next, we can create the activation key
+    <emphasis>simple</emphasis>. As can be seen in the
+    <option>--activationkey-configchannels</option>, it
+    needs the <emphasis>simple</emphasis> config channel.
+    <screen>
+&sw1p; <userinput>msat_mk_ak.py \</userinput>
+<userinput>  --activationkey-label simple \</userinput>
+<userinput>  --activationkey-description simple \</userinput>
+<userinput>  --activationkey-basechannel rhel-x86_64-server-6 \</userinput>
+<userinput>  --activationkey-monitoring false \</userinput>
+<userinput>  --activationkey-provisioning true \</userinput>
+<userinput>  --activationkey-virtualization false \</userinput>
+<userinput>  --activationkey-node false \</userinput>
+<userinput>  --activationkey-configuration true \</userinput>
+<userinput>  --activationkey-universal false \</userinput>
+<userinput>  --activationkey-childchannels 'rhn-tools-rhel-x86_64-server-6' \</userinput>
+<userinput>  --activationkey-packages 'nmap,ntp,screen,strace,sysstat,vim-enhanced,dmidecode,sg3_utils,lsscsi,tree,rhncfg,rhncfg-actions,rhncfg-client,rhncfg-management' \</userinput>
+<userinput>  --activationkey-configchannels 'simple'</userinput>
+    </screen>
+  </para>
+
+  <para>
+    Before we can finish we create the Cobbler snippet used
+    by the kickstart profile. The snippet is named
+    <emphasis>simple</emphasis> too. Note that we need to
+    escape the embedded quotes. So, if we want to use a
+    quote in bash in the form:
+    <screen>
+&sw1p; <userinput>echo 'don[quote]t'</userinput>
+don[quote]t
+&sw1p; <userinput>echo 'don'"'"'t'</userinput>
+don't
+    </screen>
+    The above statement works because bash concatenates the
+    string parts. For example:
+    <screen>
+&sw1p; <userinput>echo 'a''b''c'</userinput>
+abc
+&sw1p; <userinput>echo 'abc'</userinput>
+abc
+    </screen>
+    So, we can always embed a quote in the other style of
+    quotes. So a single quote inside double quotes and vice
+    versa.
+    <screen>
+&sw1p; <userinput>msat_mk_cs.py \</userinput>
+<userinput>  --snippet-name simple \</userinput>
+<userinput>  --snippet-content '# AB: Daemon services that needs to be on or off that come</userinput>
+<userinput># from a base installation.</userinput>
+<userinput>#/sbin/chkconfig avahi-daemon off</userinput>
+<userinput>#/sbin/chkconfig bluetooth off</userinput>
+<userinput>#/sbin/chkconfig cups off</userinput>
+<userinput>/sbin/chkconfig firstboot off</userinput>
+<userinput>/sbin/chkconfig kudzu off</userinput>
+<userinput>/sbin/chkconfig lm_sensors off</userinput>
+<userinput>#/sbin/chkconfig kdump off</userinput>
+<userinput></userinput>
+<userinput># AB: adapt GRUB to have serial console for KVM.</userinput>
+<userinput>/bin/sed -e '"'"'/^timeout/a \</userinput>
+<userinput>serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1 \</userinput>
+<userinput>terminal --timeout=5 serial console'"'"' \</userinput>
+<userinput>    -e '"'"'/^splashimage/s/^/#/'"'"' \</userinput>
+<userinput>    -e '"'"'/^hiddenmenu/s/^/#/'"'"' \</userinput>
+<userinput>    -e '"'"'/[  ]\{1,\}kernel/s/rhgb quiet$/console=ttyS0,115200n8/'"'"' \</userinput>
+<userinput>    /boot/grub/grub.conf</userinput>
+<userinput>'</userinput>
+    </screen>
+  </para>
+
+  <para>
+    We end with adding the kickstart profile to the
+    Satellite.  Again we escape the single quotes.
+    <screen>
+&sw1p; <userinput>msat_mk_kp.py \</userinput>
+<userinput>  --kickstart-label simple \</userinput>
+<userinput>  --kickstart-virt none \</userinput>
+<userinput>  --kickstart-tree ks-rhel-x86_64-server-6-6.3 \</userinput>
+<userinput>  --kickstart-satellite psat.example.org \</userinput>
+<userinput>  --kickstart-root redhat \</userinput>
+<userinput>  --kickstart-childchannels '' \</userinput>
+<userinput>  --kickstart-configmgt true \</userinput>
+<userinput>  --kickstart-remotecmds true \</userinput>
+<userinput>  --kickstart-partitioning 'partition pv.00 --size=1 --grow,partition /boot --fstype=ext4 --size=100,volgroup vg_os pv.00,logvol swap --fstype swap --name=swap --vgname=vg_os --size=512,logvol / --fstype ext4 --name=root --vgname=vg_os --size=1024 --grow' \</userinput>
+<userinput>  --kickstart-keys 'RHN-ORG-TRUSTED-SSL-CERT' \</userinput>
+<userinput>  --kickstart-install true \</userinput>
+<userinput>  --kickstart-text true \</userinput>
+<userinput>  --kickstart-url '--url /rhn/kickstart/ks-rhel-x86_64-server-6-6.3' \</userinput>
+<userinput>  --kickstart-lang 'en_US' \</userinput>
+<userinput>  --kickstart-keyboard 'us' \</userinput>
+<userinput>  --kickstart-zerombr 'yes' \</userinput>
+<userinput>  --kickstart-clearpart '--drives=vda --initlabel' \</userinput>
+<userinput>  --kickstart-bootloader '--location mbr --driveorder=vda' \</userinput>
+<userinput>  --kickstart-timezone '--utc Europe/Amsterdam' \</userinput>
+<userinput>  --kickstart-auth '--enablemd5 --enableshadow' \</userinput>
+<userinput>  --kickstart-rootpw '$1$HYefCqjK$DYFA.faC1hU4nUehHgatn1' \</userinput>
+<userinput>  --kickstart-selinux '--enforcing' \</userinput>
+<userinput>  --kickstart-reboot true \</userinput>
+<userinput>  --kickstart-firewall '--enabled' \</userinput>
+<userinput>  --kickstart-skipx true \</userinput>
+<userinput>  --kickstart-key '--skip' \</userinput>
+<userinput>  --kickstart-software '@Base,-bluez-utils,-ccid,-coolkey,-ifd-egate,-pcsc-lite,-yum-updatesd' \</userinput>
+<userinput>  --kickstart-activationkey 1-simple \</userinput>
+<userinput>  --kickstart-script '$SNIPPET('"'"'spacewalk/1/simple'"'"')</userinput>
+<userinput>'</userinput>
+    </screen>
+  </para>
+
+  <para>
+    A good trick to check the result, is to use Cobbler. In
+    the following screendump we show the Cobbler command to
+    obtain the complete kickstart file. Since we have not
+    filled in the network details, these are not yet
+    present.  The <emphasis>2 vertical dots</emphasis> show
+    places where we have truncated the output.
+    <screen>
+&sw1p; <userinput>/usr/bin/cobbler profile getks --name simple:1:Example</userinput>
+# Kickstart config file generated by RHN Satellite Config Management
+# Profile Label : simple
+# Date Created  : 2012-10-18 13:17:12.0
+
+install
+text
+url --url http://psat.example.org/ks/dist/ks-rhel-x86_64-server-6-6.3
+lang en_US
+keyboard us
+zerombr yes
+clearpart --drives=vda --initlabel
+bootloader --location mbr --driveorder=vda
+timezone --utc Europe/Amsterdam
+auth --enablemd5 --enableshadow
+rootpw --iscrypted $1$HYefCqjK$DYFA.faC1hU4nUehHgatn1
+selinux --enforcing
+reboot
+firewall --enabled
+skipx
+key --skip
+partition pv.00 --size=1 --grow
+partition /boot --fstype=ext4 --size=100
+volgroup vg_os pv.00
+logvol swap --fstype swap --name=swap --vgname=vg_os --size=512
+logvol / --fstype ext4 --name=root --vgname=vg_os --size=1024 --grow
+
+
+%packages 
+@Base
+-bluez-utils
+-ccid
+-coolkey
+-ifd-egate
+-pcsc-lite
+-yum-updatesd
+%end
+.
+.
+%post
+# AB: Daemon services that needs to be on or off that come
+# from a base installation.
+#/sbin/chkconfig avahi-daemon off
+#/sbin/chkconfig bluetooth off
+#/sbin/chkconfig cups off
+/sbin/chkconfig firstboot off
+/sbin/chkconfig kudzu off
+/sbin/chkconfig lm_sensors off
+#/sbin/chkconfig kdump off
+
+# AB: adapt GRUB to have serial console for KVM.
+/bin/sed -e '/^timeout/a \
+serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1 \
+terminal --timeout=5 serial console' \
+    -e '/^splashimage/s/^/#/' \
+    -e '/^hiddenmenu/s/^/#/' \
+    -e '/[  ]\{1,\}kernel/s/rhgb quiet$/console=ttyS0,115200n8/' \
+    /boot/grub/grub.conf
+%end
+
+%post
+.
+.
+    </screen>
+  </para>
+
+</section>

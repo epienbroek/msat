@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="sect-msat-guide-We_Need_Feedback" lang="en-US">
+	<title>We Need Feedback!</title>
+	 <indexterm>
+		<primary>feedback</primary>
+		 <secondary>contact information for this manual</secondary>
+
+	</indexterm>
+	 <para>
+		Although we put time and effort in this guide, it is very possible that errors have slipped in. We like to hear about them on <email>msat.disruptivefoss@gmail.com</email>
+		 . Please put <emphasis role="bold">msat-guide error</emphasis> in the subject field of the email.
+	</para>
+	 <para>
+		Furthermore, for suggestions, we would also like to hear from you on <email>msat.disruptivefoss@gmail.com</email>
+		 . Please put <emphasis role="bold">msat-guide suggestion</emphasis> in the subject field of the email.
+	</para>
+</section>
+
+

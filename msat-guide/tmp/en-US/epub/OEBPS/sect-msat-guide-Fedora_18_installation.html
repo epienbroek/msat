@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1.3. Fedora 18 installation</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 2.8" /><meta name="package" content="" /></head><body class="draft "><div class="section" id="sect-msat-guide-Fedora_18_installation"><div class="titlepage"><div><div><h1 class="title" id="sect-msat-guide-Fedora_18_installation">1.3. Fedora 18 installation</h1></div></div></div><div class="table" id="tabl-msat-guide-Fedora_18_installation-Time_needed"><h6>Table 1.4. Time needed</h6><div class="table-contents"><table summary="Time needed" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+						action
+					</th><th style="text-align: left" valign="top">
+						time
+					</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+						Fedora 18 installation
+					</td><td style="text-align: left" valign="top">
+						30 minutes
+					</td></tr></tbody></table></div></div><div class="para">
+		We use the Fedora 18 OS, as downloaded from <a href="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download Fedora 18 x86_64 ISO</a>. We do an interactive installation. Since we do a server installation, the Desktop parts (groups) are skipped.
+	</div><div class="para">
+		Explanation of the parameters in the <code class="command">virt-install</code> command: 
+		<div class="itemizedlist"><ul><li class="listitem"><div class="para">
+					d19sw1, d (development), 19 (version 1.9), sw (spacewalk), 1 (first server).
+				</div></li><li class="listitem"><div class="para">
+					mac=52:54:00:a8:05:0b, 192.168.5.11 -&gt; 00:a8:05:0b, the 52:54:00 is obligatory by libvirt definition.
+				</div></li></ul></div>
+		 To make it easy to verify the <code class="command">virt-install</code> options in the <span class="emphasis"><em>virt-install man page</em></span>, we specify them in the same order as they appear in the man page.
+	</div><div class="para">
+		The installation is started with: 
+<pre class="screen">
+<code class="prompt">server#</code> <strong class="userinput"><code>virt-install \</code></strong>
+  <strong class="userinput"><code>--connect qemu:///system \</code></strong>
+  <strong class="userinput"><code>--name=d19sw1 \</code></strong>
+  <strong class="userinput"><code>--ram=4096 \</code></strong>
+  <strong class="userinput"><code>--arch=x86_64 \</code></strong>
+  <strong class="userinput"><code>--description="Development Spacewalk server version 1.9" \</code></strong>
+  <strong class="userinput"><code>--cdrom /var/isos/Fedora-18-x86_64-DVD.iso \</code></strong>
+  <strong class="userinput"><code>--os-type=linux \</code></strong>
+  <strong class="userinput"><code>--os-variant=fedora18 \</code></strong>
+  <strong class="userinput"><code>--disk path=/dev/b/sw,device=disk,bus=scsi \</code></strong>
+  <strong class="userinput"><code>--network=network=dmsat1,mac=52:54:00:a8:05:0b \</code></strong>
+  <strong class="userinput"><code>--graphics vnc \</code></strong>
+  <strong class="userinput"><code>--hvm \</code></strong>
+  <strong class="userinput"><code>--autostart</code></strong>
+.. output skipped ..
+</pre>
+		 The interactive installation is started. Answer the questions with the parameter values as specified below.
+	</div><div class="para">
+		<div class="table" id="tabl-msat-guide-Fedora_18_installation-Installation_parameters"><h6>Table 1.5. Installation parameters</h6><div class="table-contents"><table summary="Installation parameters" border="1"><colgroup><col width="33%" style="text-align: left" class="c1" /><col width="67%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+							question
+						</th><th style="text-align: left" valign="top">
+							answer
+						</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+							language
+						</td><td style="text-align: left" valign="top">
+							English
+						</td></tr><tr><td style="text-align: left" valign="top">
+							Hostname
+						</td><td style="text-align: left" valign="top">
+							<code class="systemitem">d19sw1.dmsat1.org</code>
+						</td></tr><tr><td style="text-align: left" valign="top">
+							IPv4 settings
+						</td><td style="text-align: left" valign="top">
+							
+						</td></tr><tr><td style="text-align: left" valign="top">
+							Date &amp; Time
+						</td><td style="text-align: left" valign="top">
+							Europe/Amsterdam
+						</td></tr><tr><td style="text-align: left" valign="top">
+							Software selection
+						</td><td style="text-align: left" valign="top">
+							Minimal install
+						</td></tr></tbody></table></div></div>
+
+	</div><div class="para">
+		With respect to partitioning, we don't need a <code class="filename">/home</code> partition. Consequently, it needs to be removed. The trick is to let the installer choose the partitioning automatically and then remove the space assigned to <code class="filename">/home</code> and add it to <code class="filename">/</code>. We want to end up with: 
+		<div class="table" id="tabl-msat-guide-Fedora_18_installation-Partitioning_layout"><h6>Table 1.6. Partitioning layout</h6><div class="table-contents"><table summary="Partitioning layout" border="1"><colgroup><col width="33%" style="text-align: left" class="c1" /><col width="33%" style="text-align: left" class="c2" /><col width="33%" style="text-align: left" class="c3" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+							device
+						</th><th style="text-align: left" valign="top">
+							mountpoint
+						</th><th style="text-align: left" valign="top">
+							size
+						</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+							<code class="filename">/dev/sda1</code>
+						</td><td style="text-align: left" valign="top">
+							<code class="filename">/boot</code>
+						</td><td style="text-align: left" valign="top">
+							500 MB
+						</td></tr><tr><td style="text-align: left" valign="top">
+							<code class="filename">/dev/sda2</code>
+						</td><td style="text-align: left" valign="top">
+							<code class="filename">PVS</code>
+						</td><td style="text-align: left" valign="top">
+							300 GB (remainder of disk)
+						</td></tr><tr><td style="text-align: left" valign="top">
+							<code class="filename">/dev/fedora_d19sw1/swap</code>
+						</td><td style="text-align: left" valign="top">
+							<code class="filename">None</code>
+						</td><td style="text-align: left" valign="top">
+							3968 MB
+						</td></tr><tr><td style="text-align: left" valign="top">
+							<code class="filename">/dev/fedora_d19sw1/root</code>
+						</td><td style="text-align: left" valign="top">
+							<code class="filename">/</code>
+						</td><td style="text-align: left" valign="top">
+							295524 MB (remainder of disk)
+						</td></tr></tbody></table></div></div>
+
+	</div><div class="para">
+		We choose to update the Fedora 18 installation here with the latest patches: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>yum update</code></strong>
+.. takes a while, about 10 minutes ..
+</pre>
+
+	</div><div class="para">
+		After the installation we want to add some packages, do as <code class="systemitem">root</code>: 
+<pre class="screen">
+<strong class="userinput"><code>yum -y install bind-utils</code></strong>
+<strong class="userinput"><code>yum -y install vim-enhanced</code></strong>
+<strong class="userinput"><code>yum -y install tree</code></strong>
+<strong class="userinput"><code>yum -y install screen</code></strong>
+<strong class="userinput"><code>yum -y install net-tools</code></strong>
+<strong class="userinput"><code>yum -y install tar</code></strong>
+<strong class="userinput"><code>yum -y install mailx</code></strong>
+<strong class="userinput"><code>yum -y install strace</code></strong>
+<strong class="userinput"><code>yum -y install setroubleshoot</code></strong>
+<strong class="userinput"><code>yum -y install syslinux</code></strong>
+<strong class="userinput"><code>yum -y install bind-chroot</code></strong>
+<strong class="userinput"><code>yum -y install mlocate</code></strong>
+<strong class="userinput"><code>yum -y install wget</code></strong>
+.. output of commands skipped ..
+<strong class="userinput"><code>reboot</code></strong>
+.. only if new kernel, rpm -qa | grep kernel ..
+</pre>
+		 We want to enable the virtual console on the KVM. This means that Grub2 and the kernel must know about the serial console. Adapt the <code class="filename">/etc/default/grub</code> file to include the following lines: 
+<pre class="screen">
+GRUB_CMDLINE_LINUX="rd.lvm.lv=fedora_d19sw1/swap rd.md=0 rd.dm=0 rd.lvm.lv=fedora_d19sw1/root $([ -x /usr/sbin/rhcrashkernel-param ] &amp;&amp; /usr/sbin/rhcrashkernel-param || :) rd.luks=0 vconsole.keymap=us console=ttyS0,115200n8"
+GRUB_TERMINAL=serial
+GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
+</pre>
+		 Then, from the root prompt: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>grub2-mkconfig -o /boot/grub2/grub.cfg</code></strong>
+Generating grub.cfg ...
+Found linux image: /boot/vmlinuz-3.6.10-4.fc18.x86_64
+Found initrd image: /boot/initramfs-3.6.10-4.fc18.x86_64.img
+done
+</pre>
+		 Add ttyS0 to <code class="filename">/etc/securetty</code>: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>echo "ttyS0" &gt;&gt; /etc/securetty</code></strong></pre>
+		 Enable the service in Fedora 18 with systemd: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cd /etc/systemd/system/getty.target.wants</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>ln -sf /usr/lib/systemd/system/serial-getty@.service serial-getty@ttyS0.service</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>systemctl start serial-getty@ttyS0.service</code></strong></pre>
+		 Configure the firewall for Spacewalk and DNS, as <code class="systemitem">root</code>: 
+<pre class="screen">
+<strong class="userinput"><code>firewall-cmd --permanent --add-service=http</code></strong>
+<strong class="userinput"><code>firewall-cmd --permanent --add-service=https</code></strong>
+<strong class="userinput"><code>firewall-cmd --permanent --add-service=dns</code></strong>
+<strong class="userinput"><code>firewall-cmd --permanent --add-port=5222/tcp</code></strong>
+<strong class="userinput"><code>firewall-cmd --permanent --add-port=5269/tcp</code></strong>
+<strong class="userinput"><code>firewall-cmd --reload</code></strong>
+<strong class="userinput"><code>firewall-cmd --list-all</code></strong>
+public
+  interfaces: eth0
+  services: mdns http dhcpv6-client https ssh dns
+  ports: 6269/tcp 5222/tcp
+  forward-ports:
+  icmp-blocks:
+</pre>
+
+	</div></div></body></html>

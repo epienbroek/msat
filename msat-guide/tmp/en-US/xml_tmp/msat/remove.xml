@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+  <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+  %BOOK_ENTITIES;
+]>
+<section id="msat-remove">
+  <title>Remove commands</title>
+
+  <para>
+    This section provides information on the commands that
+    can be used to remove data elements. Data elements are,
+    for example, config files, config channels, activation
+    keys, and kickstart profiles.
+
+    The list of commands is:
+    <variablelist>
+      <varlistentry>
+        <term><command>msat_rm_ak.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified activation
+            key.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_cc_cf.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified config file,
+            or list of comma separated config files from the
+            specified config channel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_cc.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified config
+            channel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_cs.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified cobbler
+            snippet.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_kp.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified kickstart
+            key.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_sc.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified software
+            channel.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command>msat_rm_sys.py</command></term>
+        <listitem>
+          <para>
+            This command removes the specified system.
+            Inside Satellite systems are known by unique ID.
+            We search for the ID's belonging by the name and
+            delete all systems. So, if a system is
+            registered multiple times under the same name,
+            all are deleted.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para>
+    To illustrate the usage of the above commands, we show a
+    number of examples here. The commands only work if a
+    working Satellite server is available.
+  </para>
+
+  <para>
+    In order to demonstrate most of the commands, we have
+    installed a demonstration system called
+    <hardware>&t1;</hardware>. This system is installed
+    with help of the Satellite server, using the
+    <emphasis>simple</emphasis> kickstart profile. On the
+    system we can verify the following items:
+    <screen>
+&t1p; <userinput>grep 'Profile Label' *</userinput>
+cobbler.ks:# Profile Label : simple
+&t1p; <userinput>rhncfg-client list</userinput>
+Using server name psat.example.org
+DoFoS   Config Channel   File
+F           simple     /etc/hosts
+F           simple     /etc/init/serial.conf
+F           simple     /etc/sysconfig/iptables
+    </screen>
+  </para>
+
+  <para>
+    First, we delete a config file. We choose
+    <filename>/etc/hosts</filename>.
+    <screen>
+&sw1p; <userinput>msat_rm_cc_cf.py</userinput>
+Usage: delete config file(s) from config channel
+
+msat_rm_cc_cf.py: error: Error: specify label, -l or --configchannel-label
+&sw1p; <userinput>msat_rm_cc_cf.py -l simple</userinput>
+Usage: delete config file(s) from config channel
+
+msat_rm_cc_cf.py: error: Error: specify path, -n or --configpath-path
+&sw1p; <userinput>msat_rm_cc_cf.py -l simple -n /etc/hosts</userinput>
+
+&t1p; <userinput>rhncfg-client list</userinput>
+Using server name psat.example.org
+DoFoS   Config Channel   File
+F           simple     /etc/init/serial.conf
+F           simple     /etc/sysconfig/iptables
+    </screen>
+    Clearly, it works as expected. Note that the
+    <filename>/etc/hosts</filename> is still present on the
+    <hardware>&t1;</hardware>.
+  </para>
+
+  <para>
+    Instead of removing the config file one by one, it is
+    possible to delete the config channel at once. The
+    contained config files are automatically removed too.
+    <screen>
+&sw1p; <userinput>msat_rm_cc.py -l simple</userinput>
+.. no output ..
+
+&sw1p; msat_ls_cc.py | grep simple
+.. no output ..
+
+&t1p; <userinput>rhncfg-client list</userinput>
+Using server name psat.example.org
+No managed files.
+    </screen>
+  </para>
+
+  <para>
+    From the hierarchy of the data elements of the
+    <emphasis>simple</emphasis> kickstart profile, we have left:
+    <screen>
+&sw1p; <userinput>msat_ls_kp_hy.py -l simple</userinput>
+simple
+  simple
+  1-simple
+    </screen>
+    We now also remove the activation key,
+    <emphasis>1-simple</emphasis>. Note that on the command
+    line option, <option>-l</option> or
+    <option>--activationkey-label</option>, we specify the
+    '1-'.
+    <screen>
+&sw1p; <userinput>msat_rm_ak.py -l 1-simple</userinput>
+.. no output ..
+    </screen>
+  </para>
+
+  <para>
+    The Cobbler snippet <emphasis>simple</emphasis> can be
+    used by other kickstart profiles too. So, it is
+    dangerous to just delete it. But, by naming convention
+    we know that it belongs to the
+    <emphasis>simple</emphasis> kickstart profile, so it is
+    save to remove it.
+    <screen>
+&sw1p; <userinput>msat_rm_cs.py -n simple</userinput>
+.. no output ..
+    </screen>
+  </para>
+
+  <para>
+    Now, all that is left from the kickstart profile's
+    hierarchy, is the kickstart profile itself. We remove it
+    here.
+    <screen>
+&sw1p; <userinput>msat_rm_kp.py -l simple</userinput>
+.. no output ..
+    </screen>
+  </para>
+
+  <para>
+    What is still left from the kickstart profile
+    <emphasis>simple</emphasis>, is the system
+    <hardware>&t1;</hardware> that was installed using it.
+    We can show this with:
+    <screen>
+&sw1p; <userinput>msat_ls_sys.py</userinput>
+id: 1000010000, name: test01.example.org
+    </screen>
+    Now, we remove the system from the Satellite too.
+    <screen>
+&sw1p; <userinput>msat_rm_sys.py -n test01.example.org</userinput>
+Removing the following systems (ID's):
+1000010004
+    </screen>
+  </para>
+
+</section>

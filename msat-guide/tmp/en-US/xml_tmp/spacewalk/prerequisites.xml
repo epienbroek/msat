@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="spacewalk-prerequisites">
+	<title>Prerequisites</title>
+	 <table id="tabl-msat-guide-Prerequisites-Time_needed">
+		<title>Time needed</title>
+		 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+			<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+			 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+			 <thead valign="top">
+				<row>
+					<entry>
+						action
+					</entry>
+					 <entry>
+						time
+					</entry>
+
+				</row>
+
+			</thead>
+			 <tbody valign="top">
+				<row>
+					<entry>
+						Fedora 18 download
+					</entry>
+					 <entry>
+						76 minutes
+					</entry>
+
+				</row>
+
+			</tbody>
+
+		</tgroup>
+
+	</table>
+	 <para>
+		On the host system, make a location where the downloaded ISO can be stored: 
+<screen>
+&srvprompt; <userinput>mkdir /var/isos</userinput></screen>
+		 <itemizedlist>
+			<listitem>
+				<para>
+					Download the Fedora 18 DVD, see <ulink url="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download Fedora 18</ulink> and store it in <filename class="directory">/var/isos</filename>.
+				</para>
+
+			</listitem>
+
+		</itemizedlist>
+		 After the download, our <filename class="directory">/var/isos</filename> is: 
+<screen>
+&srvprompt; <userinput>ls -l /var/isos | grep Fedora-18</userinput>
+-rw-------. 1 qemu qemu 4573888512 Jan 15 20:30 Fedora-18-x86_64-DVD.iso
+</screen>
+
+	</para>
+
+</section>
+
+

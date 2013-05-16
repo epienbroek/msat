@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1.9. MSAT Demo</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 2.8" /><meta name="package" content="" /></head><body class="draft "><div class="section" id="sect-msat-guide-MSAT_Demo"><div class="titlepage"><div><div><h1 class="title" id="sect-msat-guide-MSAT_Demo">1.9. MSAT Demo</h1></div></div></div><div class="table" id="tabl-msat-guide-MSAT_Demo-Time_needed"><h6>Table 1.25. Time needed</h6><div class="table-contents"><table summary="Time needed" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+						action
+					</th><th style="text-align: left" valign="top">
+						time
+					</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+						Save Spacewalk content
+					</td><td style="text-align: left" valign="top">
+						1 minute
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Remove Spacewalk content
+					</td><td style="text-align: left" valign="top">
+						1 minute
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Recreate Spacewalk content
+					</td><td style="text-align: left" valign="top">
+						1 minute
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Install test system
+					</td><td style="text-align: left" valign="top">
+						15 minutes
+					</td></tr></tbody></table></div></div><div class="para">
+		Since we have a functional Spacewalk server, we can demonstrate how the MSAT scripts function. In later chapters detailed information is provided about the MSAT scripts. Here, we merely demonstrate how we can create the same <span class="bold bold"><strong>test01</strong></span> kickstart profile in a scripted way.
+	</div><div class="para">
+		First, we start by saving the current content of the Spacewalk by saving <span class="bold bold"><strong>test01</strong></span>. 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>msat_ls_kp.py</code></strong>
+test01
+
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>msat_wr_kp_hy.py -l test01</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>tree --charset=ASCII -F --noreport test01</code></strong>
+test01
+|-- ak-test01.sh*
+|-- cc-test01.sh*
+`-- kp-test01.sh*
+
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cat test01/kp-test01.sh</code></strong>
+#!/bin/bash
+#
+# SCRIPT
+#   kp-test01.sh
+# DESCRIPTION
+#   This script creates the test01
+#   kickstart profile.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+#   If you put single quotes around value, but forget to
+#   escape embedded single quotes, this script will fail.
+#   Escaping works like this:
+#   $ echo 'don'"'"'t'
+#   don't
+#   So ' -&gt; '"'"'
+#   Complicated huh?
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-05-10 17:17
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   kp-test01.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   kp-test01.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+ORGNUM=$(msat_ls_org.py)
+
+SATELLITE=$(msat_ls_sn.py)
+
+msat_mk_kp.py \
+  --kickstart-label "test01" \
+  --kickstart-virt none \
+  --kickstart-tree ks-centos-x86_64-server-5u8 \
+  --kickstart-satellite $SATELLITE \
+  --kickstart-root redhat \
+  --kickstart-childchannels '' \
+  --kickstart-configmgt true \
+  --kickstart-remotecmds true \
+  --kickstart-partitioning 'part /boot --fstype=ext3 --size=200,part pv.01 --size=1 --grow,part swap --size=512,volgroup myvg pv.01,logvol / --vgname=myvg --name=rootvol --size=1 --grow' \
+  --kickstart-keys 'RPM-GPG-KEY-EPEL-5,RPM-GPG-KEY-spacewalk-2012,RPM-GPG-KEY-CentOS-5,RHN-ORG-TRUSTED-SSL-CERT' \
+  --kickstart-install true \
+  --kickstart-text true \
+  --kickstart-url '--url /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8' \
+  --kickstart-lang 'en_US' \
+  --kickstart-keyboard 'us' \
+  --kickstart-zerombr true \
+  --kickstart-clearpart '--all' \
+  --kickstart-bootloader '--location mbr' \
+  --kickstart-timezone '--utc Europe/Amsterdam' \
+  --kickstart-auth '--enablemd5 --enableshadow' \
+  --kickstart-rootpw '$1$yfdvYZ2s$mXFhCqaiSjZ0mt9M3ZKFr0' \
+  --kickstart-selinux '--enforcing' \
+  --kickstart-reboot true \
+  --kickstart-firewall '--enabled' \
+  --kickstart-skipx true \
+  --kickstart-key '--skip' \
+  --kickstart-software '@ Base' \
+  --kickstart-activationkey $ORGNUM-test01 \
+  --kickstart-script '/bin/rm /etc/yum.repos.d/CentOS-*.repo'
+</pre>
+
+	</div><div class="para">
+		As one can see, the kickstart profile and the items it refers to are saved in the <code class="filename">test01</code> directory. Examining the content of, for example, the <code class="filename">test01/kp-test01.sh</code> script, shows that the items are saved in regeneration scripts. This means, if the script is run, it fills the Spacewalk server with the item.
+	</div><div class="important"><div class="admonition_header"><h2>Order of running scripts</h2></div><div class="admonition"><div class="para">
+			The kickstart profile depends on the activation key. The activation key, on its turn, depends on the config channel with config file. Running the kickstart regeneration script first, results in an error. It can not find the specified activation key.
+		</div></div></div><div class="para">
+		Now, it is time to unregister the already installed system. We do this with: <span class="guimenu"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Spacewalk Login: example</strong></span> → <span class="guimenuitem"><strong>Password: redhat</strong></span>+<span class="guibutton"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Systems</strong></span> → <span class="guimenuitem"><strong>dmm01.dmsat1.org</strong></span> → <span class="guimenuitem"><strong>delete system</strong></span> → <span class="guimenuitem"><strong>Delete Profile</strong></span>
+	</div><div class="para">
+		Here, we show how to delete the system items (system in Cobbler, kickstart profiles, activation keys, config channels) in the Spacewalk server. 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler system list</code></strong>
+   SpacewalkDefaultOrganization_kvm_dmm01
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler system remove --name SpacewalkDefaultOrganization_kvm_dmm01</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>msat_rm_kp_all.sh; msat_rm_ak_all.sh; msat_rm_cc_all.sh</code></strong>
+</pre>
+
+	</div><div class="warning"><div class="admonition_header"><h2>Run msat_rm_*_all.sh only on a test Spacewalk</h2></div><div class="admonition"><div class="para">
+			Although very handy during a development phase of a system, the <code class="command">msat_rm_*_all.sh</code> commands completely remove all items (kickstart profiles, activation keys, config channels) in the Spacewalk server. Do this on a production system to find out that all your system definitions are gone. Even if you can restore it with MSAT regeneration scripts, still all the production systems need to be reregistered on the Spacewalk server!
+		</div></div></div><div class="para">
+		Now, we run the regeneration scripts in the right order to create the system items again. The right order is automatically executed by <code class="command">msat_mk_kp_hy.sh</code>. 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cd</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>msat_mk_kp_hy.sh -d /root/test01</code></strong>
+/usr/local/bin/msat/msat_mk_kp_hy.sh: line 134: ./cs*: No such file or directory
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>./cobbler-dmm01.sh</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos5u8-test01-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_dmm01" --tempdir=/tmp</code></strong>
+.. output skipped ..
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>scp /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso root@192.168.5.1:/tmp</code></strong>
+root@192.168.5.1's password: <strong class="userinput"><code>redhat</code></strong>
+centos5u8-test01-kvm.iso                      100%   14MB  14.3MB/s   00:00
+</pre>
+
+	</div><div class="para">
+		The installation is started with: 
+<pre class="screen">
+<code class="prompt">server#</code> <strong class="userinput"><code>virt-install \</code></strong>
+  <strong class="userinput"><code>--connect qemu:///system \</code></strong>
+  <strong class="userinput"><code>--name=dmm01 \</code></strong>
+  <strong class="userinput"><code>--ram=512 \</code></strong>
+  <strong class="userinput"><code>--arch=x86_64 \</code></strong>
+  <strong class="userinput"><code>--description="Provisioning test machine" \</code></strong>
+  <strong class="userinput"><code>--cdrom /tmp/centos5u8-test01-kvm.iso \</code></strong>
+  <strong class="userinput"><code>--os-type=linux \</code></strong>
+  <strong class="userinput"><code>--os-variant=rhel5.4 \</code></strong>
+  <strong class="userinput"><code>--disk path=/dev/e/mm,device=disk,bus=scsi \</code></strong>
+  <strong class="userinput"><code>--network=network=dmsat1,mac=52:54:00:a8:05:64 \</code></strong>
+  <strong class="userinput"><code>--graphics vnc \</code></strong>
+  <strong class="userinput"><code>--hvm \</code></strong>
+  <strong class="userinput"><code>--autostart</code></strong>
+.. output skipped, about 10 minutes ..
+</pre>
+		 Select <span class="bold bold"><strong>SpacewalkDefaultOrganization_kvm_dmm01</strong></span> and press <span class="keycap"><strong>Enter</strong></span>.
+	</div></div></body></html>

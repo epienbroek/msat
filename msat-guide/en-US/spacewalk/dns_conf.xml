@@ -1,0 +1,477 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="spacewalk-dns_conf">
+	<title>DNS configuration</title>
+	 <table id="tabl-msat-guide-DNS_configuration-Time_needed">
+		<title>Time needed</title>
+		 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+			<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+			 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+			 <thead valign="top">
+				<row>
+					<entry>
+						action
+					</entry>
+					 <entry>
+						time
+					</entry>
+
+				</row>
+
+			</thead>
+			 <tbody valign="top">
+				<row>
+					<entry>
+						DNS configuration
+					</entry>
+					 <entry>
+						10 minutes
+					</entry>
+
+				</row>
+
+			</tbody>
+
+		</tgroup>
+
+	</table>
+	 <para>
+		First of all, to be able to configure DNS, we need the software, if not yet available: 
+<screen>
+&sw1p; <userinput>yum install bind-chroot</userinput>
+.. output skipped ..
+</screen>
+
+	</para>
+	 <para>
+		We want to set up the Spacewalk server as DNS server. In order for Spacewalk to function correctly, one needs DNS. During registration of provisioned hosts, Spacewalk does a reverse DNS query for the hostname of the registering host. In this section we describe how we configure DNS in the <emphasis>dmsat1</emphasis> environment.
+	</para>
+	 <para>
+		We want DNS to behave in the following way: 
+		<itemizedlist>
+			<listitem>
+				<para>
+					All DNS queries outside our domain, <systemitem class="domainname">dmsat1.org</systemitem>, must go to the upstream DNS server, <systemitem class="ipaddress">192.168.1.1</systemitem>. Consequently, we are a forwarding DNS server. The result queries must be cached.
+				</para>
+
+			</listitem>
+			 <listitem>
+				<para>
+					We want logging.
+				</para>
+
+			</listitem>
+			 <listitem>
+				<para>
+					The Spacewalk server is the name authority for <systemitem class="domainname">dmsat1.org</systemitem>.
+				</para>
+
+			</listitem>
+
+		</itemizedlist>
+
+	</para>
+	 <para>
+		Since we also want to keep track of the virtual MAC addresses, we use the main DNS zone file for keeping track of this administration.
+	</para>
+	 <para>
+		We just show all the DNS files here and explain afterwards how the directory structure looks: 
+<screen>
+&sw1p; <userinput>cat /var/named/chroot/etc/named.conf</userinput>
+// /etc/named.conf
+
+options {
+  /*
+   * Check names following RFC 952 and RFC 1123. The
+   * master has strict checking. Incorrect names make
+   * the nameserver fail. The slaves receive the names
+   * from the master, hence those names are not
+   * checked.
+   */
+  check-names master fail;
+  check-names slave ignore;
+  listen-on port 53 {
+    192.168.5.11;
+    127.0.0.1;
+  };
+  //listen-on-v6 port 53 { ::1; };
+  directory   "/var/named";
+  dump-file   "/var/named/data/cache_dump.db";
+  statistics-file "/var/named/data/named_stats.txt";
+  memstatistics-file "/var/named/data/named_mem_stats.txt";
+  /*
+   * To start out, we want all hosts to be able to
+   * query this nameserver.
+   */
+  //allow-query     { localhost; };
+  allow-query     { any; };
+  //allow-query-on  { any; };
+  //allow-query-on  { 192.168.1.16; 127.0.0.1; };
+  recursion yes;
+};
+
+/*
+ * Allowable log levels:
+ * critical
+ * error
+ * warning
+ * notice
+ * info
+ * debug [level]
+ * dynamic
+ */
+
+/*
+ * Allowable log categories:
+ * client
+ * config
+ * database
+ * default (all categories except queries)
+ * delegation-only
+ * dispatch
+ * dnssec
+ * general
+ * lame-servers
+ * network
+ * notify
+ * queries
+ * resolver
+ * security
+ * unmatched
+ * update
+ * update-security
+ * xfer-in
+ * xfer-out
+ */
+
+logging {
+  channel default_debug {
+    file "/var/log/named.log" versions 5 size 5m;
+    severity dynamic;
+    print-time yes;
+    print-severity yes;
+    print-category yes;
+  };
+
+  category default { default_debug; };
+  category queries { default_debug; };
+};
+
+/*
+ * The '.' represents all other zones. We depend on the
+ * upstream DNS server, 192.168.1.1, so all requests go
+ * there. The answers are cached.
+ */
+zone "." IN {
+  type forward;
+  forward first;
+  forwarders { 192.168.1.1; };
+};
+
+/*
+ * Instead of including named.rfc1912.zones, we define our
+ * localhost zones ourselves below.
+ */
+//include "/etc/named.rfc1912.zones";
+
+zone "localhost.localdomain." IN {
+  type master;
+  file "named.localhost";
+  allow-update { none; };
+};
+
+zone "localhost." IN {
+  type master;
+  file "named.localhost";
+  allow-update { none; };
+};
+
+zone "127.in-addr.arpa." IN {
+  type master;
+  file "127.in-addr.arpa";
+  allow-update { none; };
+};
+
+zone "dmsat1.org." IN {
+  type master;
+  file "dmsat1.org.zone";
+  notify yes;
+  allow-transfer { any; };
+};
+
+zone "5.168.192.in-addr.arpa." IN {
+  type master;
+  file "192.168.5.in-addr.arpa";
+  notify yes;
+  allow-transfer { any; };
+};
+</screen>
+		 
+<screen>
+&sw1p; <userinput>cat /var/named/chroot/var/named/127.in-addr.arpa</userinput>
+$TTL    86400
+@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+        2012012300      ; serial, format: YYYYMMDDNN, where
+      ; NN is the daily sequence number.
+      ; After editing this file, always
+      ; update this serial number to give
+      ; slaves a chance to keep
+      ; synchronized.
+        3H              ; refresh. The refresh interval
+      ; tells a slave for the zone how
+      ; often to check that the data for
+      ; this zone is up to date.
+        15M             ; retry. If a slave fails to connect
+      ; to the master, it will retry in
+      ; this amount of time. So here it is
+      ; 15 minutes.
+        1W              ; expiry. If a slave did not contact
+      ; the server for this amount of
+      ; time, its records become useless,
+      ; i.e. are expired.
+        1D )            ; minimum. TTL for negative
+      ; responses of this nameserver for
+      ; authoriative requests. So the
+      ; client must not ask for the same
+      ; RR (Resource Record) it got a
+      ; negative response for in the
+      ; specified amount of time.
+
+;
+; @ is implied!
+;
+        IN NS   d19sw1.dmsat1.org.
+
+;
+; 127.0.0.0/8
+;
+; Satellite.
+1.0.0   IN  PTR localhost.localdomain.
+</screen>
+		 
+<screen>
+&sw1p; <userinput>cat /var/named/chroot/var/named/192.168.5.in-addr.arpa</userinput>
+$TTL    86400
+@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+        2012012300      ; serial, format: YYYYMMDDNN, where
+      ; NN is the daily sequence number.
+      ; After editing this file, always
+      ; update this serial number to give
+      ; slaves a chance to keep
+      ; synchronized.
+        3H              ; refresh. The refresh interval
+      ; tells a slave for the zone how
+      ; often to check that the data for
+      ; this zone is up to date.
+        15M             ; retry. If a slave fails to connect
+      ; to the master, it will retry in
+      ; this amount of time. So here it is
+      ; 15 minutes.
+        1W              ; expiry. If a slave did not contact
+      ; the server for this amount of
+      ; time, its records become useless,
+      ; i.e. are expired.
+        1D )            ; minimum. TTL for negative
+      ; responses of this nameserver for
+      ; authoriative requests. So the
+      ; client must not ask for the same
+      ; RR (Resource Record) it got a
+      ; negative response for in the
+      ; specified amount of time.
+
+;
+; @ (short for domain name) is implied!
+;
+        IN NS   d19sw1.dmsat1.org.
+
+;
+; 192.168.5.0/24
+;
+
+; Development Spacewalk server.
+10  IN  PTR d19sw0.dmsat1.org.
+11  IN  PTR d19sw1.dmsat1.org.
+12  IN  PTR d19sw2.dmsat1.org.
+100 IN  PTR &t1;.dmsat1.org.
+</screen>
+		 
+<screen>
+&sw1p; <userinput>cat /var/named/chroot/var/named/dmsat1.org.zone</userinput>
+$TTL    86400
+@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+        2012012300      ; serial, format: YYYYMMDDNN, where
+      ; NN is the daily sequence number.
+      ; After editing this file, always
+      ; update this serial number to give
+      ; slaves a chance to keep
+      ; synchronized.
+        3H              ; refresh. The refresh interval
+      ; tells a slave for the zone how
+      ; often to check that the data for
+      ; this zone is up to date.
+        15M             ; retry. If a slave fails to connect
+      ; to the master, it will retry in
+      ; this amount of time. So here it is
+      ; 15 minutes.
+        1W              ; expiry. If a slave did not contact
+      ; the server for this amount of
+      ; time, its records become useless,
+      ; i.e. are expired.
+        1D )            ; minimum. TTL for negative
+      ; responses of this nameserver for
+      ; authoriative requests. So the
+      ; client must not ask for the same
+      ; RR (Resource Record) it got a
+      ; negative response for in the
+      ; specified amount of time.
+
+;
+; @ (short for domain name) is implied!
+;
+        IN NS   d19sw1.dmsat1.org.
+
+;
+; 192.168.5.0/24
+;
+
+;network   IN      A       192.168.5.0
+;gateway   IN      A       192.168.5.1
+; MAC_ETH0=52:54:00:a8:05:0a
+d19sw0     IN      A       192.168.5.10
+; MAC_ETH0=52:54:00:a8:05:0b
+d19sw1     IN      A       192.168.5.11
+; MAC_ETH0=52:54:00:a8:05:0c
+d19sw2     IN      A       192.168.5.12
+; MAC_ETH0=52:54:00:a8:05:64
+&t1;      IN      A       192.168.5.100
+;broadcast IN      A       192.168.5.255
+</screen>
+		 
+<screen>
+&sw1p; <userinput>cat /var/named/chroot/var/named/named.localhost</userinput>
+$TTL    86400
+@       IN SOA @ rname.invalid. (
+        2012012300      ; serial, format: YYYYMMDDNN, where
+      ; NN is the daily sequence number.
+      ; After editing this file, always
+      ; update this serial number to give
+      ; slaves a chance to keep
+      ; synchronized.
+        3H              ; refresh. The refresh interval
+      ; tells a slave for the zone how
+      ; often to check that the data for
+      ; this zone is up to date.
+        15M             ; retry. If a slave fails to connect
+      ; to the master, it will retry in
+      ; this amount of time. So here it is
+      ; 15 minutes.
+        1W              ; expiry. If a slave did not contact
+      ; the server for this amount of
+      ; time, its records become useless,
+      ; i.e. are expired.
+        1D )            ; minimum. TTL for negative
+      ; responses of this nameserver for
+      ; authoriative requests. So the
+      ; client must not ask for the same
+      ; RR (Resource Record) it got a
+      ; negative response for in the
+      ; specified amount of time.
+
+;
+; @ is implied!
+;
+        NS  @
+    A   127.0.0.1
+    AAAA    ::1
+</screen>
+
+	</para>
+	 <para>
+		In a directory tree, the structure looks like this: 
+<screen>
+&sw1p; <userinput>tree --charset=ASCII -F /var/named/chroot</userinput>
+/var/named/chroot
+|-- dev/
+|   |-- null
+|   |-- random
+|   `-- zero
+|-- etc/
+|   |-- localtime
+|   |-- named/
+|   |-- <emphasis role="bold">named.conf</emphasis>
+|   |-- named.iscdlv.key
+|   |-- named.rfc1912.zones
+|   |-- named.root.key
+|   |-- pki/
+|   |   `-- dnssec-keys/
+|   `-- rndc.key
+|-- usr/
+|   `-- lib64/
+|       `-- bind/
+`-- var/
+    |-- log/
+    |   `-- named.log
+    |-- named/
+    |   |-- <emphasis role="bold">127.in-addr.arpa</emphasis>
+    |   |-- <emphasis role="bold">192.168.5.in-addr.arpa</emphasis>
+    |   |-- <emphasis role="bold">dmsat1.org.zone</emphasis>
+    |   |-- named.ca
+    |   |-- named.empty
+    |   |-- <emphasis role="bold">named.localhost</emphasis>
+    |   `-- named.loopback
+    |-- run/
+    |   `-- named/
+    |       |-- named.pid
+    |       `-- session.key
+    `-- tmp/
+</screen>
+
+	</para>
+	 <para>
+		Reconfigure the <filename>/etc/resolv.conf</filename> so that the <systemitem class="fqdomainname">d19sw1.dmsat1.org</systemitem> also resolvs to its own DNS: 
+<screen>
+&sw1p; <userinput>sed -i 's/^DNS1=.*$/DNS1=192.168.5.11/' /etc/sysconfig/network-scripts/ifcfg-eth0</userinput>
+.. inotify informs NetworkManager ..
+&sw1p; <userinput>cat /etc/resolv.conf</userinput>
+# Generated by NetworkManager
+search dmsat1.org
+nameserver 192.168.5.11
+</screen>
+		 If the change is not picked up, do: 
+<screen>
+&sw1p; <userinput>systemctl restart NetworkManager.service</userinput></screen>
+
+	</para>
+	 <para>
+		Make sure to enable the service and start it: 
+<screen>
+&sw1p; <userinput>systemctl enable named-chroot.service</userinput>
+ln -s '/usr/lib/systemd/system/named-chroot.service' '/etc/systemd/system/multi-user.target.wants/named-chroot.service'
+&sw1p; <userinput>systemctl start named-chroot.service</userinput></screen>
+
+	</para>
+	 <para>
+		Do some tests: 
+<screen>
+&sw1p; <userinput>for i in d19sw0.dmsat1.org d19sw1.dmsat1.org d19sw2.dmsat1.org &t1;.dmsat1.org d19sw0 d19sw1 d19sw2 dmm01 192.168.5.10 192.168.5.11 192.168.5.12 192.168.5.100; do host $i; done</userinput>
+d19sw0.dmsat1.org has address 192.168.5.10
+d19sw1.dmsat1.org has address 192.168.5.11
+d19sw2.dmsat1.org has address 192.168.5.12
+&t1;.dmsat1.org has address 192.168.5.100
+d19sw0.dmsat1.org has address 192.168.5.10
+d19sw1.dmsat1.org has address 192.168.5.11
+d19sw2.dmsat1.org has address 192.168.5.12
+&t1;.dmsat1.org has address 192.168.5.100
+10.5.168.192.in-addr.arpa domain name pointer d19sw0.dmsat1.org.
+11.5.168.192.in-addr.arpa domain name pointer d19sw1.dmsat1.org.
+12.5.168.192.in-addr.arpa domain name pointer d19sw2.dmsat1.org.
+100.5.168.192.in-addr.arpa domain name pointer &t1;.dmsat1.org.
+</screen>
+
+	</para>
+</section>
+
+

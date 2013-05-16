@@ -1,0 +1,581 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="spacewalk-sw_filling" lang="en-US">
+	<title>Initial Spacewalk Filling</title>
+	 <table id="tabl-msat-guide-Initial_Spacewalk_Filling-Time_needed">
+		<title>Time needed</title>
+		 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+			<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+			 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+			 <thead valign="top">
+				<row>
+					<entry>
+						action
+					</entry>
+					 <entry>
+						time
+					</entry>
+
+				</row>
+
+			</thead>
+			 <tbody valign="top">
+				<row>
+					<entry>
+						Download DVD1
+					</entry>
+					 <entry>
+						77 minutes
+					</entry>
+
+				</row>
+				 <row>
+					<entry>
+						Download DVD2
+					</entry>
+					 <entry>
+						12 minutes
+					</entry>
+
+				</row>
+				 <row>
+					<entry>
+						Download Spacewalk client tools
+					</entry>
+					 <entry>
+						6 minutes
+					</entry>
+
+				</row>
+
+			</tbody>
+
+		</tgroup>
+
+	</table>
+	 <para>
+		In this section we explain how we fill the Spacewalk server. Initially we fill it with a minimal set of RPM's to make it work.
+	</para>
+	 <para>
+		This raises the question, what is a functional Spacewalk server? We think that we have a minimal functioning Spacewalk server if: 
+		<itemizedlist>
+			<listitem>
+				<para>
+					it can be used to install the OS on a system. The system may be a KVM machine.
+				</para>
+
+			</listitem>
+			 <listitem>
+				<para>
+					the installed system automatically registers to the Spacewalk server. I must show up in the list of systems of the Spacewalk web interface.
+				</para>
+
+			</listitem>
+			 <listitem>
+				<para>
+					the installed system automatically has access to configured software channel, besides the base channel. In other words: "yum repolist" on the installed system should give the configured software channels.
+				</para>
+
+			</listitem>
+			 <listitem>
+				<para>
+					the installed system automatically obtains RPM's from connected activation keys, and config files from connected config channels.
+				</para>
+
+			</listitem>
+
+		</itemizedlist>
+
+	</para>
+	 <para>
+		To make the Spacewalk server function, we need to add RPM's from a Linux distribution. For this purpose, we use CentOS 5.8. Hence, we need to create a base channel and put RPM's into it. For registration and configuration we need some tools. We put these in a child channel. Finally, we need to create a kickstartable tree to do bare metal deployment. We show the steps in the following sections.
+	</para>
+	 <section id="spacewalk-sw_filling-bc">
+		<title>Base channel</title>
+		 <para>
+			First, we create the base channel. Point the browser to <ulink url="http://192.168.5.11">http://192.168.5.11</ulink> and do: <menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Channels</guimenuitem> <guimenuitem>Manage Software Channels</guimenuitem> <guimenuitem>create new channel</guimenuitem> <guimenuitem>Channel Name: centos-x86_64-server-5</guimenuitem> <guimenuitem>Channel Label: centos-x86_64-server-5</guimenuitem> <guimenuitem>Parent Channel: None</guimenuitem> <guimenuitem>Architecture: x86_64</guimenuitem> <guimenuitem>Yum Repository Checksum Type: sha1</guimenuitem> <guimenuitem>Channel Summary: centos-x86_64-server-5</guimenuitem> <guimenuitem>GPG key URL: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5</guimenuitem> <guibutton>Create Channel</guibutton> </menuchoice>
+		</para>
+		 <para>
+			The newly created channel needs to be filled. We use the following commands: 
+<screen>
+&sw1p; <userinput>cd</userinput>
+&srvprompt; <userinput>wget http://mirror.nsc.liu.se/centos-store/5.8/isos/x86_64/CentOS-5.8-x86_64-bin-DVD-1of2.iso</userinput>
+.. output skipped ..
+.. 77 minutes ..
+&srvprompt; <userinput>wget http://mirror.nsc.liu.se/centos-store/5.8/isos/x86_64/CentOS-5.8-x86_64-bin-DVD-2of2.iso</userinput>
+.. output skipped ..
+.. 12 minutes ..
+&sw1p; <userinput>wget http://mirror.nsc.liu.se/centos-store/5.8/isos/x86_64/md5sum.txt</userinput>
+.. output skipped ..
+
+&sw1p; <userinput>md5sum CentOS-5.8-x86_64-bin-DVD-1of2.iso</userinput>
+8a3bf0030f192022943f83fe6b2cf373  CentOS-5.8-x86_64-bin-DVD-1of2.iso
+&sw1p; <userinput>grep CentOS-5.8-x86_64-bin-DVD-1of2.iso md5sum.txt</userinput>
+8a3bf0030f192022943f83fe6b2cf373  CentOS-5.8-x86_64-bin-DVD-1of2.iso
+
+&sw1p; <userinput>md5sum CentOS-5.8-x86_64-bin-DVD-2of2.iso</userinput>
+1d0d05edeb310c99a48fbef075695bb3  CentOS-5.8-x86_64-bin-DVD-2of2.iso
+&sw1p; <userinput>grep CentOS-5.8-x86_64-bin-DVD-2of2.iso md5sum.txt</userinput>
+1d0d05edeb310c99a48fbef075695bb3  CentOS-5.8-x86_64-bin-DVD-2of2.iso
+
+&sw1p; <userinput>mkdir -p /var/www/html/pub/iso/{1,2}</userinput>
+&sw1p; <userinput>mount -o loop /root/CentOS-5.8-x86_64-bin-DVD-1of2.iso /var/www/html/pub/iso/1</userinput>
+&sw1p; <userinput>mount -o loop /root/CentOS-5.8-x86_64-bin-DVD-2of2.iso /var/www/html/pub/iso/2</userinput>
+
+&sw1p; <userinput>spacewalk-repo-sync -c centos-x86_64-server-5 -u http://192.168.5.11/pub/iso/1</userinput>
+.. output skipped ..
+3536/3595 : openoffice.org-langpack-hr_HR-3.1.1-19.5.el5_5.6-1.x86_64
+failure: CentOS/openoffice.org-langpack-hr_HR-3.1.1-19.5.el5_5.6.x86_64.rpm from centos-x86_64-server-5: [Errno 256] No more mirrors to try.
+http://192.168.5.11/pub/iso/1/CentOS/openoffice.org-langpack-hr_HR-3.1.1-19.5.el5_5.6.x86_64.rpm: [Errno 14] curl#22 - "The requested URL returned error: 404 Not Found"
+.. output skipped ..
+.. 4 hours and 30 minutes ..
+&sw1p; <userinput>rhnpush -d /var/www/html/pub/iso/2/CentOS/ -c centos-x86_64-server-5 -u example -p redhat --server $(hostname)</userinput>
+.. output skipped ..
+.. 9 minutes ..
+</screen>
+			 The langpack errors can be ignored. Via the <command>rhnpush</command> command, these packages are added.
+		</para>
+
+	</section>
+	
+	 <section id="spacewalk-sw_filling-tools">
+		<title>Tools child channel</title>
+		 <para>
+			Just using CentOS 5.8 will not do. Believe us, we learned the hard way! We also need extra RPM's to make automatic registration and configuration work. Hence, a second software channel is created.
+		</para>
+		 <para>
+			<menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Channels</guimenuitem> <guimenuitem>Manage Software Channels</guimenuitem> <guimenuitem>create new channel</guimenuitem> <guimenuitem>Channel Name: con-tools-centos-x86_64-server-5</guimenuitem> <guimenuitem>Channel Label: con-tools-centos-x86_64-server-5</guimenuitem> <guimenuitem>Parent Channel: centos-x86_64-server-5</guimenuitem> <guimenuitem>Architecture: x86_64</guimenuitem> <guimenuitem>Yum Repository Checksum Type: sha1</guimenuitem> <guimenuitem>Channel Summary: con-tools-centos-x86_64-server-5</guimenuitem> <guimenuitem>GPG key URL: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-spacewalk-2012</guimenuitem> <guibutton>Create Channel</guibutton> </menuchoice>
+		</para>
+		 <warning>
+			<title>A software channel name cannot start with <emphasis role="bold">rhn</emphasis></title>
+			 <para>
+				It is not possible to use the name <emphasis role="bold">rhn-tools-centos-x86_64-server-5</emphasis>. Spacewalk forbids the use of <emphasis role="bold">rhn</emphasis>. It is reserved for the Satellite server of Red Hat.
+			</para>
+
+		</warning>
+		 <para>
+			We fill the tools channel with: 
+<screen>
+&sw1p; <userinput>spacewalk-repo-sync -c con-tools-centos-x86_64-server-5 -u http://spacewalk.redhat.com/yum/1.9-client/RHEL/5/x86_64</userinput>
+.. less than a minute ..
+</screen>
+
+		</para>
+		 <para>
+			During one of the test installations (happens when <command>rhnreg_ks</command> is run) we found out that the <emphasis role="bold">con-tools-centos-x86_64-server-5</emphasis> channel is incomplete. We need an extra RPM called <package>python-hashlib-20081119-4.el5.x86_64.rpm</package> because <package>spacewalk-backend-libs-1.9.48-1.el5.noarch</package> depends on it. We download and push it to the channel with: 
+<screen>
+&sw1p; <userinput>cd</userinput>
+&sw1p; <userinput>wget http://dl.fedoraproject.org/pub/epel/5/x86_64/python-hashlib-20081119-4.el5.x86_64.rpm</userinput>
+.. output skipped ..
+&sw1p; <userinput>rhnpush -c con-tools-centos-x86_64-server-5 -u example -p redhat --server=$(hostname) python-hashlib-20081119-4.el5.x86_64.rpm</userinput></screen>
+
+		</para>
+
+	</section>
+	
+	 <section id="spacewalk-sw_filling-registration">
+		<title>Registration packages</title>
+		 <para>
+			Some of the packages of the <emphasis role="bold">con-tools-centos-x86_64-server-5</emphasis> channel need to be moved to the <emphasis role="bold">centos-x86_64-server-5</emphasis> base channel. The reason lies in the fact that the <filename>comps.xml</filename> for the <emphasis role="bold">base</emphasis> component contains the <package>rhn-check</package>, <package>rhn-setup</package> and <package>yum-rhn-plugin</package> packages. These are needed for system registration. Including their dependencies, we come up with the following list: 
+			<orderedlist>
+				<listitem>
+					<para>
+						<package>rhn-check-1.9.10-1.el5.noarch.rpm</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>rhn-client-tools-1.9.10-1.el5.noarch.rpm</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>rhnlib-2.5.55-1.el5.noarch.rpm</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>rhnsd-5.0.9-1.el5.x86_64.rpm</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>rhn-setup-1.9.10-1.el5.noarch.rpm</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>rhn-setup-gnome-1.9.10-1.el5.noarch</package>
+					</para>
+
+				</listitem>
+				 <listitem>
+					<para>
+						<package>yum-rhn-plugin-1.9.4-1.el5.noarch.rpm</package>
+					</para>
+
+				</listitem>
+
+			</orderedlist>
+			 Note that <package>rhn-setup-gnome-1.9.10-1.el5.noarch</package> is added because it is in <filename>comps.xml</filename> too, under <emphasis role="bold">x-base</emphasis>.
+		</para>
+		 <note>
+			<title>Installing MSAT</title>
+			 <para>
+				Download the tarball from <ulink url="http://msat.disruptivefoss.org/Downloads/tarball/msat_scripts.tgz">http://msat.disruptivefoss.org/Downloads/tarball/msat_scripts.tgz</ulink>. On the Spacewalk server, do: 
+<screen>
+&sw1p; <userinput>echo 'PATH=$PATH:/usr/local/bin/msat' &gt; /etc/profile.d/msat.sh</userinput>
+&sw1p; <userinput>mkdir -p /usr/local/bin/msat</userinput>
+&sw1p; <userinput>cd /usr/local/bin/msat</userinput>
+&sw1p; <userinput>wget msat.disruptivefoss.org/Downloads/tarball/msat_scripts.tgz</userinput>
+&sw1p; <userinput>tar xzf msat_scripts.tgz</userinput></screen>
+				 A configuration file, <filename>~/.sat.conf</filename> is needed to. See <!--          <xref linkend="sect-msat-guide-MSAT_configuration" />          -->. Make sure to set the <replaceable>login</replaceable> to <parameter>example</parameter> and <replaceable>password</replaceable> to <parameter>redhat</parameter>.
+			</para>
+
+		</note>
+		 <para>
+			Before we do the move, we use our first <command>msat</command> command. We need to save the above set of RPM's in a directory to be able to calculate the repository metadata later! We must do it here: 
+<screen>
+&sw1p; <userinput>cd</userinput>
+&sw1p; <userinput>mkdir registration</userinput>
+&sw1p; <userinput>msat_wr_sc_rpms.py -l con-tools-centos-x86_64-server-5 -e .</userinput>
+&sw1p; <userinput>cd con-tools-centos-x86_64-server-5</userinput>
+&sw1p; <userinput>mv rhn-check-1.9.10-1.el5.noarch.rpm rhn-setup-* rhn-client-tools-1.9.10-1.el5.noarch.rpm rhnlib-2.5.55-1.el5.noarch.rpm rhnsd-5.0.9-1.el5.x86_64.rpm yum-rhn-plugin-1.9.4-1.el5.noarch.rpm ../registration/</userinput></screen>
+
+		</para>
+		 <para>
+			Moving the RPM's means: delete them from the <emphasis role="bold">con-tools-centos-x86_64-server-5</emphasis> channel at the web interface and them place them in <emphasis role="bold">centos-x86_64-server-5</emphasis> channel.
+		</para>
+		 <para>
+			<menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Channels</guimenuitem> <guimenuitem>Manage Software Channels</guimenuitem> <guimenuitem>con-tools-centos-x86_64-server-5</guimenuitem> <guimenuitem>Packages</guimenuitem> <guimenuitem>List / Remove Packages</guimenuitem> <guimenuitem>Check: rhn-check-1.9.10-1.el5.noarch.rpm, rhn-client-tools-1.9.10-1.el5.noarch.rpm, rhnlib-2.5.55-1.el5.noarch.rpm, rhnsd-5.0.9-1.el5.x86_64.rpm, rhn-setup-1.9.10-1.el5.noarch.rpm, rhn-setup-gnome-1.9.10-1.el5.noarch, yum-rhn-plugin-1.9.4-1.el5.noarch.rpm, </guimenuitem> <guimenuitem>Confirm Removal</guimenuitem> <guimenuitem>Remove</guimenuitem> </menuchoice>
+		</para>
+		 <para>
+			<menuchoice> <guimenuitem>Channels</guimenuitem> <guimenuitem>Manage Software Channels</guimenuitem> <guimenuitem>centos-x86_64-server-5</guimenuitem> <guimenuitem>Packages</guimenuitem> <guimenuitem>Add</guimenuitem> <guimenuitem>Packages in no channels.</guimenuitem> <guimenuitem>Select All (should be 7 just removed)</guimenuitem> <guimenuitem>Confirm Addition</guimenuitem> <guimenuitem>Add Packages(s)</guimenuitem> </menuchoice>
+		</para>
+
+	</section>
+	
+	 <section id="spacewalk-sw_filling-kt">
+		<title>Kickstartable tree</title>
+		 <para>
+			After filling the software channels, we need to create a kickstartable tree. A <emphasis role="bold">kickstartable tree</emphasis> is the software from which we can start the OS installation. It is created on the Spacewalk server and on the web interface. We start with the Spacewalk server part.
+		</para>
+		 <para>
+			The part on the Spacewalk server consists of the RPM's, images and the repository metadata. A standard yum repository is a directory in which one finds the RPM's and the metadata of the repository. The metadata is calculated with the <command>createrepo</command> command.
+		</para>
+		 <para>
+			Since the Satellite server stores the RPM's in its own way, it is not possible to calculate the repodata with <command>createrepo</command> in the normal way. We tackle this problem by using the CentOS DVD and the <filename>/root/registration</filename> directory. 
+<screen>
+&sw1p; <userinput>mkdir -p /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8</userinput>
+&sw1p; <userinput>cd /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8</userinput>
+&sw1p; <userinput>mount | grep CentOS-5.8-x86_64-bin-DVD-1of2.iso</userinput>
+.. not mounted ..
+&sw1p; <userinput>mount -o loop /root/CentOS-5.8-x86_64-bin-DVD-1of2.iso /var/www/html/pub/iso/1</userinput>
+&sw1p; <userinput>cp -a /var/www/html/pub/iso/1/images .</userinput>
+&sw1p; <userinput>cp -a /var/www/html/pub/iso/1/isolinux .</userinput>
+&sw1p; <userinput>cp -a /var/www/html/pub/iso/1/repodata .</userinput>
+&sw1p; <userinput>cp repodata/comps.xml .</userinput>
+&sw1p; <userinput>createrepo -o /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8 -p --simple-md-filenames --no-database -s sha -g /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8/comps.xml --split /var/www/html/pub/iso/1/CentOS --split /var/www/html/pub/iso/2/CentOS /root/registration</userinput>
+.. takes about 2 minutes ..
+</screen>
+
+		</para>
+		 <para>
+			The next thing we need to do, is to create the kickstartable tree on the Web interface by defining a kickstart distribution.
+		</para>
+		 <para>
+			<menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Systems</guimenuitem> <guimenuitem>Kickstart</guimenuitem> <guimenuitem>Distributions</guimenuitem> <guimenuitem>create new distribution</guimenuitem> <guimenuitem>Distribution Label: ks-centos-x86_64-server-5u8</guimenuitem> <guimenuitem>Tree Path: /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8</guimenuitem> <guimenuitem>Base Channel: centos-x86_64-server-5</guimenuitem> <guimenuitem>Installer Generation: Red Hat Enterprise Linux 5</guimenuitem> <guibutton>Create Kickstart Distribution</guibutton> </menuchoice>
+		</para>
+		 <para>
+			Make sure to set the <emphasis role="bold">Variables</emphasis> correctly. <menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Systems</guimenuitem> <guimenuitem>Kickstart</guimenuitem> <guimenuitem>Distributions</guimenuitem> <guimenuitem>ks-centos-x86_64-server-5u8</guimenuitem> <guimenuitem>Variables</guimenuitem> <guimenuitem>media_path=/ks/dist/org/1/ks-centos-x86_64-server-5u8</guimenuitem> <guimenuitem>org=1</guimenuitem> <guibutton>Update Variables</guibutton> </menuchoice>
+		</para>
+		 <para>
+			Next, we install the public GPG keys, needed for RPM verification. We download them to the Spacewalk server and also copy them to our local PC on which we run the web browser to the Spacewalk web interface. 
+<screen>
+&sw1p; <userinput>cd /etc/pki/rpm-gpg</userinput>
+&sw1p; <userinput>wget http://vault.centos.org/5.8/os/x86_64/RPM-GPG-KEY-CentOS-5</userinput>
+&sw1p; <userinput>wget http://spacewalk.redhat.com/yum/RPM-GPG-KEY-spacewalk-2012</userinput>
+&sw1p; <userinput>wget http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-5</userinput></screen>
+			 Next we dump them to stdout so that we can copy them to our local Linux PC: 
+<screen>
+&sw1p; <userinput>cd /etc/pki/rpm-gpg</userinput>
+&sw1p; <userinput>cat RPM-GPG-KEY-CentOS-5</userinput>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+mQGiBEWfB6MRBACrnYW6yKMT+MwJlCIhoyTxGf3mAxmnAiDEy6HcYN8rivssVTJk
+CFtQBlBOpLV/OW2YtKrCO2xHn46eNfnMri8FGT8g+9JF3MUVi7kiV1He4iJynHXB
++F2ZqIvHf3IaUj1ys+p8TK64FDFxDQDrGQfIsD/+pkSGx53/877IrvdwjwCguQcr
+Ioip5TH0Fj0OLUY4asYVZH8EAIqFHEqsY+9ziP+2R3/FyxSllKkjwcMLrBug+cYO
+LYDD6eQXE9Mq8XKGFDj9ZB/0+JzK/XQeStheeFG75q3noq5oCPVFO4czuKErIRAB
+qKbDBhaTj3JhOgM12XsUYn+rI6NeMV2ZogoQCC2tWmDETfRpYp2moo53NuFWHbAy
+XjETA/sHEeQT9huHzdi/lebNBj0L8nBGfLN1nSRP1GtvagBvkR4RZ6DTQyl0UzOJ
+RA3ywWlrL9IV9mrpb1Fmn60l2jTMMCc7J6LacmPK906N+FcN/Docj1M4s/4CNanQ
+NhzcFhAFtQL56SNyLTCk1XzhssGZ/jwGnNbU/aaj4wOj0Uef5LRGQ2VudE9TLTUg
+S2V5IChDZW50T1MgNSBPZmZpY2lhbCBTaWduaW5nIEtleSkgPGNlbnRvcy01LWtl
+eUBjZW50b3Mub3JnPohkBBMRAgAkBQJFnwekAhsDBQkSzAMABgsJCAcDAgMVAgMD
+FgIBAh4BAheAAAoJEKikR9zoViiXKlEAmwSoZDvZo+WChcg3s/SpNoWCKhMAAJwI
+E2aXpZVrpsQnInUQWwkdrTiL5YhMBBMRAgAMBQJFnwiSBYMSzAIRAAoJEDjCFhY5
+bKCk0hAAn134bIx3wSbq58E6P6U5RT7Z2Zx4AJ9VxnVkoGHkVIgSdsxHUgRjo27N
+F7kBDQRFnwezEAQA/HnJ5yiozwgtf6jt+kii8iua+WnjqBKomPHOQ8moxbWdv5Ks
+4e1DPhzRqxhshjmub4SuJ93sgMSAF2ayC9t51mSJV33KfzPF2gIahcMqfABe/2hJ
+aMzcQZHrGJCEX6ek8l8SFKou7vICzyajRSIK8gxWKBuQknP/9LKsoczV+xsAAwUD
+/idXPkk4vRRHsCwc6I23fdI0ur52bzEqHiAIswNfO521YgLk2W1xyCLc2aYjc8Ni
+nrMX1tCnEx0/gK7ICyJoWH1Vc7//79sWFtX2EaTO+Q07xjFX4E66WxJlCo9lOjos
+Vk5qc7R+xzLDoLGFtbzaTRQFzf6yr7QTu+BebWLoPwNTiE8EGBECAA8FAkWfB7MC
+GwwFCRLMAwAACgkQqKRH3OhWKJfvvACfbsF1WK193zM7vSc4uq51XsceLwgAoI0/
+9GxdNhGQEAweSlQfhPa3yYXH
+=o/Mx
+-----END PGP PUBLIC KEY BLOCK-----
+
+&lpc; <userinput>cat &gt; /tmp/RPM-GPG-KEY-CentOS-5</userinput>
+.. the base64 encoded key from above ..
+
+&sw1p; <userinput>cat RPM-GPG-KEY-spacewalk-2012</userinput>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+mQGiBE9V9U0RBADjRxY1+Ng5gzaAj2LYHNwXHzyH65p+jL80+2vkf6WCNvewa+zK
+SY8JH3syZMhjGi/vW3TcDy5KVqiXS2rpMJS6zCBrOJbtcFdV3VvbsPd7hK9COlph
+NUx5RSIIwZRg1wyEjgeuYOSLuIhqNsI+fjXk+uzletSLtIYUF3TUq5jCvwCg4XQ/
+/RPOFH6KiHfIx8QUZmvT0IkD/ip7pOn5uSPNiIbj3X5RYbz8PB/z5OuoenfzYn4R
+WDBXZBlWMaPJCupAYwdP9IsiXo8WvbyXPHgG91P/MStrCgOffACNhuMus1FwqlCQ
+VFuKENB6f2g4DY9Mow6bKYgsSEy0qnEF5I2M+BqjApO0oznxzcyJ4coXQdA9/oCP
+vYU5A/9FTgukU1p/CbNJIhT4iH+vE6cKFGAtzhwwQxMdnii8ctcKiCYgiimuU7OG
+rcPKR1xsRX/sc6XZYJeLmc1Lt7Btkdl36RY5BgesVJkUNyKh8+7MllW5PvVFvtGv
+vvvrRVK+mJYxdBU0/Sqc94ZgBW6vdvRwHgXhpKor6NsCfJUWvLQmU3BhY2V3YWxr
+IDxzcGFjZXdhbGstZGV2ZWxAcmVkaGF0LmNvbT6IaAQTEQIAKAUCT1X1TQIbAwUJ
+BKKGAAYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQDmRvaIY6hT16sQCfVuJv
+KnSWzWXo0ek16NrqUSgdTYIAn3Q6Jc3GAzkx/JgmA6T6pLxp2f1uiEYEEBECAAYF
+Ak9V/egACgkQ7WNTebOJITK97gCfdeNye+OKidB2huEfzxP37ZkdfSIAniAA4NMY
+QsmjPPkUJSVguO7GbdXSuQINBE9V9U0QCACBbWXaPP5RqAIGnr9LeFbSYpWs2SnL
+KPv0qylyOGMc3GwmpJjeuz1d4y5fHIQxsQl7+RLIxOARcYH1QL6gHN450JcpYzau
+/Lj1ArsAP/QK/J8YSmjG0E0rU8sYRWIu7jzISgfMAs3c3wNvOMUCiXtXFV6crm9q
+3kbrZTedWLkShSLDAp5394hmBbRicWnc9h4LwBKp+BBtsvJFfDydc8IJUGZLZNZT
+RayYWC5VMDe1xmOZXhNpDxfNrjhUUI6E6qWwdinmzifhP6z6YNtRON1yWSLBwtcr
+LghyEJlilijIbCDgZ8Nvtqy/c2ypcLxMrXy70x05fjcQK2KIuLI58GGDAAMFB/9n
+m5YLj4S4XxF8/xP7givuPq37C7NYLOuzFKKx6xxqngV8TNGDVU2zv/lieh2ussXE
+XF/S9Du2abpXYgxsxwFJNMMKXUam03ExFSUvUAco6nmxySzvtgudCZ/9HqLhbNVu
+RpyUNA/g9vkYK6KVdxAeHUdu/EwfSL/pCEc11Dw1jYqbihktlTQPcizsSPG4Y7jh
+OUrKgxJop9DovUGzuUSl/7zYr4W7TiGV3my0f7U3qkpVT0bQoMnw8TxCZj4x3umo
+F4klakeGX0FK4vwV5hDq32Q6vWN804F34Vi3WsaUT9G1E3H7/s/OQgWLOm16mgjR
+pN1E79kYwtPMCAz0pYMciE8EGBECAA8FAk9V9U0CGwwFCQSihgAACgkQDmRvaIY6
+hT3D2ACfYsiYS39rFdR1aBHviE0hVm9MWxUAnR3Ua92zW/0UoJ7TgxR0Dxzta37z
+=yqYQ
+-----END PGP PUBLIC KEY BLOCK-----
+
+&lpc; <userinput>cat &gt; /tmp/RPM-GPG-KEY-spacewalk-2012</userinput>
+.. the base64 encoded key from above ..
+
+&sw1p; <userinput>cat RPM-GPG-KEY-EPEL-5</userinput>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+mQGiBEXopTIRBACZDBMOoFOakAjaxw1LXjeSvh/kmE35fU1rXfM7T0AV31NATCLF
+l5CQiNDA4oWreDThg2Bf6+LIVTsGQb1V+XXuLak4Em5yTYwMTVB//4/nMxQEbpl/
+QB2XwlJ7EQ0vW+kiPDz/7pHJz1p1jADzd9sQQicMtzysS4qT2i5A23j0VwCg1PB/
+lpYqo0ZhWTrevxKMa1n34FcD/REavj0hSLQFTaKNLHRotRTF8V0BajjSaTkUT4uk
+/RTaZ8Kr1mTosVtosqmdIAA2XHxi8ZLiVPPSezJjfElsSqOAxEKPL0djfpp2wrTm
+l/1iVnX+PZH5DRKCbjdCMLDJhYap7YUhcPsMGSeUKrwmBCBJUPc6DhjFvyhA9IMl
+1T0+A/9SKTv94ToP/JYoCTHTgnG5MoVNafisfe0wojP2mWU4gRk8X4dNGKMj6lic
+vM6gne3hESyjcqZSmr7yELPPGhI9MNauJ6Ob8cTR2T12Fmv9w03DD3MnBstR6vhP
+QcqZKhc5SJYYY7oVfxlSOfF4xfwcHQKoD5TOKwIAQ6T8jyFpKbQkRmVkb3JhIEVQ
+RUwgPGVwZWxAZmVkb3JhcHJvamVjdC5vcmc+iGQEExECACQFAkXopTICGwMFCRLM
+AwAGCwkIBwMCAxUCAwMWAgECHgECF4AACgkQEZzANiF1IfabmQCgzvE60MnHSOBa
+ZXXF7uU2Vzu8EOkAoKg9h+j0NuNom6WUYZyJQt4zc5seuQINBEXopTYQCADapnR/
+blrJ8FhlgNPl0X9S3JE/kygPbNXIqne4XBVYisVp0uzNCRUxNZq30MpY027JCs2J
+nL2fMpwvx33f0phU029vrIZKA3CmnnwVsjcWfMJOVPBmVN7m5bGU68F+PdRIcDsl
+PMOWRLkTBZOGolLgIbM4719fqA8etewILrX6uPvRDwywV7/sPCFpRcfNNBUY+Zx3
+5bf4fnkaCKxgXgQS3AT+hGYhlzIqQVTkGNveHTnt4SSzgAqR9sSwQwqvEfVtYNeS
+w5rDguLG41HQm1Hojv59HNYjH6F/S1rClZi21bLgZbKpCFX76qPt8CTw+iQLBPPd
+yoOGHfzyp7nsfhUrAAMFB/9/H9Gpk822ZpBexQW4y3LGFo9ZSnmu+ueOZPU3SqDA
+DW1ovZdYzGuJTGGM9oMl6bL8eZrcUBBOFaWge5wZczIE3hx2exEOkDdvq+MUDVD1
+axmN45q/7h1NYRp5GQL2ZsoV4g9U2gMdzHOFtZCER6PP9ErVlfJpgBUCdSL93V4H
+Sgpkk7znmTOklbCM6l/G/A6q4sCRqfzHwVSTiruyTBiU9lfROsAl8fjIq2OzWJ2T
+P9sadBe1llUYaow7txYSUxssW+89avct35gIyrBbof5M+CBXyAOUaSWmpM2eub24
+0qbqiSr/Y6Om0t6vSzR8gRk7g+1H6IE0Tt1IJCvCAMimiE8EGBECAA8FAkXopTYC
+GwwFCRLMAwAACgkQEZzANiF1IfZQYgCgiZHCv4xb+sTHCn/otc1Ovvi/OgMAnRXY
+bbsLFWOfmzAnNIGvFRWy+YHi
+=MMNL
+-----END PGP PUBLIC KEY BLOCK-----
+
+&lpc; <userinput>cat &gt; /tmp/RPM-GPG-KEY-EPEL-5</userinput>
+.. the base64 encoded key from above ..
+
+</screen>
+
+		</para>
+		 <para>
+			Next, we need to upload the public GPG keys to the Spacewalk server, via the web interface.
+		</para>
+		 <para>
+			<menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Systems</guimenuitem> <guimenuitem>Kickstart</guimenuitem> <guimenuitem>GPG and SSL Keys</guimenuitem> <guimenuitem>create new stored key/cert</guimenuitem> </menuchoice> <table id="tabl-msat-guide-Kickstartable_tree-Create_CentOS_5_GPGSSL_Key">
+				<title>Create CentOS 5 GPG/SSL Key</title>
+				 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+					<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+					 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+					 <thead valign="top">
+						<row>
+							<entry>
+								parameter
+							</entry>
+							 <entry>
+								value
+							</entry>
+
+						</row>
+
+					</thead>
+					 <tbody valign="top">
+						<row>
+							<entry>
+								<emphasis role="bold">Description:</emphasis>
+							</entry>
+							 <entry>
+								RPM-GPG-KEY-CentOS-5
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Type:</emphasis>
+							</entry>
+							 <entry>
+								GPG
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Select file to upload:</emphasis>
+							</entry>
+							 <entry>
+								<filename>/tmp/RPM-GPG-KEY-CentOS-5</filename>
+							</entry>
+
+						</row>
+
+					</tbody>
+
+				</tgroup>
+
+			</table>
+			 <table id="tabl-msat-guide-Kickstartable_tree-Create_Spacewalk_2012_GPGSSL_Key">
+				<title>Create Spacewalk 2012 GPG/SSL Key</title>
+				 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+					<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+					 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+					 <thead valign="top">
+						<row>
+							<entry>
+								parameter
+							</entry>
+							 <entry>
+								value
+							</entry>
+
+						</row>
+
+					</thead>
+					 <tbody valign="top">
+						<row>
+							<entry>
+								<emphasis role="bold">Description:</emphasis>
+							</entry>
+							 <entry>
+								RPM-GPG-KEY-spacewalk-2012
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Type:</emphasis>
+							</entry>
+							 <entry>
+								GPG
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Select file to upload:</emphasis>
+							</entry>
+							 <entry>
+								<filename>/tmp/RPM-GPG-KEY-spacewalk-2012</filename>
+							</entry>
+
+						</row>
+
+					</tbody>
+
+				</tgroup>
+
+			</table>
+			 <table id="tabl-msat-guide-Kickstartable_tree-Create_EPEL_5_GPGSSL_Key">
+				<title>Create EPEL 5 GPG/SSL Key</title>
+				 <tgroup align="left" cols="2" colsep="1" rowsep="1">
+					<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+					 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+					 <thead valign="top">
+						<row>
+							<entry>
+								parameter
+							</entry>
+							 <entry>
+								value
+							</entry>
+
+						</row>
+
+					</thead>
+					 <tbody valign="top">
+						<row>
+							<entry>
+								<emphasis role="bold">Description:</emphasis>
+							</entry>
+							 <entry>
+								RPM-GPG-KEY-EPEL-5
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Type:</emphasis>
+							</entry>
+							 <entry>
+								GPG
+							</entry>
+
+						</row>
+						 <row>
+							<entry>
+								<emphasis role="bold">Select file to upload:</emphasis>
+							</entry>
+							 <entry>
+								<filename>/tmp/RPM-GPG-KEY-EPEL-5</filename>
+							</entry>
+
+						</row>
+
+					</tbody>
+
+				</tgroup>
+
+			</table>
+
+		</para>
+
+	</section>
+	
+
+</section>
+
+

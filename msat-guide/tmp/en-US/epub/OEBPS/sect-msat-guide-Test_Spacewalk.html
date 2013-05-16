@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>1.7. Test Spacewalk</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 2.8" /><meta name="package" content="" /></head><body class="draft "><div class="section" id="sect-msat-guide-Test_Spacewalk"><div class="titlepage"><div><div><h1 class="title" id="sect-msat-guide-Test_Spacewalk">1.7. Test Spacewalk</h1></div></div></div><div class="table" id="tabl-msat-guide-Test_Spacewalk-Time_needed"><h6>Table 1.14. Time needed</h6><div class="table-contents"><table summary="Time needed" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+						action
+					</th><th style="text-align: left" valign="top">
+						time
+					</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+						Config channel
+					</td><td style="text-align: left" valign="top">
+						5 minutes
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Activation key
+					</td><td style="text-align: left" valign="top">
+						5 minutes
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Kickstart profile
+					</td><td style="text-align: left" valign="top">
+						20 minutes
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Cobbler
+					</td><td style="text-align: left" valign="top">
+						5 minutes
+					</td></tr><tr><td style="text-align: left" valign="top">
+						Test installation
+					</td><td style="text-align: left" valign="top">
+						15 minutes
+					</td></tr></tbody></table></div></div><div class="para">
+		To test Spacewalk, we need the following items: 
+		<div class="itemizedlist"><ul><li class="listitem"><div class="para">
+					A configuration file in a configuration channel.
+				</div></li><li class="listitem"><div class="para">
+					An activation key with at least one RPM and a link to the configuration channel.
+				</div></li><li class="listitem"><div class="para">
+					A kickstart profile with a link to the activation key and 1 post install script.
+				</div></li><li class="listitem"><div class="para">
+					A Cobbler system and the Cobbler boot ISO.
+				</div></li><li class="listitem"><div class="para">
+					The environment on the host to create a KVM virtual machine.
+				</div></li></ul></div>
+
+	</div><div class="section" id="sect-msat-guide-Test_Spacewalk-Config_Channel"><div class="titlepage"><div><div><h2 class="title" id="sect-msat-guide-Test_Spacewalk-Config_Channel">1.7.1. Config Channel</h2></div></div></div><div class="para">
+			Create the config channel. <span class="guimenuitem"><strong>Configuration</strong></span> → <span class="guimenuitem"><strong>Configuration Channels</strong></span> → <span class="guimenuitem"><strong>create new config channel</strong></span>
+		</div><div class="para">
+			<div class="table" id="tabl-msat-guide-Config_Channel-Config_Channel"><h6>Table 1.15. Config Channel</h6><div class="table-contents"><table summary="Config Channel" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Name:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Label:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Description:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr></tbody></table></div></div>
+
+		</div><div class="para">
+			Add a configuration file with: <span class="guimenuitem"><strong>Add Files</strong></span> → <span class="guimenuitem"><strong>Create File</strong></span>
+		</div><div class="para">
+			Now, add the following parameters: 
+			<div class="table" id="tabl-msat-guide-Config_Channel-etcmotd"><h6>Table 1.16. <code class="filename">/etc/motd</code></h6><div class="table-contents"><table summary="/etc/motd" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Filename/Path:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								/etc/motd
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>File Contents:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								
+<pre class="screen">
+Welcome to test01.
+
+
+</pre>
+
+							</td></tr></tbody></table></div></div>
+			 Click <span class="guibutton"><strong>Create Configuration File</strong></span>.
+		</div></div><div class="section" id="sect-msat-guide-Test_Spacewalk-Activation_Key"><div class="titlepage"><div><div><h2 class="title" id="sect-msat-guide-Test_Spacewalk-Activation_Key">1.7.2. Activation Key</h2></div></div></div><div class="para">
+			The <span class="bold bold"><strong>test01</strong></span> config channel needs to be refered to by an activation key. We create it here.
+		</div><div class="para">
+			<span class="guimenu"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Spacewalk Login: example</strong></span> → <span class="guimenuitem"><strong>Password: redhat</strong></span>+<span class="guibutton"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Systems</strong></span> → <span class="guimenuitem"><strong>Activation Keys</strong></span> → <span class="guimenuitem"><strong>create new key</strong></span> <div class="table" id="tabl-msat-guide-Activation_Key-Activation_Key"><h6>Table 1.17. Activation Key</h6><div class="table-contents"><table summary="Activation Key" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Description:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Key:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Usage:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Base Channels:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								centos-x86_64-server-5
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Add-On Entitlements:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								Provisioning
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Universal Default:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;unchecked&gt;
+							</td></tr></tbody></table></div></div>
+			 Click <span class="guibutton"><strong>Create Activation Key</strong></span>
+		</div><div class="para">
+			Make sure to also check <span class="bold bold"><strong>Configuration File Deployment</strong></span> since we want to deploy configuration file too.
+		</div><div class="para">
+			<span class="guimenuitem"><strong>Details</strong></span> → <span class="guimenuitem"><strong>Configuration File Deployment</strong></span> → <span class="guimenuitem"><strong>check</strong></span>+<span class="guibutton"><strong>Update Key</strong></span>
+		</div><div class="para">
+			Add an RPM package with: <span class="guimenuitem"><strong>Packages</strong></span> → <span class="guimenuitem"><strong>screen</strong></span>+<span class="guibutton"><strong>Update Key</strong></span>
+		</div><div class="para">
+			Link the configuration channel with <span class="guimenuitem"><strong>Configuration</strong></span> → <span class="guimenuitem"><strong>Subscribe to Channels</strong></span> → <span class="guimenuitem"><strong>test01</strong></span>+<span class="guibutton"><strong>Continue</strong></span>
+		</div></div><div class="section" id="sect-msat-guide-Test_Spacewalk-Kickstart_Profile"><div class="titlepage"><div><div><h2 class="title" id="sect-msat-guide-Test_Spacewalk-Kickstart_Profile">1.7.3. Kickstart Profile</h2></div></div></div><div class="para">
+			To further determine how the system should be provisioned, we define the <span class="bold bold"><strong>test01</strong></span> kickstart profile. In it, we refer to the activation key.
+		</div><div class="para">
+			<span class="guimenu"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Spacewalk Login: example</strong></span> → <span class="guimenuitem"><strong>Password: redhat</strong></span>+<span class="guibutton"><strong>Sign In</strong></span> → <span class="guimenuitem"><strong>Systems</strong></span> → <span class="guimenuitem"><strong>Kickstart</strong></span> → <span class="guimenuitem"><strong>Profiles</strong></span> → <span class="guimenuitem"><strong>create new kickstart profile</strong></span> <div class="table" id="tabl-msat-guide-Kickstart_Profile-Kickstart_Profile"><h6>Table 1.18. Kickstart Profile</h6><div class="table-contents"><table summary="Kickstart Profile" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Label:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Base Channel:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								cnetos-x86_64-server-5
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Kickstartable Tree:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								ks-centos-x86_64-server-5u8
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Base Channels:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								centos-x86_64-server-5
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Virtualization Type:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								None
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Next</strong></span>+<span class="guimenu"><strong>Next</strong></span> <div class="table" id="tabl-msat-guide-Kickstart_Profile-Root_password"><h6>Table 1.19. Root password</h6><div class="table-contents"><table summary="Root password" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>New Root Password:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								redhat
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Verify New Root Password:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								redhat
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Finish</strong></span>
+		</div><div class="para">
+			<div class="table" id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01"><h6>Table 1.20. Kickstart: test01</h6><div class="table-contents"><table summary="Kickstart: test01" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Kickstart Label:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								test01
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Operating System:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								centos-x86_64_server-5
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Virtualization Type:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								None
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Active:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Log custom post scripts:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Log custom pre scripts:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Preserve ks.cfg:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Organization Default Profile:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;unchecked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Kernel Options:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Post Kernel Options:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Comments:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Update Kickstart</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>Advanced Options</strong></span>
+		</div><div class="para">
+			Note, some values need to be unchecked and cleared! Really, only the values presented here must be present. 
+			<div class="table" id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01_System_Details"><h6>Table 1.21. Kickstart: test01, System Details</h6><div class="table-contents"><table summary="Kickstart: test01, System Details" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>auth:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--enablemd5 --enableshadow
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>bootloader:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--location mbr
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>clearpart:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--all
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>firewall:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--enabled
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>install:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>key:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--skip
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>keyboard:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								us
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>lang:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								en_US
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>reboot:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>rootpw:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								$1$RsnjsSwK$KbtWynXvaUGZ0ZZh0qXQu/
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>selinux:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--enforcing
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>skipx:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>text:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>timezone:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--utc Europe/Amsterdam
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>url:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								--url /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>zerombr:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Update Kickstart</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>System Details</strong></span>+<span class="guimenu"><strong>Details</strong></span>
+		</div><div class="para">
+			We only show the checked options and their value! 
+			<div class="table" id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01_Advanced_Options"><h6>Table 1.22. Kickstart: test01, Advanced Options</h6><div class="table-contents"><table summary="Kickstart: test01, Advanced Options" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>SeLinux:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								Enforcing
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Enable Spacewalk Configuration Management:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Enable Spacewalk Remote Commands:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Spacewalk Profile:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								Re-connect to the existing system profile. Do not create a new system profile.
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>New Root password:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Verify New Root password:</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;empty&gt;
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Update System Details</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>System Details</strong></span>+<span class="guimenu"><strong>Partitioning</strong></span>
+		</div><div class="para">
+			Partition Details: 
+<pre class="screen">
+part /boot --fstype=ext3 --size=200
+part pv.01 --size=1 --grow
+part swap --size=512
+volgroup myvg pv.01
+logvol / --vgname=myvg --name=rootvol --size=1 --grow
+</pre>
+			 <span class="guimenu"><strong>Update Partitions</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>System Details</strong></span>+<span class="guimenu"><strong>GPG &amp; SSL</strong></span>+<span class="guimenu"><strong>Select All</strong></span>+<span class="guimenu"><strong>Update keys</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>Activation Keys</strong></span>+<span class="guimenu"><strong>Select All</strong></span>+<span class="guimenu"><strong>Update Activation Keys</strong></span>
+		</div><div class="para">
+			<span class="guimenu"><strong>Scripts</strong></span>+<span class="guimenu"><strong>add new kickstart script</strong></span> <div class="table" id="tabl-msat-guide-Kickstart_Profile-Kickstart_Script"><h6>Table 1.23. Kickstart: Script</h6><div class="table-contents"><table summary="Kickstart: Script" border="1"><colgroup><col width="50%" style="text-align: left" class="c1" /><col width="50%" style="text-align: left" class="c2" /></colgroup><thead valign="top"><tr><th style="text-align: left" valign="top">
+								parameter
+							</th><th style="text-align: left" valign="top">
+								value
+							</th></tr></thead><tbody valign="top"><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Script Name</strong></span>
+							</td><td style="text-align: left" valign="top">
+								1
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Script Contents</strong></span>
+							</td><td style="text-align: left" valign="top">
+								
+<pre class="screen">
+/bin/rm /etc/yum.repos.d/CentOS-*.repo
+</pre>
+
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Script Execution Time</strong></span>
+							</td><td style="text-align: left" valign="top">
+								Post Script
+							</td></tr><tr><td style="text-align: left" valign="top">
+								<span class="bold bold"><strong>Template</strong></span>
+							</td><td style="text-align: left" valign="top">
+								&lt;checked&gt;
+							</td></tr></tbody></table></div></div>
+			 <span class="guimenu"><strong>Update Kickstart</strong></span>
+		</div></div><div class="section" id="sect-msat-guide-Test_Spacewalk-Cobbler"><div class="titlepage"><div><div><h2 class="title" id="sect-msat-guide-Test_Spacewalk-Cobbler">1.7.4. Cobbler</h2></div></div></div><div class="para">
+			Since we want to start our bare metal provisioning with a boot ISO, we need to create a system in Cobbler. This task can be accomplished by using a script. We present it here: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cat /root/cobbler-dmm01.sh</code></strong>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler-dmm01.sh
+# DESCRIPTION
+#   This script should be run on the Spacewalk server:
+#   # ./cobbler-dmm01.sh
+#
+#   IP details
+#
+#   Host       Prod            Cluster        ILO
+#   dmm01      192.168.5.100   -              -
+#
+#   Subnets:
+#   192.168.5.0/24  gw: 192.168.5.1
+#
+#   DNS servers:
+#   * 192.168.5.11 (d19sw1.dmsat1.org)
+#
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   sudo cobbler system remove \
+#     --name=SpacewalkDefaultOrganization_kvm_dmm01
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-05-02 19:18
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cobbler-dmm01.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cobbler-dmm01.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+COBBLER="sudo cobbler"
+# AB: non base Spacewalk organizations have orgnum != 1
+#ORGNUM=$(msat_ls_org.py)
+ORGNUM=1
+
+########## PARAMETERS TO EDIT ##########
+NAME="dmm01"
+OWNERS="example"
+MACH="kvm"
+PROFILE="test01"
+ORG="SpacewalkDefaultOrganization"
+COMMENT="empty"
+GATEWAY=192.168.5.1
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="dmsat1.org"
+HOSTNAME=${NAME}.${NAMESERVERS_SEARCH}
+PROD_IP=192.168.5.100
+PROD_SUBNET=255.255.255.0
+PROD_DNS_NAME=${HOSTNAME}
+MAC_ETH0=52:54:00:a8:05:64
+
+########## START SCRIPT ##########
+$COBBLER system add \
+  --name=${ORG}_${MACH}_${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORGNUM}:${ORG} \
+  --kopts="ksdevice=${MAC_ETH0} ip=${PROD_IP} netmask=${PROD_SUBNET}" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;'
+  #--uid=UID
+  #--image=IMAGE
+  #--kopts-post=KOPTS_POST
+  #--ksmeta=KSMETA
+  #--kickstart=KICKSTART
+  #--depth=DEPTH
+  #--server=SERVER
+  #--virt-path=VIRT_PATH
+  #--virt-type=VIRT_TYPE
+  #--virt-cpus=VIRT_CPUS
+  #--virt-file-size=VIRT_FILE_SIZE
+  #--virt-ram=VIRT_RAM
+  #--virt-auto-boot=VIRT_AUTO_BOOT
+  #--ctime=CTIME
+  #--mtime=MTIME
+  #--power-address=POWER_ADDRESS
+  #--power-user=POWER_USER
+  #--power-pass=POWER_PASS
+  #--power-id=POWER_ID
+  #--ipv6-default-device=IPV6_DEFAULT_DEVICE
+  #--ipv6-autoconfiguration=IPV6_AUTOCONFIGURATION
+  #--mgmt-classes=MGMT_CLASSES
+  #--template-files=TEMPLATE_FILES
+  #--template-remote-kickstarts=TEMPLATE_REMOTE_KICKSTARTS
+  #--clobber
+  #--template-files=TEMPLATE_FILES
+  #--in-place
+
+/usr/bin/cobbler system edit \
+  --name=${ORG}_${MACH}_${NAME} \
+  --mac-address=${MAC_ETH0} \
+  --ip-address=${PROD_IP} \
+  --static=1 \
+  --subnet=${PROD_SUBNET} \
+  --dns-name=${PROD_DNS_NAME} \
+  --interface=eth0
+  #--mtu=MTU
+  #--dhcp-tag=DHCP_TAG
+  #--static-routes=STATIC_ROUTES
+  #--virt-bridge=VIRT_BRIDGE
+  #--ipv6-address=IPV6_ADDRESS
+  #--ipv6-secondaries=IPV6_SECONDARIES
+  #--ipv6-mtu=IPV6_MTU
+  #--ipv6-static-routes=IPV6_STATIC_ROUTES
+  #--ipv6-default-gateway=IPV6_DEFAULT_GATEWAY
+</pre>
+
+		</div><div class="para">
+			We run the above script and verify that the system is known in Cobbler: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>chmod u+x cobbler-dmm01.sh</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>./cobbler-dmm01.sh</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler system list | grep dmm01</code></strong>
+   SpacewalkDefaultOrganization_kvm_dmm01
+</pre>
+
+		</div><div class="para">
+			We create the Cobbler boot ISO with: 
+<pre class="screen">
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler get-loaders</code></strong>
+task started: 2013-05-02_155133_get_loaders
+task started (id=Download Bootloader Content, time=Thu May  2 15:51:33 2013)
+downloading http://dgoodwin.fedorapeople.org/loaders/README to /var/lib/cobbler/loaders/README
+downloading http://dgoodwin.fedorapeople.org/loaders/COPYING.elilo to /var/lib/cobbler/loaders/COPYING.elilo
+downloading http://dgoodwin.fedorapeople.org/loaders/COPYING.yaboot to /var/lib/cobbler/loaders/COPYING.yaboot
+downloading http://dgoodwin.fedorapeople.org/loaders/COPYING.syslinux to /var/lib/cobbler/loaders/COPYING.syslinux
+downloading http://dgoodwin.fedorapeople.org/loaders/elilo-3.8-ia64.efi to /var/lib/cobbler/loaders/elilo-ia64.efi
+downloading http://dgoodwin.fedorapeople.org/loaders/yaboot-1.3.14-12 to /var/lib/cobbler/loaders/yaboot
+downloading http://dgoodwin.fedorapeople.org/loaders/pxelinux.0-3.61 to /var/lib/cobbler/loaders/pxelinux.0
+downloading http://dgoodwin.fedorapeople.org/loaders/menu.c32-3.61 to /var/lib/cobbler/loaders/menu.c32
+downloading http://dgoodwin.fedorapeople.org/loaders/grub-0.97-x86.efi to /var/lib/cobbler/loaders/grub-x86.efi
+downloading http://dgoodwin.fedorapeople.org/loaders/grub-0.97-x86_64.efi to /var/lib/cobbler/loaders/grub-x86_64.efi
+*** TASK COMPLETE ***
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>yum install syslinux</code></strong>
+.. might already be installed ..
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cd /var/lib/cobbler/loaders</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cp /usr/share/syslinux/menu.c32 .</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>cp /usr/share/syslinux/vesamenu.c32 .</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>mkdir -p /var/www/cobbler/pub/example</code></strong>
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos5u8-test01-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_dmm01" --tempdir=/tmp</code></strong>
+task started: 2013-05-02_155717_buildiso
+task started (id=Build Iso, time=Thu May  2 15:57:17 2013)
+using/creating buildisodir: /tmp/buildiso
+building tree for isolinux
+copying miscellaneous files
+copying kernels and initrds for profiles
+copying kernels and initrds for systems
+generating a isolinux.cfg
+generating profile list
+generating system list
+ - ksdevice 52:54:00:a8:05:64 set for system SpacewalkDefaultOrganization_kvm_dmm01
+append line length is greater than 254 chars: (276 chars)
+done writing config
+running: mkisofs -o /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso -r -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -V Cobbler\ Install -R -J -T /tmp/buildiso
+received on stdout: 
+received on stderr: I: -input-charset not specified, using utf-8 (detected in locale settings)
+Size of boot image is 4 sectors -&gt; No emulation
+ 68.62% done, estimate finish Thu May  2 15:57:18 2013
+Total translation table size: 4029
+Total rockridge attributes bytes: 1320
+Total directory bytes: 4096
+Path table size(bytes): 40
+Max brk space used 1c000
+7301 extents written (14 MB)
+
+ISO build complete
+You may wish to delete: /tmp/buildiso
+The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
+*** TASK COMPLETE ***
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>ls -lh /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso</code></strong>
+-rw-r--r--. 1 root root 15M May  2 15:57 /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
+<code class="prompt">d19sw1#</code> <strong class="userinput"><code>scp /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso root@192.168.5.1:/tmp</code></strong></pre>
+
+		</div></div><div class="section" id="sect-msat-guide-Test_Spacewalk-KVM_installation"><div class="titlepage"><div><div><h2 class="title" id="sect-msat-guide-Test_Spacewalk-KVM_installation">1.7.5. KVM installation</h2></div></div></div><div class="para">
+			On the host machine we need to create storage space for our test machine: 
+<pre class="screen">
+<code class="prompt">server#</code> <strong class="userinput"><code>pvs</code></strong>
+  PV         VG        Fmt  Attr PSize   PFree
+  /dev/sda3  vg_server lvm2 a--  931.00g      0
+  /dev/sdb   b         lvm2 a--  931.51g 638.54g
+  /dev/sdc   c         lvm2 a--  931.51g 931.51g
+  /dev/sdd   d         lvm2 a--  931.51g 931.51g
+  /dev/sde   e         lvm2 a--  931.51g 931.51g
+  /dev/sdf   f         lvm2 a--  931.51g 931.51g
+
+<code class="prompt">server#</code> <strong class="userinput"><code>pvs -o +vg_extent_size /dev/sde</code></strong>
+  PV         VG   Fmt  Attr PSize   PFree   Ext
+  /dev/sde   e    lvm2 a--  931.51g 931.51g 4.00m
+
+<code class="prompt">server#</code> <strong class="userinput"><code>lvcreate -n mm -l $((25 * 10 * 5)) e</code></strong>
+  Logical volume "mm" created
+
+</pre>
+
+		</div><div class="para">
+			Explanation of the parameters in the <code class="command">virt-install</code> command: 
+			<div class="itemizedlist"><ul><li class="listitem"><div class="para">
+						dmm01, d (development), mm (model machine), 01 (first).
+					</div></li><li class="listitem"><div class="para">
+						mac=52:54:00:a8:05:64, 192.168.5.100 -&gt; 00:a8:05:64, the 52:54:00 is obligatory by libvirt definition.
+					</div></li></ul></div>
+			 To make it easy to verify the <code class="command">virt-install</code> options in the <span class="emphasis"><em>virt-install man page</em></span>, we specify them in the same order as they appear in the man page.
+		</div><div class="para">
+			The installation is started with: 
+<pre class="screen">
+<code class="prompt">server#</code> <strong class="userinput"><code>virt-install \</code></strong>
+  <strong class="userinput"><code>--connect qemu:///system \</code></strong>
+  <strong class="userinput"><code>--name=dmm01 \</code></strong>
+  <strong class="userinput"><code>--ram=512 \</code></strong>
+  <strong class="userinput"><code>--arch=x86_64 \</code></strong>
+  <strong class="userinput"><code>--description="Provisioning test machine" \</code></strong>
+  <strong class="userinput"><code>--cdrom /tmp/centos5u8-test01-kvm.iso \</code></strong>
+  <strong class="userinput"><code>--os-type=linux \</code></strong>
+  <strong class="userinput"><code>--os-variant=rhel5.4 \</code></strong>
+  <strong class="userinput"><code>--disk path=/dev/e/mm,device=disk,bus=scsi \</code></strong>
+  <strong class="userinput"><code>--network=network=dmsat1,mac=52:54:00:a8:05:64 \</code></strong>
+  <strong class="userinput"><code>--graphics vnc \</code></strong>
+  <strong class="userinput"><code>--hvm \</code></strong>
+  <strong class="userinput"><code>--autostart</code></strong>
+.. output skipped, about 10 minutes ..
+</pre>
+			 Select <span class="bold bold"><strong>SpacewalkDefaultOrganization_kvm_dmm01</strong></span> and press <span class="keycap"><strong>Enter</strong></span>.
+		</div><div class="para">
+			To check on the installed system if everything is working fine, one does: 
+<pre class="screen">
+<code class="prompt">dmm01#</code> rhncfg-client list
+Using server name d19sw1.dmsat1.org
+DoFoS   Config Channel   File
+F           test01     /etc/motd
+<code class="prompt">dmm01#</code> yum repolist
+Loaded plugins: fastestmirror, rhnplugin, security
+This system is receiving updates from RHN Classic or RHN Satellite.
+Loading mirror speeds from cached hostfile
+repo id                              repo name                            status
+centos-x86_64-server-5               centos-x86_64-server-5               3,602
+con-tools-centos-x86_64-server-5     con-tools-centos-x86_64-server-5        15
+repolist: 3,617
+</pre>
+
+		</div></div></div></body></html>
