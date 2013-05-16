@@ -122,9 +122,11 @@ options $*
 verify
 
 # AB: loop over de software channels
-for s in $(/bin/echo $L_OPTION | /usr/bin/tr ',' ' ')
+for i in $(/bin/echo $O_OPTION | /usr/bin/tr ',' ' ')
 do
-  for i in $(/bin/echo $O_OPTION | /usr/bin/tr ',' ' ')
+  echo "msat_mk_org_trust.py -o $i"
+  msat_mk_org_trust.py -o $i
+  for s in $(/bin/echo $L_OPTION | /usr/bin/tr ',' ' ')
   do
     echo "msat_mk_sc_org.py -t yes -s $A_OPTION -l $s -o $i"
     msat_mk_sc_org.py -t yes -s $A_OPTION -l $s -o $i
