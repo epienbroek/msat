@@ -2,26 +2,28 @@
 
 #
 # SCRIPT
-#   msat_ls_sc_rpms.py
+#   msat_ls_sc_ids.py
 # DESCRIPTION
+#   Lists the RPM ID's of the specified RPM names in the
+#   specified software channel label.
 # DEPENDENCIES
 #   You need a Satellite server running to which this client
 #   can connect.
 # FAILURE
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
-#   Allard Berends (AB), 2013-02-24 13:07
+#   Allard Berends (AB), 2013-05-20 19:24
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
-#   msat_ls_sc_rpms.py is free software; you can
+#   msat_ls_sc_ids.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
 #   Software Foundation; either version 3 of the License, or
 #   (at your option) any later version.
 #
-#   msat_ls_sc_rpms.py is distributed in the hope that it
+#   msat_ls_sc_ids.py is distributed in the hope that it
 #   will be useful, but WITHOUT ANY WARRANTY; without even
 #   the implied warranty of MERCHANTABILITY or FITNESS FOR A
 #   PARTICULAR PURPOSE. See the GNU General Public License
@@ -39,9 +41,9 @@ import optparse
 import sys
 import xmlrpclib
 
-usage = '''list RPM's in software channel'''
+usage = '''list RPM ID's of specified RPM's in software channel'''
 
-description = '''This script lists the contained RPM's in the specified software channel on the specified Satellite server.'''
+description = '''This script lists the RPM ID's of the specified RPM's in the specified software channel.'''
 
 parser = optparse.OptionParser(
   usage = usage,
@@ -119,19 +121,27 @@ parser.add_option(
   help = "softwarechannel label"
 )
 parser.add_option(
-  "-i",
-  "--rpm-id",
+  "-n",
+  "--rpm-names",
   action = "callback",
-  callback = config.parse_boolean,
-  dest = "rpm_id",
+  callback = config.parse_string,
+  dest = "rpm_names",
   type = "string",
   default = None,
-  help = "show RPM ID"
+  help = "comma separated list of RPM's"
 )
 (options, args) = config.get_conf(parser)
 
 if options.softwarechannel_label is None:
   parser.error('Error: specify label, -l or --softwarechannel-label')
+if options.rpm_names is None:
+  parser.error('Error: specify RPM names, -n or --rpm-names')
+
+names = options.rpm_names.split(',')
+
+d = {}
+for n in names:
+  d[n] = None
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
@@ -146,11 +156,17 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, kickstart
 
-if options.rpm_id:
-  for i in rpms:
-    print "%8d: %s %s %s %s" % (i['id'], i['name'], i['version'], i['release'], i['arch_label'])
-else:
-  for i in rpms:
-    print "%s %s %s %s" % (i['name'], i['version'], i['release'], i['arch_label'])
+for i in rpms:
+  nvra = "%s-%s-%s-%s" % (i['name'], i['version'], i['release'], i['arch_label'])
+  try:
+    d[nvra]
+    d[nvra] = i['id']
+  except KeyError, e:
+    pass
+
+ids = d.values()
+ids.sort()
+ids = [str(i) for i in ids]
+print ','.join(ids)
 
 client.auth.logout(key)

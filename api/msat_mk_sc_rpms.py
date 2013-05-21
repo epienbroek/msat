@@ -2,28 +2,36 @@
 
 #
 # SCRIPT
-#   msat_ls_sc_rpms.py
+#   msat_mk_sc_rpms.py
 # DESCRIPTION
+#   Adds specified RPM's, by ID, to the target software
+#   channel label.
+# OPTIONS
+#   See the optparse code. parser.add_option statements.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
 # DEPENDENCIES
 #   You need a Satellite server running to which this client
 #   can connect.
 # FAILURE
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
-#   Allard Berends (AB), 2013-02-24 13:07
+#   Allard Berends (AB), 2013-05-20 19:11
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
-#   msat_ls_sc_rpms.py is free software; you can
-#   redistribute it and/or modify it under the terms of the
-#   GNU General Public License as published by the Free
-#   Software Foundation; either version 3 of the License, or
-#   (at your option) any later version.
+#   msat_mk_sc_rpms.py is free software; you can redistribute it
+#   and/or modify it under the terms of the GNU General
+#   Public License as published by the Free Software
+#   Foundation; either version 3 of the License, or (at your
+#   option) any later version.
 #
-#   msat_ls_sc_rpms.py is distributed in the hope that it
-#   will be useful, but WITHOUT ANY WARRANTY; without even
-#   the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   msat_mk_sc_rpms.py is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the
+#   implied warranty of MERCHANTABILITY or FITNESS FOR A
 #   PARTICULAR PURPOSE. See the GNU General Public License
 #   for more details.
 #
@@ -39,9 +47,9 @@ import optparse
 import sys
 import xmlrpclib
 
-usage = '''list RPM's in software channel'''
+usage = '''adds RPM's to software channel by ID'''
 
-description = '''This script lists the contained RPM's in the specified software channel on the specified Satellite server.'''
+description = '''This script adds the specified RPM's, by ID to the specified software channel label.'''
 
 parser = optparse.OptionParser(
   usage = usage,
@@ -97,60 +105,49 @@ parser.add_option(
   default = None,
   help = "password belonging to Satellite admin account",
 )
-parser.add_option(
-  "-v",
-  "--satellite-version",
-  action = "callback",
-  callback = config.parse_string,
-  dest = "satellite_version",
-  type = "string",
-  default = "5.4",
-  help = "version of the Satellite API",
-)
 
 parser.add_option(
   "-l",
   "--softwarechannel-label",
-  action = "callback",
+  action = "callback", 
   callback = config.parse_string,
   dest = "softwarechannel_label",
   type = "string",
   default = None,
-  help = "softwarechannel label"
+  help = "config channel label"
 )
 parser.add_option(
   "-i",
-  "--rpm-id",
-  action = "callback",
-  callback = config.parse_boolean,
-  dest = "rpm_id",
+  "--rpm-ids",
+  action = "callback", 
+  callback = config.parse_string,
+  dest = "rpm_ids",
   type = "string",
   default = None,
-  help = "show RPM ID"
+  help = "comma separated list of RPM ID's"
 )
 (options, args) = config.get_conf(parser)
 
 if options.softwarechannel_label is None:
   parser.error('Error: specify label, -l or --softwarechannel-label')
+if options.rpm_ids is None:
+  parser.error('Error: specify name, -i or --rpm-ids')
+
+ids = options.rpm_ids.split(',')
+ids = [int(i) for i in ids]
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
 try:
-  rpms = client.channel.software.listAllPackages(
-    key,
+  rc = client.channel.software.addPackages(
+    key, 
     options.softwarechannel_label,
+    ids,
   )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
-  print >> sys.stderr, kickstart
-
-if options.rpm_id:
-  for i in rpms:
-    print "%8d: %s %s %s %s" % (i['id'], i['name'], i['version'], i['release'], i['arch_label'])
-else:
-  for i in rpms:
-    print "%s %s %s %s" % (i['name'], i['version'], i['release'], i['arch_label'])
+  print >> sys.stderr, options
 
 client.auth.logout(key)
