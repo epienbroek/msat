@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+  <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+  %BOOK_ENTITIES;
+]>
+<refentry id="references-msat_mk_kp">
+
+<refentryinfo>
+<author>
+  <honorific>Mr</honorific>
+  <firstname>Allard</firstname>
+  <surname>Berends</surname>
+  <contrib>Author of this manpage</contrib>
+  <affiliation>
+    <shortaffil>LEA</shortaffil>
+    <jobtitle>Enterprise Administrator</jobtitle>
+    <orgname>Linux Enterprise Administration</orgname>
+    <orgdiv>Operations</orgdiv>
+  </affiliation>
+</author>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle>msat_mk_kp.py</refentrytitle>
+<manvolnum>8</manvolnum>
+<refmiscinfo class='date'>21 October 2012</refmiscinfo>
+<refmiscinfo class='source'>LEA</refmiscinfo>
+<refmiscinfo class='manual'>msat commands</refmiscinfo>
+</refmeta>
+
+@msat_command@
+
+<refsect1 id="references-msat_mk_kp-examples">
+<title>EXAMPLES</title>
+<para>
+  <screen>
+&uprompt; <userinput>create_kickstart_profile.py \
+  --kickstart-label kvm-server \
+  --kickstart-virt none \
+  --kickstart-tree ks-rhel-x86_64-server-5-u5 \
+  --kickstart-satellite psat.example.org \
+  --kickstart-root redhat \
+  --kickstart-childchannels 'rhn-tools-rhel-x86_64-server-5,support,splunk' \
+  --kickstart-configmgt true \
+  --kickstart-remotecmds true \
+  --kickstart-partitioning 'partition pv.00 --size=0 --grow,partition /boot --fstype=ext3 --size=100,volgroup vg_os pv.00,logvol swap --fstype swap --name=swap --vgname=vg_os --size=512,logvol / --fstype ext3 --name=root --vgname=vg_os --size=1024 --grow' \
+  --kickstart-keys 'Example-GPG-KEY' \
+  --kickstart-install true \
+  --kickstart-text true \
+  --kickstart-url '--url /rhn/kickstart/ks-rhel-x86_64-server-5-u5' \
+  --kickstart-lang 'en_US' \
+  --kickstart-keyboard 'us' \
+  --kickstart-mouse 'none' \
+  --kickstart-zerombr 'yes' \
+  --kickstart-clearpart '--drives=sda --initlabel' \
+  --kickstart-bootloader '--location mbr --driveorder=sda' \
+  --kickstart-timezone '--utc Europe/Amsterdam' \
+  --kickstart-auth '--enablemd5 --enableshadow' \
+  --kickstart-rootpw '$1$HYefCqjK$DYFA.faC1hU4nUehHgatn1' \
+  --kickstart-selinux '--enforcing' \
+  --kickstart-reboot true \
+  --kickstart-firewall '--enabled' \
+  --kickstart-skipx true \
+  --kickstart-key '--skip' \
+  --kickstart-software '@Base,authconfig,authconfig-gtk,openldap-clients,mozldap-tools,xorg-x11-xauth,net-snmp,kexec-tools,nmap,ntp,screen,strace,sysstat,vim-enhanced,net-snmp-utils,dmidecode,sg3_utils,lsscsi,-bluez-utils,-ccid,-coolkey,-ifd-egate,-pcsc-lite,-yum-updatesd' \
+  --kickstart-activationkey 1-kvm-server \
+  --kickstart-script '# Roll out configuration channel and activate sysctl settings
+rhncfg-client get
+sysctl -p /etc/sysctl.conf
+
+# Create ssh keys
+/usr/bin/ssh-keygen -q -f /root/.ssh/id_rsa -N ""
+
+# AB: triggered by /etc/openldap/cacerts/my-ca.crt config
+# file.
+ODIR=$(/bin/pwd)
+cd /etc/openldap/cacerts
+HASH=$(/usr/bin/openssl x509 -in my-ca.crt -noout -hash).0
+ln -s my-ca.crt $HASH
+cd $ODIR
+
+# Standard services configuration.
+/sbin/chkconfig avahi-daemon off
+/sbin/chkconfig bluetooth off
+/sbin/chkconfig cups off
+/sbin/chkconfig firstboot off
+/sbin/chkconfig kudzu off
+/sbin/chkconfig lm_sensors off
+/sbin/chkconfig kdump off
+/sbin/chkconfig snmpd off
+/sbin/chkconfig ntpd on
+
+# AB: triggered by ntp.conf config file.
+/bin/cat &gt; /usr/bin/nightly_ntp_sync.sh &lt;&lt; EOF__BLAH__EOF
+#!/bin/bash
+#
+# SCRIPT
+#   nightly_ntp_sync.sh
+# DESCRIPTION
+#   Systems must use NTP to keep track of time. When the NTP
+#   service is down, systems must rely on their internal
+#   clock. Hence, the internal clock must be synchronised to
+#   NTP. This is done once a day via this script, run from
+#   cron.
+#
+#   The script must only synchronise if we know that NTP is
+#   correct. Hence, this is first checked with ntpq.
+#
+#   The cron entry is placed in /etc/cron.d and looks like:
+#   # Set hardware clock to NTP, if NTP is correct:
+#   53 03 * * * root /root/nightly_ntp_sync.sh
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+# AUTHORS
+#   Date strings made with date +"\%Y-\%m-\%d \%H:\%M".
+#   Allard Berends (AB), 2013-02-24 19:38
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+#
+#   nightly_ntp_sync.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   nightly_ntp_sync.sh is distributed in the hope that it
+#   will be useful, but WITHOUT ANY WARRANTY; without even
+#   the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#   Reason for this script to exist is that we don not want
+#   to rely on an initial install once to set the hardware
+#   clock. In case of NTP failure, we want to have an
+#   accurate hardware time. So, we synchronise on a daily
+#   basis.
+#   Furthermore, if we rely on the installation to set the
+#   hardware clock from NTP and for new systems NTP is not
+#   available, we do not even start out with a correct
+#   hardware clock.
+
+GREP=/bin/grep
+HWCLOCK=/sbin/hwclock
+NTPQ=/usr/sbin/ntpq
+
+# Test if we have a sys.peer (see man ntpq) upstream NTP
+# server.
+$NTPQ -n -p | $GREP "^\*" &gt;/dev/null 2&gt;&amp;1 || { echo "ERROR: no NTP time" 1&gt;&amp;2; exit 1; }
+
+# Set the hardware clock to the system time.
+$HWCLOCK --systohc --utc
+EOF__BLAH__EOF
+/bin/chmod 755 /usr/bin/nightly_ntp_sync.sh
+'</userinput>
+  </screen>
+</para>
+</refsect1>
+
+<refsect1>
+<title>SEE ALSO</title>
+<para>
+  <citerefentry>
+    <refentrytitle>list_activation_keys.py</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </citerefentry>,
+  <citerefentry>
+    <refentrytitle>list_config_channels.py</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </citerefentry>
+</para>
+</refsect1>
+
+</refentry>

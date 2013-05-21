@@ -151,8 +151,8 @@ def print_description(p):
 </refsect1>''' % (p.get_description(), )
 
 def print_xmlhelp(option, opt_str, value, parser):
-  print '''<?xml version="1.0" encoding="UTF-8" ?>
-<!ENTITY %(prog)s "''' % {'prog': re.sub('\.py', '', parser.get_prog_name())}
+  #print '''<?xml version="1.0" encoding="UTF-8" ?>
+#<!ENTITY %(prog)s "''' % {'prog': re.sub('\.py', '', parser.get_prog_name())}
   print_name_purpose(parser)
   print_synopsis(parser)
   print_description(parser)
@@ -167,7 +167,7 @@ def print_xmlhelp(option, opt_str, value, parser):
     print '''</variablelist>
 </para>
 </refsect1>'''
-  print '''">'''
+  #print '''">'''
   parser.exit()
 
 def get_conf(parser):

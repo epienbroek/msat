@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+  <!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+  %BOOK_ENTITIES;
+]>
+<chapter id="references">
+<title>MSAT commands</title>
+<para>
+  In this chapter, the commands, constructed by using the
+  Satellite API, are detailed.
+</para>
+
+<xi:include href="references/msat_ls_ak_cc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_ak_kp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_ak.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_ak_sys.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_bc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cc_ak.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cc_cf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cc_files.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cf_cc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cr.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_cs.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kp_ak.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kp_co.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kp_hy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kp_sys.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_kt.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_org.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_orgs.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_rpm_path.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_rpm_sc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sc_org.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sc_paths.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sc_rpms.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sl.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sn.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sys_ak.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sys_cf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sys_rk.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sys.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="references/msat_ls_sys_up.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</chapter>

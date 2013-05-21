@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+  <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+  %BOOK_ENTITIES;
+]>
+<refentry id="references-msat_ls_cs">
+
+<refentryinfo>
+<author>
+  <honorific>Mr</honorific>
+  <firstname>Allard</firstname>
+  <surname>Berends</surname>
+  <contrib>Author of this manpage</contrib>
+  <affiliation>
+    <shortaffil>LEA</shortaffil>
+    <jobtitle>Enterprise Administrator</jobtitle>
+    <orgname>Linux Enterprise Administration</orgname>
+    <orgdiv>Operations</orgdiv>
+  </affiliation>
+</author>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle>msat_ls_cs.py</refentrytitle>
+<manvolnum>8</manvolnum>
+<refmiscinfo class='date'>21 October 2012</refmiscinfo>
+<refmiscinfo class='source'>LEA</refmiscinfo>
+<refmiscinfo class='manual'>msat commands</refmiscinfo>
+</refmeta>
+
+@msat_command@
+
+<refsect1>
+<title>SEE ALSO</title>
+<para>
+  <citerefentry>
+    <refentrytitle>list_activation_keys.py</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </citerefentry>,
+  <citerefentry>
+    <refentrytitle>list_config_channels.py</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </citerefentry>
+</para>
+</refsect1>
+
+</refentry>
