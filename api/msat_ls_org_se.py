@@ -128,6 +128,21 @@ client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
 try:
+  se = client.org.listSystemEntitlements(
+    key,
+  )
+except xmlrpclib.Fault, e:
+  print >> sys.stderr, str(e)
+  sys.exit(1)
+
+if options.org_header:
+  print "Overall system entitlements"
+  print "%-30.30s %11.11s %11.11s %11.11s %11.11s" % ('label', 'free', 'used', 'allocated', 'unallocated')
+  for i in se:
+    print "%-30.30s %11d %11d %11d %11d" % (i['label'], i['free'], i['used'], i['allocated'], i['unallocated'])
+  print
+
+try:
   se = client.org.listSystemEntitlementsForOrg(
     key,
     options.org_number
@@ -136,8 +151,6 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   sys.exit(1)
 
-if options.org_header:
-  print "%-30.30s %11.11s %11.11s %11.11s %11.11s" % ('label', 'free', 'used', 'allocated', 'unallocated')
 for i in se:
   print "%-30.30s %11d %11d %11d %11d" % (i['label'], i['free'], i['used'], i['allocated'], i['unallocated'])
 

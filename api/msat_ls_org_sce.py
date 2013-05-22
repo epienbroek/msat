@@ -120,33 +120,57 @@ parser.add_option(
 )
 (options, args) = config.get_conf(parser)
 
-if not options.org_number:
-  parser.error('Error: specify organization number, -o or --org-number')
+if options.org_number == 0:
+  pass
+elif not options.org_number:
+  parser.error('Error: specify organization number, -o or --org-number. 0 for overall')
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
-try:
-  se = client.org.listSoftwareEntitlementsForOrg(
-    key,
-    options.org_number
-  )
-except xmlrpclib.Fault, e:
-  print >> sys.stderr, str(e)
-  sys.exit(1)
+if options.org_number != 0:
+	try:
+		se = client.org.listSoftwareEntitlementsForOrg(
+			key,
+			options.org_number
+		)
+	except xmlrpclib.Fault, e:
+		print >> sys.stderr, str(e)
+		sys.exit(1)
 
-l = 0
-for i in se:
-  dummy = len(i['label'])
-  if dummy > l:
-    l = dummy
+	l = 0
+	for i in se:
+		dummy = len(i['label'])
+		if dummy > l:
+			l = dummy
 
-f1 = "%-" + str(l) + "." + str(l) + "s %7.7s %7.7s %7.7s %7.7s"
-f2 = "%-" + str(l) + "." + str(l) + "s %7d %7d %7d %7d"
-if options.org_header:
-  print f1 % ('label', 'alloc', 'unalloc', 'free', 'used')
-for i in se:
-  print f2 % (i['label'], i['allocated'], i['unallocated'], i['free'], i['used'])
+	f1 = "%-" + str(l) + "." + str(l) + "s %7.7s %7.7s %7.7s %7.7s"
+	f2 = "%-" + str(l) + "." + str(l) + "s %7d %7d %7d %7d"
+	if options.org_header:
+		print f1 % ('label', 'alloc', 'unalloc', 'free', 'used')
+	for i in se:
+		print f2 % (i['label'], i['allocated'], i['unallocated'], i['free'], i['used'])
+else:
+	try:
+		se = client.org.listSoftwareEntitlements(
+			key,
+		)
+	except xmlrpclib.Fault, e:
+		print >> sys.stderr, str(e)
+		sys.exit(1)
+
+	l = 0
+	for i in se:
+		dummy = len(i['label'])
+		if dummy > l:
+			l = dummy
+
+	f1 = "%-" + str(l) + "." + str(l) + "s %7.7s %7.7s %7.7s %7.7s"
+	f2 = "%-" + str(l) + "." + str(l) + "s %7d %7d %7d %7d"
+	if options.org_header:
+		print f1 % ('label', 'alloc', 'unalloc', 'free', 'used')
+	for i in se:
+		print f2 % (i['label'], i['allocated'], i['unallocated'], i['free'], i['used'])
 
 client.auth.logout(key)
