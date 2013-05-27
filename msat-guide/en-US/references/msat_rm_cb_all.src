@@ -4,7 +4,7 @@
   <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
   %BOOK_ENTITIES;
 ]>
-<refentry id="references-msat_ls_ak_sys">
+<refentry id="references-msat_rm_cb_all">
 
 <refentryinfo>
 <author>
@@ -22,7 +22,7 @@
 </refentryinfo>
 
 <refmeta>
-<refentrytitle>msat_ls_ak_sys.py</refentrytitle>
+<refentrytitle>msat_rm_cb_all.py</refentrytitle>
 <manvolnum>8</manvolnum>
 <refmiscinfo class='date'>21 October 2012</refmiscinfo>
 <refmiscinfo class='source'>LEA</refmiscinfo>
@@ -35,13 +35,9 @@
 <title>SEE ALSO</title>
 <para>
   <citerefentry>
-    <refentrytitle>msat_ls_ak.py</refentrytitle>
+    <refentrytitle>msat_ls_kp.py</refentrytitle>
     <manvolnum>8</manvolnum>
   </citerefentry>,
-  <citerefentry>
-    <refentrytitle>msat_ls_sys.py</refentrytitle>
-    <manvolnum>8</manvolnum>
-  </citerefentry>
 </para>
 </refsect1>
 

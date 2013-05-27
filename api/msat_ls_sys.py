@@ -41,7 +41,7 @@ import xmlrpclib
 
 usage = '''list registered systems'''
 
-description = '''This script lists the systems known to the Satellite organization.'''
+description = '''This script lists the systems registered to the Satellite organization.'''
 
 parser = optparse.OptionParser(
   usage = usage,

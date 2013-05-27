@@ -36,6 +36,7 @@
 
 import config
 import optparse
+import sys
 import xmlrpclib
 
 usage = '''list kickstartable channels'''
@@ -131,6 +132,7 @@ try:
   )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
+  sys.exit(1)
 
 for i in k:
   print i['label']

@@ -54,6 +54,72 @@ usage() {
 
 #
 # FUNCTION
+#   xml_help
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+xml_help() {
+  cat << EOF__EOF
+<refnamediv>
+<refname>msat_mk_kp_hy.sh</refname>
+<refpurpose>list the config channels</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+<cmdsynopsis>
+  <command>msat_mk_kp_hy.sh</command>
+  <arg choice='opt'>--version</arg>
+  <arg choice='opt'>-h, --help</arg>
+  <arg choice='opt'>-x, --xml-help</arg>
+  <arg choice='opt'>-f, --params-file <replaceable>PARAMS_FILE</replaceable></arg>
+  <arg choice='opt'>-u, --satellite-url <replaceable>SATELLITE_URL</replaceable></arg>
+  <arg choice='opt'>-a, --satellite-login <replaceable>SATELLITE_LOGIN</replaceable></arg>
+  <arg choice='opt'>-p, --satellite-password <replaceable>SATELLITE_PASSWORD</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+<refsect1>
+<title>DESCRIPTION</title>
+<para>This script lists the config channels available on the Satellite server.</para>
+</refsect1>
+<refsect1>
+<title>OPTIONS</title>
+<para>
+  The options are as follows:
+  <variablelist>
+    <varlistentry>
+      <term><option>-h, --help</option></term>
+      <listitem>
+        <para>
+          show this help message and exit
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-x, --xml-help</option></term>
+      <listitem>
+        <para>
+          Print help in XML format
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-d</option> <replaceable>DIRECTORY_PATH</replaceable></term>
+      <listitem>
+        <para>
+          kickstart profile hierarchy source directory
+        </para>
+      </listitem>
+    </varlistentry>
+</variablelist>
+</para>
+</refsect1>
+EOF__EOF
+} # end xml_help
+
+#
+# FUNCTION
 #   options
 # DESCRIPTION
 #   This function parses the command line options.
@@ -67,10 +133,12 @@ options() {
   # Assume correct processing
   RC=0
 
-  while getopts "d:h" Option 2>/dev/null
+  while getopts "d:hx" Option 2>/dev/null
   do
     case $Option in
     d)  D_OPTION=$OPTARG ;;
+    x)  xml_help
+        exit 0 ;;
     ?|h|-h|-help)  usage
         exit 0 ;;
     *)  usage

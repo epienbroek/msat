@@ -35,11 +35,15 @@
 <title>SEE ALSO</title>
 <para>
   <citerefentry>
-    <refentrytitle>list_activation_keys.py</refentrytitle>
+    <refentrytitle>msat_ls_ak.py</refentrytitle>
     <manvolnum>8</manvolnum>
   </citerefentry>,
   <citerefentry>
-    <refentrytitle>list_config_channels.py</refentrytitle>
+    <refentrytitle>msat_ls_kp.py</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </citerefentry>
+  <citerefentry>
+    <refentrytitle>msat_ls_kp_ak.py</refentrytitle>
     <manvolnum>8</manvolnum>
   </citerefentry>
 </para>

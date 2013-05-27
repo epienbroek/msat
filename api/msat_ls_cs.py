@@ -54,9 +54,9 @@ import optparse
 import sys
 import xmlrpclib
 
-usage = '''adds the specified cobbler snippet'''
+usage = '''lists the cobbler snippets'''
 
-description = '''This script adds the specified cobbler snipped to the Satellite. If the cobbler snippet does not exist, a new one will be created. If the cobbler snipped already exists, it will be overwritten. So be carefull.'''
+description = '''This lists the custom cobbler snippets known to the organization.'''
 
 parser = optparse.OptionParser(
   usage = usage,
@@ -123,27 +123,6 @@ parser.add_option(
   help = "version of the Satellite API",
 )
 
-parser.add_option(
-  "-n",
-  "--snippet-name",
-  action = "callback",
-  callback = config.parse_string,
-  dest = "snippet_name",
-  type = "string",
-  default = None,
-  help = "snippet name option"
-)
-parser.add_option(
-  "-c",
-  "--snippet-content",
-  action = "callback",
-  callback = config.parse_file,
-  dest = "snippet_content",
-  type = "string",
-  default = None,
-  help = "snippet content option"
-)
-
 (options, args) = config.get_conf(parser)
 
 if options.satellite_url is None:
@@ -152,10 +131,6 @@ if options.satellite_login is None:
   parser.error('Error: specify login, -l or --login')
 if options.satellite_password is None:
   parser.error('Error: specify password, -p or --password')
-#if options.snippet_name is None:
-#  parser.error('Error: specify name, -n or --snippet-name')
-#if options.snippet_content is None:
-#  parser.error('Error: specify content, -c or --snippet-content')
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
@@ -169,6 +144,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.error(1)
 
 for s in snippets:
   print 'name: %s' % (s['name'],)

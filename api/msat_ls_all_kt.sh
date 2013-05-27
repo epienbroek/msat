@@ -50,7 +50,79 @@ usage() {
   echo " -a <satellite admin>:    To overwrite the default"
   echo " -p <satellite password>: To overwrite the default"
   echo " -h : this help message"
+  echo " -x : XML help for manpage generation"
 } # end usage
+
+#
+# FUNCTION
+#   xml_help
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+xml_help() {
+  cat << EOF__EOF
+<refnamediv>
+<refname>msat_ls_all_kt.sh</refname>
+<refpurpose>list kickstartable trees</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+<cmdsynopsis>
+  <command>msat_ls_all_kt.sh</command>
+  <arg choice='opt'>-h, --help</arg>
+  <arg choice='opt'>-x, --xml-help</arg>
+  <arg choice='opt'>-a, --satellite-login <replaceable>SATELLITE_LOGIN</replaceable></arg>
+  <arg choice='opt'>-p, --satellite-password <replaceable>SATELLITE_PASSWORD</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+<refsect1>
+<title>DESCRIPTION</title>
+<para>This script lists the kickstartable trees available on the Satellite server.</para>
+</refsect1>
+<refsect1>
+<title>OPTIONS</title>
+<para>
+  The options are as follows:
+  <variablelist>
+    <varlistentry>
+      <term><option>-h, --help</option></term>
+      <listitem>
+        <para>
+          show this help message and exit
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-x, --xml-help</option></term>
+      <listitem>
+        <para>
+          Print help in XML format
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-a, --satellite-login</option> <replaceable>SATELLITE_LOGIN</replaceable></term>
+      <listitem>
+        <para>
+          admin account to log in with on Satellite
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-p, --satellite-password</option> <replaceable>SATELLITE_PASSWORD</replaceable></term>
+      <listitem>
+        <para>
+          password belonging to Satellite admin account
+        </para>
+      </listitem>
+    </varlistentry>
+</variablelist>
+</para>
+</refsect1>
+EOF__EOF
+} # end xml_help
 
 #
 # FUNCTION
@@ -67,12 +139,13 @@ options() {
   # Assume correct processing
   RC=0
 
-  while getopts "a:p:h" Option 2>/dev/null
+  while getopts "a:p:hx" Option 2>/dev/null
   do
     case $Option in
     a)  A_OPTION=$OPTARG ;;
     p)  P_OPTION=$OPTARG ;;
-    o)  O_OPTION=$OPTARG ;;
+    x)  xml_help
+        exit 0 ;;
     ?|h|-h|-help)  usage
         exit 0 ;;
     *)  usage

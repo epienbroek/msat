@@ -50,7 +50,61 @@ usage() {
   echo "Usage: $PNAME"
   echo " -d <dir path> : Directory in which is saved"
   echo " -h : this help message"
+  echo " -x : XML help for manpage generation"
 } # end usage
+
+#
+# FUNCTION
+#   xml_help
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+xml_help() {
+  cat << EOF__EOF
+<refnamediv>
+<refname>msat_wr_all_hy.sh</refname>
+<refpurpose>write all org kickstart trees to dir</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+<cmdsynopsis>
+  <command>msat_wr_all_hy.sh</command>
+  <arg choice='opt'>-h, --help</arg>
+  <arg choice='opt'>-x, --xml-help</arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+<refsect1>
+<title>DESCRIPTION</title>
+<para>This script writes all the kickstart profiles and attached information of the current Satellite organization to the specified directory in terms of regeneration scripts.</para>
+</refsect1>
+<refsect1>
+<title>OPTIONS</title>
+<para>
+  The options are as follows:
+  <variablelist>
+    <varlistentry>
+      <term><option>-h, --help</option></term>
+      <listitem>
+        <para>
+          show this help message and exit
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-x, --xml-help</option></term>
+      <listitem>
+        <para>
+          Print help in XML format
+        </para>
+      </listitem>
+    </varlistentry>
+</variablelist>
+</para>
+</refsect1>
+EOF__EOF
+} # end xml_help
 
 #
 # FUNCTION
@@ -67,10 +121,12 @@ options() {
   # Assume correct processing
   RC=0
 
-  while getopts "d:h" Option 2>/dev/null
+  while getopts "d:hx" Option 2>/dev/null
   do
     case $Option in
     d)  D_OPTION=$OPTARG ;;
+    x)  xml_help
+        exit 0 ;;
     ?|h|-h|-help)  usage
         exit 0 ;;
     *)  usage

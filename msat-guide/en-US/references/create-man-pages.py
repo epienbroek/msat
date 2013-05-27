@@ -52,7 +52,9 @@ for f in direntries:
     m = includeline.search(line)
     if m:
       h = re.sub('\.src', '.py', f)
-      hp = subprocess.Popen([os.path.join(MSAT_SCRIPTS_DIR, h), '--xml-help'], stdout=subprocess.PIPE, stderr=None).stdout
+      if not os.access(os.path.join(MSAT_SCRIPTS_DIR, h), os.X_OK):
+        h = re.sub('\.src', '.sh', f)
+      hp = subprocess.Popen([os.path.join(MSAT_SCRIPTS_DIR, h), '-x'], stdout=subprocess.PIPE, stderr=None).stdout
       while True:
         l = hp.readline()
         if not l:

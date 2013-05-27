@@ -56,6 +56,85 @@ usage() {
 
 #
 # FUNCTION
+#   xml_help
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+xml_help() {
+  cat << EOF__EOF
+<refnamediv>
+<refname>msat_mk_trusts.sh</refname>
+<refpurpose>list the config channels</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+<cmdsynopsis>
+  <command>msat_mk_trusts.sh</command>
+  <arg choice='opt'>-h, --help</arg>
+  <arg choice='opt'>-x, --xml-help</arg>
+  <arg choice='opt'>-l <replaceable>SOFTWARE_CHANNELS</replaceable></arg>
+  <arg choice='opt'>-o <replaceable>ORG_IDS</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+<refsect1>
+<title>DESCRIPTION</title>
+<para>This script lists the config channels available on the Satellite server.</para>
+</refsect1>
+<refsect1>
+<title>OPTIONS</title>
+<para>
+  The options are as follows:
+  <variablelist>
+    <varlistentry>
+      <term><option>-h, --help</option></term>
+      <listitem>
+        <para>
+          show this help message and exit
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-x, --xml-help</option></term>
+      <listitem>
+        <para>
+          Print help in XML format
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-a</option> <replaceable>ACCESS_LEVEL</replaceable></term>
+      <listitem>
+        <para>
+          must be public, private, or protected
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-l</option> <replaceable>SOFTWARE_CHANNELS</replaceable></term>
+      <listitem>
+        <para>
+          comma separated list of software channels
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-o</option> <replaceable>ORG_IDS</replaceable></term>
+      <listitem>
+        <para>
+          comma separated list of organization ID's
+        </para>
+      </listitem>
+    </varlistentry>
+</variablelist>
+</para>
+</refsect1>
+EOF__EOF
+} # end xml_help
+
+#
+# FUNCTION
 #   options
 # DESCRIPTION
 #   This function parses the command line options.
@@ -69,12 +148,14 @@ options() {
   # Assume correct processing
   RC=0
 
-  while getopts "a:l:o:h" Option 2>/dev/null
+  while getopts "a:l:o:hx" Option 2>/dev/null
   do
     case $Option in
     a)  A_OPTION=$OPTARG ;;
     l)  L_OPTION=$OPTARG ;;
     o)  O_OPTION=$OPTARG ;;
+    x)  xml_help
+        exit 0 ;;
     ?|h|-h|-help)  usage
         exit 0 ;;
     *)  usage

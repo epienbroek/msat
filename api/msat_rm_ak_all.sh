@@ -36,6 +36,107 @@
 # DESIGN
 #
 
+#
+# FUNCTION
+#   usage
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+usage() {
+  echo "Usage: $PNAME"
+  echo " -x : XML help for manpage generation"
+} # end usage
+
+#
+# FUNCTION
+#   xml_help
+# DESCRIPTION
+#   This function explains how this script should be called
+#   on the command line.
+# RETURN CODE
+#   Nothing
+#
+xml_help() {
+  cat << EOF__EOF
+<refnamediv>
+<refname>msat_rm_ak_all.sh</refname>
+<refpurpose>removes all activation keys of org</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+<cmdsynopsis>
+  <command>msat_rm_ak_all.sh</command>
+  <arg choice='opt'>-h, --help</arg>
+  <arg choice='opt'>-x, --xml-help</arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+<refsect1>
+<title>DESCRIPTION</title>
+<para>This script removes all activation keys of the current Satellite organization.</para>
+</refsect1>
+<refsect1>
+<title>OPTIONS</title>
+<para>
+  The options are as follows:
+  <variablelist>
+    <varlistentry>
+      <term><option>-h, --help</option></term>
+      <listitem>
+        <para>
+          show this help message and exit
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-x, --xml-help</option></term>
+      <listitem>
+        <para>
+          Print help in XML format
+        </para>
+      </listitem>
+    </varlistentry>
+</variablelist>
+</para>
+</refsect1>
+EOF__EOF
+} # end xml_help
+
+#
+# FUNCTION
+#   options
+# DESCRIPTION
+#   This function parses the command line options.
+#   If an option requires a parameter and it is not
+#   given, this function exits with error code 1, otherwise
+#   it succeeds. Parameter checking is done later.
+# EXIT CODE
+#   1: error
+#
+options() {
+  # Assume correct processing
+  RC=0
+
+  while getopts "hx" Option 2>/dev/null
+  do
+    case $Option in
+    x)  xml_help
+        exit 0 ;;
+    ?|h|-h|-help)  usage
+        exit 0 ;;
+    *)  usage
+        exit 1 ;;
+    esac
+  done
+
+  shift $(($OPTIND-1))
+  ARGS=$@
+} # end options
+
+# Get command line options.
+options $*
+
 msat_ls_ak.py | grep -v '1-[0-9a-f]\{1,\}$' | while read line
 do
   msat_rm_ak.py -l "$line"
