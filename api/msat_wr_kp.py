@@ -339,9 +339,9 @@ for o in order:
     if map[o]:
       if o == 'url':
         dummy = re.sub('org/\d+/', 'org/$ORGNUM/', map[o])
-        print "  --kickstart-%s '%s' \\" % (o, dummy)
+        print "  --kickstart-%s \"%s\" \\" % (o, dummy)
       else:
-        print "  --kickstart-%s '%s' \\" % (o, map[o])
+        print "  --kickstart-%s \"%s\" \\" % (o, map[o])
     else:
       print "  --kickstart-%s true \\" % (o, )
 
