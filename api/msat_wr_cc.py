@@ -201,7 +201,7 @@ print '''#!/bin/bash
 '''
 
 if options.configchannel_existence:
-  print  '''if [ -n "$(msat_ls_cc.py | /bin/grep %s)" ]; then
+  print  '''if [ -n "$(msat_ls_cc.py | /bin/grep '^%s$')" ]; then
   /bin/echo "INFO: %s already exists! Bailing out."
   exit 0
 fi

@@ -142,6 +142,16 @@ parser.add_option(
   default = None,
   help = "kickstart label"
 )
+parser.add_option(
+  "-e",
+  "--kickstart-existence",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "kickstart_existence",
+  type = "string",
+  default = None,
+  help = "test for kickstart existence in regeneration script"
+)
 (options, args) = config.get_conf(parser)
 if options.satellite_url is None:
   parser.error('Error: specify URL, -u or --satellite-url')
@@ -206,6 +216,13 @@ print '''#!/bin/bash
 #
 
 '''
+
+if options.kickstart_existence:
+  print  '''if [ -n "$(msat_ls_kp.py | /bin/grep '^%s$')" ]; then
+  /bin/echo "INFO: %s already exists! Bailing out."
+  exit 0
+fi
+''' % (options.kickstart_label, options.kickstart_label)
 
 print "ORGNUM=$(msat_ls_org.py)"
 print

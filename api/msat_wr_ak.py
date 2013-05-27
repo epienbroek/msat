@@ -124,6 +124,16 @@ parser.add_option(
   default = None,
   help = "activationkey label"
 )
+parser.add_option(
+  "-e",
+  "--activationkey-existence",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "activationkey_existence",
+  type = "string",
+  default = None,
+  help = "test for activationkey existence in regeneration script"
+)
 (options, args) = config.get_conf(parser)
 
 if options.satellite_url is None:
@@ -183,10 +193,21 @@ print '''#!/bin/bash
 # DESIGN
 #
 
-msat_mk_ak.py \\'''
+'''
+
+ak_label = re.sub('\d+-', '', options.activationkey_label, 1)
+
+if options.activationkey_existence:
+  print  '''if [ -n "$(msat_ls_ak.py | /bin/grep '^[0-9]\{1,\}-%s$')" ]; then
+  /bin/echo "INFO: %s already exists! Bailing out."
+  exit 0
+fi
+''' % (ak_label, ak_label)
+
+print '''msat_mk_ak.py \\'''
 
 # Set activationkey label.
-print "  --activationkey-label %s \\" % (re.sub('\d+-', '', options.activationkey_label, 1), )
+print "  --activationkey-label %s \\" % (ak_label, )
 
 # Get description: Systems > Activation Keys > Details
 # Get base channels: Systems > Activation Keys > Details
