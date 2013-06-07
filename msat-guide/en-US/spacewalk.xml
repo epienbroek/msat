@@ -3,7 +3,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="chap-msat-guide-Spacewalk">
+<chapter id="msat-guide-Spacewalk">
   <title>Spacewalk</title>
   <para>
     This chapter discusses how to setup a Spacewalk server

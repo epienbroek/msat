@@ -295,9 +295,6 @@ $TTL    86400
 10  IN  PTR d19sw0.dmsat1.org.
 11  IN  PTR d19sw1.dmsat1.org.
 12  IN  PTR d19sw2.dmsat1.org.
-13  IN  PTR ds0.dmsat1.org.
-14  IN  PTR ds1.dmsat1.org.
-15  IN  PTR ds2.dmsat1.org.
 100 IN  PTR &t1;.dmsat1.org.
 </screen>
 		 
@@ -342,18 +339,12 @@ $TTL    86400
 
 ;network   IN      A       192.168.5.0
 ;gateway   IN      A       192.168.5.1
-; MAC_ETH0=52:54:00:a8:05:0a, not used (virtual)
+; MAC_ETH0=52:54:00:a8:05:0a
 d19sw0     IN      A       192.168.5.10
 ; MAC_ETH0=52:54:00:a8:05:0b
 d19sw1     IN      A       192.168.5.11
 ; MAC_ETH0=52:54:00:a8:05:0c
 d19sw2     IN      A       192.168.5.12
-; MAC_ETH0=52:54:00:a8:05:0d, not used (virtual)
-ds0        IN      A       192.168.5.13
-; MAC_ETH0=52:54:00:a8:05:0e
-ds1        IN      A       192.168.5.14
-; MAC_ETH0=52:54:00:a8:05:0f
-ds2        IN      A       192.168.5.15
 ; MAC_ETH0=52:54:00:a8:05:64
 &t1;      IN      A       192.168.5.100
 ;broadcast IN      A       192.168.5.255

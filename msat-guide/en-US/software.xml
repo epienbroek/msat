@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="msat-guide-software">
+  <title>Software management</title>
+  <para>
+    This chapter discusses how to manage software inside the
+    Spacewalk server. To illustrate our strategy, we will
+    create a Directory Server using software from a static
+    software channel.
+  </para>
+
+  <para>
+    After the RHDS is installed, we want to make the system
+    dummy proof. In short, if an administrator is logged in
+    on the system, he should not be able to simply change it
+    by running <command>yum update</command>.
+    Hence, the requirements we impose on the installed
+    system and its connection to the Spacewalk server are:
+    <orderedlist>
+      <listitem>
+        <para>
+          The yum repositories to which the system has
+          access on the Spacewalk server must be constant.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          From the repositories it must be clear what
+          version of the software set we are using.
+        </para>
+      </listitem>
+    </orderedlist>
+  </para>
+
+  <para>
+    How to install the Red Hat Directory Server (RHDS) is
+    explained in <xref
+    linkend="msat-guide-appendix1-rhds_install_guide" />.
+  </para>
+</chapter>
+
