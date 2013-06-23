@@ -14,3 +14,5 @@
 <!ENTITY t1p "<prompt>dmm01#</prompt>">
 <!ENTITY lpc "localpc">
 <!ENTITY lpcp "<prompt>localpc$</prompt>">
+<!ENTITY ds1 "ds1">
+<!ENTITY ds1p "<prompt>ds1#</prompt>">

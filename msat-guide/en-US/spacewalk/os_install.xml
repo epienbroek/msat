@@ -1,67 +1,66 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
 %BOOK_ENTITIES;
 ]>
 <section id="spacewalk-os_install">
-	<title>Fedora 18 installation</title>
-	 <table id="tabl-msat-guide-Fedora_18_installation-Time_needed">
-		<title>Time needed</title>
-		 <tgroup align="left" cols="2" colsep="1" rowsep="1">
-			<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-			 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-			 <thead valign="top">
-				<row>
-					<entry>
-						action
-					</entry>
-					 <entry>
-						time
-					</entry>
-
-				</row>
-
-			</thead>
-			 <tbody valign="top">
-				<row>
-					<entry>
-						Fedora 18 installation
-					</entry>
-					 <entry>
-						30 minutes
-					</entry>
-
-				</row>
-
-			</tbody>
-
-		</tgroup>
-
-	</table>
-	 <para>
-		We use the Fedora 18 OS, as downloaded from <ulink url="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download Fedora 18 x86_64 ISO</ulink>. We do an interactive installation. Since we do a server installation, the Desktop parts (groups) are skipped.
-	</para>
-	 <para>
-		Explanation of the parameters in the <command>virt-install</command> command: 
-		<itemizedlist>
-			<listitem>
-				<para>
-					d19sw1, d (development), 19 (version 1.9), sw (spacewalk), 1 (first server).
-				</para>
-
-			</listitem>
-			 <listitem>
-				<para>
-					mac=52:54:00:a8:05:0b, 192.168.5.11 -&gt; 00:a8:05:0b, the 52:54:00 is obligatory by libvirt definition.
-				</para>
-
-			</listitem>
-
-		</itemizedlist>
-		 To make it easy to verify the <command>virt-install</command> options in the <emphasis>virt-install man page</emphasis>, we specify them in the same order as they appear in the man page.
-	</para>
-	 <para>
-		The installation is started with: 
+  <title>Fedora 18 installation</title>
+  <table id="tabl-msat-guide-Fedora_18_installation-Time_needed">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>
+            action
+          </entry>
+          <entry>
+            time
+          </entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>
+            Fedora 18 installation
+          </entry>
+          <entry>
+            30 minutes
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  <para>
+    We use the Fedora 18 OS, as downloaded from <ulink
+    url="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download
+    Fedora 18 x86_64 ISO</ulink>. We do an interactive
+    installation. Since we do a server installation, the
+    Desktop parts (groups) are skipped.
+  </para>
+  <para>
+    Explanation of the parameters in the
+    <command>virt-install</command> command: 
+    <itemizedlist>
+      <listitem>
+        <para>
+          d19sw1, d (development), 19 (version 1.9), sw (spacewalk), 1 (first server).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          mac=52:54:00:a8:05:0b, 192.168.5.11 -&gt; 00:a8:05:0b, the 52:54:00 is obligatory by libvirt definition.
+        </para>
+      </listitem>
+    </itemizedlist>
+    To make it easy to verify the
+    <command>virt-install</command> options in the
+    <emphasis>virt-install man page</emphasis>, we specify
+    them in the same order as they appear in the man page.
+  </para>
+  <para>
+    The installation is started with: 
 <screen>
 &srvprompt; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
@@ -79,55 +78,53 @@
   <userinput>--autostart</userinput>
 .. output skipped ..
 </screen>
-		 The interactive installation is started. Answer the questions with the parameter values as specified below.
-	</para>
-	 <para>
-		<table id="tabl-msat-guide-Fedora_18_installation-Installation_parameters">
-			<title>Installation parameters</title>
-			 <tgroup align="left" cols="2" colsep="1" rowsep="1">
-				<!--        
-          The width of a column by default is 1* or just *. So,
-          with 2 columns and column 2 needing 2 times more space,
-          we say column 1 has 1* width and column 2 has 2* width.
-                --> <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-				 <colspec colname="c2" colnum="2" colwidth="2*"></colspec>
-				 <thead valign="top">
-					<row>
-						<entry>
-							question
-						</entry>
-						 <entry>
-							answer
-						</entry>
-
-					</row>
-
-				</thead>
-				 <tbody valign="top">
-					<row>
-						<entry>
-							language
-						</entry>
-						 <entry>
-							English
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Hostname
-						</entry>
-						 <entry>
-							<systemitem class="fqdomainname">d19sw1.dmsat1.org</systemitem>
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							IPv4 settings
-						</entry>
-						 <entry>
-							<!--        
+     The interactive installation is started. Answer the questions with the parameter values as specified below.
+  </para>
+  <para>
+    <table id="tabl-msat-guide-Fedora_18_installation-Installation_parameters">
+      <title>Installation parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <!--        
+          The width of a column by default is 1* or just *.
+          So, with 2 columns and column 2 needing 2 times
+          more space, we say column 1 has 1* width and
+          column 2 has 2* width.
+        -->
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="2*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>
+              question
+            </entry>
+            <entry>
+              answer
+            </entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>
+              language
+            </entry>
+            <entry>
+              English
+            </entry>
+          </row>
+          <row>
+            <entry>
+              Hostname
+            </entry>
+            <entry>
+              <systemitem class="fqdomainname">d19sw1.dmsat1.org</systemitem>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              IPv4 settings
+            </entry>
+            <entry>
+              <!--        
               <informaltable frame="none">
                 <tgroup cols="2" align="left" colsep="1" rowsep="1">
                   <colspec colnum="1" colname="c1" colwidth="1*" />
@@ -165,131 +162,123 @@
                   </tbody>
                 </tgroup>
               </informaltable>
-                      -->
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Date &amp; Time
-						</entry>
-						 <entry>
-							Europe/Amsterdam
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Software selection
-						</entry>
-						 <entry>
-							Minimal install
-						</entry>
-
-					</row>
-
-				</tbody>
-
-			</tgroup>
-
-		</table>
-
-	</para>
-	 <para>
-		With respect to partitioning, we don't need a <filename class="directory">/home</filename> partition. Consequently, it needs to be removed. The trick is to let the installer choose the partitioning automatically and then remove the space assigned to <filename class="directory">/home</filename> and add it to <filename class="directory">/</filename>. We want to end up with: 
-		<table id="tabl-msat-guide-Fedora_18_installation-Partitioning_layout">
-			<title>Partitioning layout</title>
-			 <tgroup align="left" cols="3" colsep="1" rowsep="1">
-				<!--        
+              -->
+            </entry>
+          </row>
+          <row>
+            <entry>
+              Date &amp; Time
+            </entry>
+            <entry>
+              Europe/Amsterdam
+            </entry>
+          </row>
+           <row>
+            <entry>
+              Software selection
+            </entry>
+            <entry>
+              Minimal install
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+  <para>
+    With respect to partitioning, we don't need a <filename
+    class="directory">/home</filename> partition.
+    Consequently, it needs to be removed. The trick is to
+    let the installer choose the partitioning automatically
+    and then remove the space assigned to <filename
+    class="directory">/home</filename> and add it to
+    <filename class="directory">/</filename>. We want to end
+    up with: 
+    <table id="tabl-msat-guide-Fedora_18_installation-Partitioning_layout">
+      <title>Partitioning layout</title>
+       <tgroup align="left" cols="3" colsep="1" rowsep="1">
+        <!--        
           The width of a column by default is 1* or just *. So,
           with 2 columns and column 2 needing 2 times more space,
           we say column 1 has 1* width and column 2 has 2* width.
                 --> <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-				 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-				 <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
-				 <thead valign="top">
-					<row>
-						<entry>
-							device
-						</entry>
-						 <entry>
-							mountpoint
-						</entry>
-						 <entry>
-							size
-						</entry>
-
-					</row>
-
-				</thead>
-				 <tbody valign="top">
-					<row>
-						<entry>
-							<filename class="devicefile">/dev/sda1</filename>
-						</entry>
-						 <entry>
-							<filename class="directory">/boot</filename>
-						</entry>
-						 <entry>
-							500 MB
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							<filename class="devicefile">/dev/sda2</filename>
-						</entry>
-						 <entry>
-							<filename class="directory">PVS</filename>
-						</entry>
-						 <entry>
-							300 GB (remainder of disk)
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							<filename class="devicefile">/dev/fedora_d19sw1/swap</filename>
-						</entry>
-						 <entry>
-							<filename class="directory">None</filename>
-						</entry>
-						 <entry>
-							3968 MB
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							<filename class="devicefile">/dev/fedora_d19sw1/root</filename>
-						</entry>
-						 <entry>
-							<filename class="directory">/</filename>
-						</entry>
-						 <entry>
-							295524 MB (remainder of disk)
-						</entry>
-
-					</row>
-
-				</tbody>
-
-			</tgroup>
-
-		</table>
-
-	</para>
-	 <para>
-		We choose to update the Fedora 18 installation here with the latest patches: 
-<screen>
+         <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+         <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
+         <thead valign="top">
+          <row>
+            <entry>
+              device
+            </entry>
+             <entry>
+              mountpoint
+            </entry>
+             <entry>
+              size
+            </entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>
+              <filename class="devicefile">/dev/sda1</filename>
+            </entry>
+             <entry>
+              <filename class="directory">/boot</filename>
+            </entry>
+             <entry>
+              500 MB
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <filename class="devicefile">/dev/sda2</filename>
+            </entry>
+            <entry>
+              <filename class="directory">PVS</filename>
+            </entry>
+            <entry>
+              300 GB (remainder of disk)
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <filename class="devicefile">/dev/fedora_d19sw1/swap</filename>
+            </entry>
+            <entry>
+              <filename class="directory">None</filename>
+            </entry>
+            <entry>
+              3968 MB
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <filename class="devicefile">/dev/fedora_d19sw1/root</filename>
+            </entry>
+            <entry>
+              <filename class="directory">/</filename>
+            </entry>
+            <entry>
+              295524 MB (remainder of disk)
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+  <para>
+    We choose to update the Fedora 18 installation here with
+    the latest patches: 
+    <screen>
 &sw1p; <userinput>yum update</userinput>
 .. takes a while, about 10 minutes ..
-</screen>
+    </screen>
 
-	</para>
-	 <para>
-		After the installation we want to add some packages, do as <systemitem class="username">root</systemitem>: 
-<screen>
+  </para>
+  <para>
+    After the installation we want to add some packages, do
+    as <systemitem class="username">root</systemitem>: 
+    <screen>
 <userinput>yum -y install bind-utils</userinput>
 <userinput>yum -y install vim-enhanced</userinput>
 <userinput>yum -y install tree</userinput>
@@ -306,31 +295,38 @@
 .. output of commands skipped ..
 <userinput>reboot</userinput>
 .. only if new kernel, rpm -qa | grep kernel ..
-</screen>
-		 We want to enable the virtual console on the KVM. This means that Grub2 and the kernel must know about the serial console. Adapt the <filename>/etc/default/grub</filename> file to include the following lines: 
-<screen>
+    </screen>
+    We want to enable the virtual console on the KVM. This
+    means that Grub2 and the kernel must know about the
+    serial console. Adapt the
+    <filename>/etc/default/grub</filename> file to include
+    the following lines: 
+    <screen>
 GRUB_CMDLINE_LINUX="rd.lvm.lv=fedora_d19sw1/swap rd.md=0 rd.dm=0 rd.lvm.lv=fedora_d19sw1/root $([ -x /usr/sbin/rhcrashkernel-param ] &amp;&amp; /usr/sbin/rhcrashkernel-param || :) rd.luks=0 vconsole.keymap=us console=ttyS0,115200n8"
 GRUB_TERMINAL=serial
 GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
-</screen>
-		 Then, from the root prompt: 
-<screen>
+    </screen>
+    Then, from the root prompt: 
+    <screen>
 &sw1p; <userinput>grub2-mkconfig -o /boot/grub2/grub.cfg</userinput>
 Generating grub.cfg ...
 Found linux image: /boot/vmlinuz-3.6.10-4.fc18.x86_64
 Found initrd image: /boot/initramfs-3.6.10-4.fc18.x86_64.img
 done
-</screen>
-		 Add ttyS0 to <filename>/etc/securetty</filename>: 
-<screen>
-&sw1p; <userinput>echo "ttyS0" &gt;&gt; /etc/securetty</userinput></screen>
-		 Enable the service in Fedora 18 with systemd: 
-<screen>
+    </screen>
+    Add ttyS0 to <filename>/etc/securetty</filename>: 
+    <screen>
+&sw1p; <userinput>echo "ttyS0" &gt;&gt; /etc/securetty</userinput>
+    </screen>
+    Enable the service in Fedora 18 with systemd: 
+    <screen>
 &sw1p; <userinput>cd /etc/systemd/system/getty.target.wants</userinput>
 &sw1p; <userinput>ln -sf /usr/lib/systemd/system/serial-getty@.service serial-getty@ttyS0.service</userinput>
-&sw1p; <userinput>systemctl start serial-getty@ttyS0.service</userinput></screen>
-		 Configure the firewall for Spacewalk and DNS, as <systemitem class="username">root</systemitem>: 
-<screen>
+&sw1p; <userinput>systemctl start serial-getty@ttyS0.service</userinput>
+    </screen>
+    Configure the firewall for Spacewalk and DNS, as
+    <systemitem class="username">root</systemitem>: 
+    <screen>
 <userinput>firewall-cmd --permanent --add-service=http</userinput>
 <userinput>firewall-cmd --permanent --add-service=https</userinput>
 <userinput>firewall-cmd --permanent --add-service=dns</userinput>
@@ -344,9 +340,6 @@ public
   ports: 6269/tcp 5222/tcp
   forward-ports:
   icmp-blocks:
-</screen>
-
-	</para>
+    </screen>
+  </para>
 </section>
-
-

@@ -138,14 +138,14 @@
     keep the amount of information limited. In appendix ...
     we show screen dumps and extra information.
   </para>
-    <xi:include href="spacewalk/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/host.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/os_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/dns_conf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/sw_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/sw_filling.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/selinux.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="spacewalk/msat_demo.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/host.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/os_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/dns_conf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/sw_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/sw_filling.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/selinux.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/msat_demo.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>
 

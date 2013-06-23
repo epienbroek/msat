@@ -1,0 +1,4 @@
+# We need a mechanism to ensure that the hardware clock of a
+# system is correct. Hence, we test if NTP is running
+# correctly and synchronise the hardware clock:
+53 03 * * * root /usr/bin/ntp-sync.sh

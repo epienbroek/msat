@@ -3,59 +3,57 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
 %BOOK_ENTITIES;
 ]>
-<section id="spacewalk-prerequisites">
+<section id="software-prerequisites">
   <title>Prerequisites</title>
-  <table id="tabl-msat-guide-Prerequisites-Time_needed">
+  <table id="msat-guide-software-prerequisites-time_needed">
     <title>Time needed</title>
     <tgroup align="left" cols="2" colsep="1" rowsep="1">
       <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
       <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
       <thead valign="top">
         <row>
-          <entry>
-            action
-          </entry>
-           <entry>
-            time
-          </entry>
+          <entry>action</entry>
+          <entry>time</entry>
         </row>
       </thead>
       <tbody valign="top">
         <row>
-          <entry>
-            Fedora 18 download
-          </entry>
-           <entry>
-            76 minutes
-          </entry>
+          <entry>CentOS extras download</entry>
+          <entry>45 minutes</entry>
         </row>
       </tbody>
     </tgroup>
   </table>
   <para>
-    On the host system, make a location where the downloaded ISO can be stored: 
+    By searching on the Internet, we found out that the
+    RPM's needed to run the recompiled Red Hat Directory
+    Server on CentOS, on needs the Extras repository. The
+    document is: <xref
+    linkend="msat-guide-appendix1-centos_ds_setup" />.
+    Consequently, we need to create a software channel on
+    the Spacewalk server to contain the Extras repository:
     <screen>
-&srvprompt; <userinput>mkdir /var/isos</userinput>
+&srvprompt; <userinput>msat_mk_sc.py -l centos-x86_64-server-extras-5 -n centos-x86_64-server-extras-5 -s centos-x86_64-server-extras-5 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-5</userinput>
+&srvprompt; <userinput>msat_ls_sc.py</userinput>
+con-tools-centos-x86_64-server-5
+centos-x86_64-server-extras-5
+centos-x86_64-server-5
+&sw1p; <userinput>msat_ls_sc_rpms.py -l centos-x86_64-server-extras-5 | wc -l</userinput>
+0
     </screen>
-    <itemizedlist>
-      <listitem>
-        <para>
-          Download the Fedora 18 DVD, see <ulink
-          url="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download
-          Fedora 18</ulink> and store it in <filename
-          class="directory">/var/isos</filename>.
-          <screen>
-&sw1p; <userinput>cd /var/isos</userinput>
-&sw1p; <userinput>wget http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso</userinput>
-          </screen>
-        </para>
-      </listitem>
-    </itemizedlist>
-    After the download, our <filename
-    class="directory">/var/isos</filename> is: 
+    For the set of growing software channels that are
+    directly related to CentOS server, we have the following
+    naming convention: <emphasis role="bold">&lt;base
+    name&gt;-&lt;function&gt;-&lt;major #&gt;</emphasis>.
+    So, we come up with <emphasis
+    role="bold">centos-x86_64-server-extras-5</emphasis>.
+    The content of the yum repository is downloaded into the
+    channel with:
     <screen>
-&srvprompt; <userinput>ls -l /var/isos | grep Fedora-18</userinput>
--rw-------. 1 qemu qemu 4573888512 Jan 15 20:30 Fedora-18-x86_64-DVD.iso
+&sw1p; <userinput>spacewalk-repo-sync -c centos-x86_64-server-extras-5 -u http://vault.centos.org/5.8/extras/x86_64/</userinput>
+.. about 45 minutes ..
+&sw1p; <userinput>msat_ls_sc_rpms.py -l centos-x86_64-server-extras-5 | wc -l</userinput>
+279
     </screen>
   </para>
 </section>

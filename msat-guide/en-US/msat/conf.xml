@@ -4,7 +4,7 @@
   <!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
   %BOOK_ENTITIES;
 ]>
-<section id="msat-conf">
+<section id="msat-guide-msat-conf">
   <title>MSAT configuration</title>
   <para>
     Before we can start using the Satellite API, we need to

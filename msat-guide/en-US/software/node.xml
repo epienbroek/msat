@@ -1,0 +1,1494 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="msat-guide-software-node">
+  <title>Test node example</title>
+  <table id="msat-guide-software-node-time">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Config channel</entry>
+          <entry>5 minutes</entry>
+        </row>
+        <row>
+          <entry>Activation key</entry>
+          <entry>5 minutes</entry>
+        </row>
+        <row>
+          <entry>Kickstart profile</entry>
+          <entry>20 minutes</entry>
+        </row>
+        <row>
+          <entry>Cobbler</entry>
+          <entry>5 minutes</entry>
+        </row>
+        <row>
+          <entry>Test installation</entry>
+          <entry>15 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    In the former section we installed software and
+    configured it to make it possible to have NFS home
+    directories and authentication via LDAP. The
+    configuration needed is uploaded to the Spacewalk
+    server. We show how:
+    <screen>
+&t1p; <userinput>rhncfg-manager create-channel ldap-5-1_0</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: <userinput>example</userinput>
+Password: <userinput>redhat</userinput>
+Creating config channel ldap-5-1_0
+Config channel ldap-5-1_0 created
+
+&t1p; <userinput>rhncfg-manager add -c ldap-5-1_0 /etc/pam.d/system-auth-ac /etc/ldap.conf /etc/openldap/ldap.conf /etc/sysconfig/authconfig /etc/nsswitch.conf</userinput>
+Local file /etc/pam.d/system-auth-ac -> remote file /etc/pam.d/system-auth-ac
+Local file /etc/ldap.conf -> remote file /etc/ldap.conf
+Local file /etc/openldap/ldap.conf -> remote file /etc/openldap/ldap.conf
+Local file /etc/sysconfig/authconfig -> remote file /etc/sysconfig/authconfig
+Local file /etc/nsswitch.conf -> remote file /etc/nsswitch.conf
+    </screen>
+    <warning>
+      <title>Remove SELinux context</title>
+      <para>
+        Remove the SELinux context field of the config files
+        on the Web interface of Spacewalk. Not removing them
+        results in installation errors if one wants to
+        deploy all configuration files automatically during
+        installation. If the command, <command>rhncfg-client
+        get</command> is run once the system is rebooted, no
+        problem occurs.
+      </para>
+    </warning>
+  </para>
+
+  <para>
+    Using the <emphasis role="bold">msat_*.py</emphasis>
+    scripts, one can save the config channel in the form of
+    a <command>bash</command> script. For this to work, one
+    must install the scripts and create a configuration
+    file. See <xref
+    linkend="spacewalk-sw_filling-registration" /> and <xref
+    linkend="msat-guide-msat-conf" />. This can be useful
+    for making backups of the Spacewalk contents or to put
+    the configuration in a version control system, like
+    <application>git</application>. It works like this:
+    <screen>
+&sw1p; <userinput>msat_wr_cc.py -l ldap-5-1_0</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cc-ldap-5-1_0.sh
+# DESCRIPTION
+#   This script creates the ldap-5-1_0
+#   config channel and contents.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-18 17:56
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cc-ldap-5-1_0.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cc-ldap-5-1_0.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+msat_mk_cc.py \
+  --configchannel-label ldap-5-1_0 \
+  --configchannel-description 'ldap-5-1_0' \
+  --configchannel-name 'ldap-5-1_0'
+
+msat_mk_cc_cf.py \
+  --configchannel-label ldap-5-1_0 \
+  --configpath-path /etc/ldap.conf \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+# @(#)$Id: ldap.conf,v 1.38 2006/05/15 08:13:31 lukeh Exp $
+#
+# This is the configuration file for the LDAP nameservice
+# switch library and the LDAP PAM module.
+#
+# The man pages for this file are nss_ldap(5) and pam_ldap(5)
+#
+# PADL Software
+# http://www.padl.com
+#
+
+# Your LDAP server. Must be resolvable without using LDAP.
+# Multiple hosts may be specified, each separated by a 
+# space. How long nss_ldap takes to failover depends on
+# whether your LDAP client library supports configurable
+# network or connect timeouts (see bind_timelimit).
+#host 127.0.0.1
+
+# The distinguished name of the search base.
+base dc=dmsat1,dc=org
+
+# Another way to specify your LDAP server is to provide an
+# uri with the server name. This allows to use
+# Unix Domain Sockets to connect to a local LDAP Server.
+#uri ldap://127.0.0.1/
+#uri ldaps://127.0.0.1/   
+#uri ldapi://%2fvar%2frun%2fldapi_sock/
+# Note: %2f encodes the '/' used as directory separator
+
+# The LDAP version to use (defaults to 3
+# if supported by client library)
+#ldap_version 3
+
+# The distinguished name to bind to the server with.
+# Optional: default is to bind anonymously.
+#binddn cn=proxyuser,dc=example,dc=com
+
+# The credentials to bind with. 
+# Optional: default is no credential.
+#bindpw secret
+
+# The distinguished name to bind to the server with
+# if the effective user ID is root. Password is
+# stored in /etc/ldap.secret (mode 600)
+#rootbinddn cn=manager,dc=example,dc=com
+
+# The port.
+# Optional: default is 389.
+#port 389
+
+# The search scope.
+#scope sub
+#scope one
+#scope base
+
+# Search timelimit
+#timelimit 30
+timelimit 120
+
+# Bind/connect timelimit
+#bind_timelimit 30
+bind_timelimit 120
+
+# Reconnect policy: hard (default) will retry connecting to
+# the software with exponential backoff, soft will fail
+# immediately.
+#bind_policy hard
+
+# Idle timelimit; client will close connections
+# (nss_ldap only) if the server has not been contacted
+# for the number of seconds specified below.
+#idle_timelimit 3600
+idle_timelimit 3600
+
+# Filter to AND with uid=%s
+#pam_filter objectclass=account
+
+# The user ID attribute (defaults to uid)
+#pam_login_attribute uid
+
+# Search the root DSE for the password policy (works
+# with Netscape Directory Server)
+#pam_lookup_policy yes
+
+# Check the 'host' attribute for access control
+# Default is no; if set to yes, and user has no
+# value for the host attribute, and pam_ldap is
+# configured for account management (authorization)
+# then the user will not be allowed to login.
+#pam_check_host_attr yes
+
+# Check the 'authorizedService' attribute for access
+# control
+# Default is no; if set to yes, and the user has no
+# value for the authorizedService attribute, and
+# pam_ldap is configured for account management
+# (authorization) then the user will not be allowed
+# to login.
+#pam_check_service_attr yes
+
+# Group to enforce membership of
+#pam_groupdn cn=PAM,ou=Groups,dc=example,dc=com
+
+# Group member attribute
+#pam_member_attribute uniquemember
+
+# Specify a minium or maximum UID number allowed
+#pam_min_uid 0
+#pam_max_uid 0
+
+# Template login attribute, default template user
+# (can be overriden by value of former attribute
+# in user's entry)
+#pam_login_attribute userPrincipalName
+#pam_template_login_attribute uid
+#pam_template_login nobody
+
+# HEADS UP: the pam_crypt, pam_nds_passwd,
+# and pam_ad_passwd options are no
+# longer supported.
+#
+# Do not hash the password at all; presume
+# the directory server will do it, if
+# necessary. This is the default.
+#pam_password clear
+
+# Hash password locally; required for University of
+# Michigan LDAP server, and works with Netscape
+# Directory Server if you're using the UNIX-Crypt
+# hash mechanism and not using the NT Synchronization
+# service. 
+#pam_password crypt
+
+# Remove old password first, then update in
+# cleartext. Necessary for use with Novell
+# Directory Services (NDS)
+#pam_password clear_remove_old
+#pam_password nds
+
+# RACF is an alias for the above. For use with
+# IBM RACF
+#pam_password racf
+
+# Update Active Directory password, by
+# creating Unicode password and updating
+# unicodePwd attribute.
+#pam_password ad
+
+# Use the OpenLDAP password change
+# extended operation to update the password.
+#pam_password exop
+
+# Redirect users to a URL or somesuch on password
+# changes.
+#pam_password_prohibit_message Please visit http://internal to change your password.
+
+# RFC2307bis naming contexts
+# Syntax:
+# nss_base_XXX		base?scope?filter
+# where scope is {base,one,sub}
+# and filter is a filter to be &amp;'d with the
+# default filter.
+# You can omit the suffix eg:
+# nss_base_passwd	ou=People,
+# to append the default base DN but this
+# may incur a small performance impact.
+#nss_base_passwd	ou=People,dc=example,dc=com?one
+#nss_base_shadow	ou=People,dc=example,dc=com?one
+#nss_base_group		ou=Group,dc=example,dc=com?one
+#nss_base_hosts		ou=Hosts,dc=example,dc=com?one
+#nss_base_services	ou=Services,dc=example,dc=com?one
+#nss_base_networks	ou=Networks,dc=example,dc=com?one
+#nss_base_protocols	ou=Protocols,dc=example,dc=com?one
+#nss_base_rpc		ou=Rpc,dc=example,dc=com?one
+#nss_base_ethers	ou=Ethers,dc=example,dc=com?one
+#nss_base_netmasks	ou=Networks,dc=example,dc=com?ne
+#nss_base_bootparams	ou=Ethers,dc=example,dc=com?one
+#nss_base_aliases	ou=Aliases,dc=example,dc=com?one
+#nss_base_netgroup	ou=Netgroup,dc=example,dc=com?one
+
+# Just assume that there are no supplemental groups for these named users
+nss_initgroups_ignoreusers root,ldap,named,avahi,haldaemon,dbus,radvd,tomcat,radiusd,news,mailman,nscd,gdm
+
+# attribute/objectclass mapping
+# Syntax:
+#nss_map_attribute	rfc2307attribute	mapped_attribute
+#nss_map_objectclass	rfc2307objectclass	mapped_objectclass
+
+# configure --enable-nds is no longer supported.
+# NDS mappings
+#nss_map_attribute uniqueMember member
+
+# Services for UNIX 3.5 mappings
+#nss_map_objectclass posixAccount User
+#nss_map_objectclass shadowAccount User
+#nss_map_attribute uid msSFU30Name
+#nss_map_attribute uniqueMember msSFU30PosixMember
+#nss_map_attribute userPassword msSFU30Password
+#nss_map_attribute homeDirectory msSFU30HomeDirectory
+#nss_map_attribute homeDirectory msSFUHomeDirectory
+#nss_map_objectclass posixGroup Group
+#pam_login_attribute msSFU30Name
+#pam_filter objectclass=User
+#pam_password ad
+
+# configure --enable-mssfu-schema is no longer supported.
+# Services for UNIX 2.0 mappings
+#nss_map_objectclass posixAccount User
+#nss_map_objectclass shadowAccount user
+#nss_map_attribute uid msSFUName
+#nss_map_attribute uniqueMember posixMember
+#nss_map_attribute userPassword msSFUPassword
+#nss_map_attribute homeDirectory msSFUHomeDirectory
+#nss_map_attribute shadowLastChange pwdLastSet
+#nss_map_objectclass posixGroup Group
+#nss_map_attribute cn msSFUName
+#pam_login_attribute msSFUName
+#pam_filter objectclass=User
+#pam_password ad
+
+# RFC 2307 (AD) mappings
+#nss_map_objectclass posixAccount user
+#nss_map_objectclass shadowAccount user
+#nss_map_attribute uid sAMAccountName
+#nss_map_attribute homeDirectory unixHomeDirectory
+#nss_map_attribute shadowLastChange pwdLastSet
+#nss_map_objectclass posixGroup group
+#nss_map_attribute uniqueMember member
+#pam_login_attribute sAMAccountName
+#pam_filter objectclass=User
+#pam_password ad
+
+# configure --enable-authpassword is no longer supported
+# AuthPassword mappings
+#nss_map_attribute userPassword authPassword
+
+# AIX SecureWay mappings
+#nss_map_objectclass posixAccount aixAccount
+#nss_base_passwd ou=aixaccount,?one
+#nss_map_attribute uid userName
+#nss_map_attribute gidNumber gid
+#nss_map_attribute uidNumber uid
+#nss_map_attribute userPassword passwordChar
+#nss_map_objectclass posixGroup aixAccessGroup
+#nss_base_group ou=aixgroup,?one
+#nss_map_attribute cn groupName
+#nss_map_attribute uniqueMember member
+#pam_login_attribute userName
+#pam_filter objectclass=aixAccount
+#pam_password clear
+
+# Netscape SDK LDAPS
+#ssl on
+
+# Netscape SDK SSL options
+#sslpath /etc/ssl/certs
+
+# OpenLDAP SSL mechanism
+# start_tls mechanism uses the normal LDAP port, LDAPS typically 636
+#ssl start_tls
+#ssl on
+
+# OpenLDAP SSL options
+# Require and verify server certificate (yes/no)
+# Default is to use libldap's default behavior, which can be configured in
+# /etc/openldap/ldap.conf using the TLS_REQCERT setting.  The default for
+# OpenLDAP 2.0 and earlier is "no", for 2.1 and later is "yes".
+#tls_checkpeer yes
+
+# CA certificates for server certificate verification
+# At least one of these are required if tls_checkpeer is "yes"
+#tls_cacertfile /etc/ssl/ca.cert
+#tls_cacertdir /etc/ssl/certs
+
+# Seed the PRNG if /dev/urandom is not provided
+#tls_randfile /var/run/egd-pool
+
+# SSL cipher suite
+# See man ciphers for syntax
+#tls_ciphers TLSv1
+
+# Client certificate and key
+# Use these, if your server requires client authentication.
+#tls_cert
+#tls_key
+
+# Disable SASL security layers. This is needed for AD.
+#sasl_secprops maxssf=0
+
+# Override the default Kerberos ticket cache location.
+#krb5_ccname FILE:/etc/.ldapcache
+
+# SASL mechanism for PAM authentication - use is experimental
+# at present and does not support password policy control
+#pam_sasl_mech DIGEST-MD5
+uri ldap://192.168.5.14/
+ssl no
+tls_cacertdir /etc/openldap/cacerts
+pam_password md5
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label ldap-5-1_0 \
+  --configpath-path /etc/nsswitch.conf \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+#
+# /etc/nsswitch.conf
+#
+# An example Name Service Switch config file. This file should be
+# sorted with the most-used services at the beginning.
+#
+# The entry '[NOTFOUND=return]' means that the search for an
+# entry should stop if the search in the previous entry turned
+# up nothing. Note that if the search failed due to some other reason
+# (like no NIS server responding) then the search continues with the
+# next entry.
+#
+# Legal entries are:
+#
+#	nisplus or nis+		Use NIS+ (NIS version 3)
+#	nis or yp		Use NIS (NIS version 2), also called YP
+#	dns			Use DNS (Domain Name Service)
+#	files			Use the local files
+#	db			Use the local database (.db) files
+#	compat			Use NIS on compat mode
+#	hesiod			Use Hesiod for user lookups
+#	[NOTFOUND=return]	Stop searching if not found so far
+#
+
+# To use db, put the "db" in front of "files" for entries you want to be
+# looked up first in the databases
+#
+# Example:
+#passwd:    db files nisplus nis
+#shadow:    db files nisplus nis
+#group:     db files nisplus nis
+
+passwd:     files ldap
+shadow:     files ldap
+group:      files ldap
+
+#hosts:     db files nisplus nis dns
+hosts:      files dns
+
+# Example - obey only what nisplus tells us...
+#services:   nisplus [NOTFOUND=return] files
+#networks:   nisplus [NOTFOUND=return] files
+#protocols:  nisplus [NOTFOUND=return] files
+#rpc:        nisplus [NOTFOUND=return] files
+#ethers:     nisplus [NOTFOUND=return] files
+#netmasks:   nisplus [NOTFOUND=return] files     
+
+bootparams: nisplus [NOTFOUND=return] files
+
+ethers:     files
+netmasks:   files
+networks:   files
+protocols:  files
+rpc:        files
+services:   files
+
+netgroup:   files ldap
+
+publickey:  nisplus
+
+automount:  files ldap
+aliases:    files nisplus
+
+sudoers: files ldap
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label ldap-5-1_0 \
+  --configpath-path /etc/openldap/ldap.conf \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+#
+# LDAP Defaults
+#
+
+# See ldap.conf(5) for details
+# This file should be world readable but not world writable.
+
+#BASE	dc=example, dc=com
+#URI	ldap://ldap.example.com ldap://ldap-master.example.com:666
+
+#SIZELIMIT	12
+#TIMELIMIT	15
+#DEREF		never
+URI ldap://192.168.5.14/
+BASE dc=dmsat1,dc=org
+TLS_CACERTDIR /etc/openldap/cacerts
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label ldap-5-1_0 \
+  --configpath-path /etc/pam.d/system-auth-ac \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+#%PAM-1.0
+# This file is auto-generated.
+# User changes will be destroyed the next time authconfig is run.
+auth        required      pam_env.so
+auth        sufficient    pam_unix.so nullok try_first_pass
+auth        requisite     pam_succeed_if.so uid &gt;= 500 quiet
+auth        sufficient    pam_ldap.so use_first_pass
+auth        required      pam_deny.so
+
+account     required      pam_unix.so broken_shadow
+account     sufficient    pam_succeed_if.so uid &lt; 500 quiet
+account     [default=bad success=ok user_unknown=ignore] pam_ldap.so
+account     required      pam_permit.so
+
+password    requisite     pam_cracklib.so try_first_pass retry=3
+password    sufficient    pam_unix.so md5 shadow nullok try_first_pass use_authtok
+password    sufficient    pam_ldap.so use_authtok
+password    required      pam_deny.so
+
+session     optional      pam_keyinit.so revoke
+session     required      pam_limits.so
+session     [success=1 default=ignore] pam_succeed_if.so service in crond quiet use_uid
+session     required      pam_unix.so
+session     optional      pam_ldap.so
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label ldap-5-1_0 \
+  --configpath-path /etc/sysconfig/authconfig \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+USEWINBINDAUTH=no
+USEKERBEROS=no
+USESYSNETAUTH=no
+USEPAMACCESS=no
+USESSSDAUTH=no
+FORCESMARTCARD=no
+USESMBAUTH=no
+USESMARTCARD=no
+USELDAPAUTH=yes
+USESSSD=no
+USEWINBIND=no
+USESHADOW=yes
+PASSWDALGORITHM=md5
+USELOCAUTHORIZE=no
+USEPASSWDQC=no
+USELDAP=yes
+USEMKHOMEDIR=no
+USEHESIOD=no
+USEDB=no
+USECRACKLIB=yes
+USENIS=no
+
+EOF__BLAH__EOF
+    </screen>
+    Now, by connecting to this config channel via an
+    activation key, one can automatically install this
+    configuration, thus providing the authentication
+    function via LDAP.
+  </para>
+
+  <para>
+    For our default system, we want more! We would also like
+    to have the <systemitem
+    class="daemon">autofs</systemitem> function enabled.
+    Hence, we create another config channel:
+    <screen>
+&t1p; <userinput>rhncfg-manager create-channel autofs-5-1_0</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: <userinput>example</userinput>
+Password: <userinput>redhat</userinput>
+Creating config channel autofs-5-1_0
+Config channel autofs-5-1_0 created
+
+&t1p; <userinput>rhncfg-manager add -c autofs-5-1_0 /etc/auto.master /etc/auto.homes</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: example
+Password: <userinput>redhat</userinput>
+Pushing to channel autofs-5-1_0:
+Local file /etc/auto.master -> remote file /etc/auto.master
+Local file /etc/auto.homes -> remote file /etc/auto.homes
+
+&sw1p; <userinput>msat_wr_cc.py -l autofs-5-1_0</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cc-autofs-5-1_0.sh
+# DESCRIPTION
+#   This script creates the autofs-5-1_0
+#   config channel and contents.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-18 19:17
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cc-autofs-5-1_0.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cc-autofs-5-1_0.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+msat_mk_cc.py \
+  --configchannel-label autofs-5-1_0 \
+  --configchannel-description 'autofs-5-1_0' \
+  --configchannel-name 'autofs-5-1_0'
+
+msat_mk_cc_cf.py \
+  --configchannel-label autofs-5-1_0 \
+  --configpath-path /etc/auto.homes \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+* 192.168.5.11:/homes/&amp;
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label autofs-5-1_0 \
+  --configpath-path /etc/auto.master \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+#
+# $Id: auto.master,v 1.4 2005/01/04 14:36:54 raven Exp $
+#
+# Sample auto.master file
+# This is an automounter map and it has the following format
+# key [ -mount-options-separated-by-comma ] location
+# For details of the format look at autofs(5).
+#
+/misc /etc/auto.misc
+#
+# NOTE: mounts done from a hosts map will be mounted with the
+# "nosuid" and "nodev" options unless the "suid" and "dev"
+# options are explicitly given.
+#
+/net  -hosts
+#
+# Include central master map if it can be found using
+# nsswitch sources.
+#
+# Note that if there are entries for /net or /misc (as
+# above) in the included master map any keys that are the
+# same will not be seen as the first read key seen takes
+# precedence.
+#
++auto.master
+
+# AB: home dirs
+/homes  file:/etc/auto.homes  rw
+
+EOF__BLAH__EOF
+    </screen>
+  </para>
+
+  <para>
+    Since we are adding config channels anyway, let us add
+    another one, called base:
+    <screen>
+&t1p; <userinput>rhncfg-manager create-channel base</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: example
+Password: <userinput>redhat</userinput>
+Creating config channel base
+Config channel base created
+
+&t1p; <userinput>rhncfg-manager add -c base /etc/motd /etc/profile.d/mozldap.sh</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: example
+Password: <userinput>redhat</userinput>
+Pushing to channel base:
+Local file /etc/motd -> remote file /etc/motd
+Local file /etc/profile.d/mozldap.sh -> remote file /etc/profile.d/mozldap.sh
+
+&sw1p; <userinput>msat_wr_cc.py -l base</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cc-base.sh
+# DESCRIPTION
+#   This script creates the base
+#   config channel and contents.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-18 19:43
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cc-base.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cc-base.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+msat_mk_cc.py \
+  --configchannel-label base \
+  --configchannel-description 'base' \
+  --configchannel-name 'base'
+
+msat_mk_cc_cf.py \
+  --configchannel-label base \
+  --configpath-path /etc/motd \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+
+Welcome to the dmsat1.org test environment. We hope it helps
+you to experiment with Linux provisioning via the Spacewalk
+server and doing all sorts of other tricks.
+
+Please feel free to create your own dmsat1.org environment.
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label base \
+  --configpath-path /etc/profile.d/mozldap.sh \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+PATH=/usr/lib64/mozldap:$PATH
+
+EOF__BLAH__EOF
+    </screen>
+  </para>
+
+  <para>
+    Being in the mood, we also add an <emphasis
+    role="bold">ssh</emphasis> channel:
+    <screen>
+&t1p; <userinput>rhncfg-manager create-channel ssh</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: example
+Password: <userinput>redhat</userinput>
+Creating config channel base
+Config channel base created
+
+&t1p; <userinput>rhncfg-manager add -c ssh /root/.ssh/authorized_keys /root/.ssh/config</userinput>
+Using server name d19sw1.dmsat1.org
+Red Hat Network username: example
+Password: <userinput>redhat</userinput>
+Pushing to channel ssh:
+Local file /root/.ssh/authorized_keys -> remote file /root/.ssh/authorized_keys
+Local file /root/.ssh/config -> remote file /root/.ssh/config
+
+&sw1p; <userinput>msat_wr_cc.py -l ssh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cc-ssh.sh
+# DESCRIPTION
+#   This script creates the ssh
+#   config channel and contents.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-23 16:33
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cc-ssh.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cc-ssh.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+msat_mk_cc.py \
+  --configchannel-label ssh \
+  --configchannel-description 'ssh' \
+  --configchannel-name 'ssh'
+
+msat_mk_cc_cf.py \
+  --configchannel-label ssh \
+  --configpath-path /root/.ssh/authorized_keys \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAqIfvykEC9dnthet376nHtAE/1OYPpWoyzgYLXOK2xo43iEeyu8lUNGA5VT+dNvMxT8jE00EdrpbHpqa2/3DYYjLWjb1K0BRO1HdgqqU6ek56SnqGiElWAYr2PyYIJ8M22uUtItpzYglqLtD9fVgwvKqWorHgcUqmA4/w1SDGzSqh4jcutnq2YIlXOE0xA4nzXoy2rOFCOe8llj0oFFKrG544njsC58ZVtO3B/Qas8jhf9gCW4FKL8xgAgECGIE+JhhtpeNRxsAQ6NhcUTukyUoT8M3wnwFa0dtihMPmK1CVGqQmO7THnKaiyfsNojOkBVJug9oiXJC71FAsTy3wzJQ== allard@server.home.org
+
+EOF__BLAH__EOF
+
+msat_mk_cc_cf.py \
+  --configchannel-label ssh \
+  --configpath-path /root/.ssh/config \
+  --configpath-dir false \
+  --configpath-content - \
+  --configpath-user root \
+  --configpath-group root \
+  --configpath-context '' \
+  --configpath-permissions 644 \
+  --configpath-startdelimiter '{|' \
+  --configpath-enddelimiter '|}' &lt;&lt; 'EOF__BLAH__EOF'
+# Disable the known_hosts file
+Host *
+        StrictHostKeyChecking no
+        UserKnownHostsFile=/dev/null
+
+
+EOF__BLAH__EOF
+    </screen>
+  </para>
+
+  <para>
+    We also create the activation key that connects to the
+    config channels. The activation key provides the
+    possibility to add RPM's too. Since we don't have any
+    specific RPM's to install for our test node, we won't
+    install them via the activation key that takes care of
+    the configuration.
+    <screen>
+&sw1p; <userinput>cat ak-test01.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   ak-test01.sh
+# DESCRIPTION
+#   This script creates the test01
+#   activation key.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+#   This script depends on a functioning Satellite server to
+#   connect to.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-18 19:50
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   ak-test01.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   ak-test01.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+msat_mk_ak.py \
+  --activationkey-label test01 \
+  --activationkey-description test01 \
+  --activationkey-basechannel centos-x86_64-server-5 \
+  --activationkey-monitoring false \
+  --activationkey-provisioning true \
+  --activationkey-virtualization false \
+  --activationkey-node false \
+  --activationkey-configuration true \
+  --activationkey-universal false \
+  --activationkey-childchannels 'con-tools-centos-x86_64-server-5' \
+  --activationkey-packages '' \
+  --activationkey-configchannels 'test01,autofs-5-1_0,ldap-5-1_0,ssh,base'
+    </screen>
+  </para>
+
+  <para>
+    We create a second activation key that contains a set of
+    RPM's that we want to be present at all nodes from a
+    support point of view:
+    <orderedlist>
+      <listitem>
+        <para>
+          <package>mozldap-tools</package>, for use
+          of the <command>ldapsearch</command> and
+          family kind of utilities.
+        </para> 
+      </listitem>
+      <listitem>
+        <para>
+          <package>screen</package>, for enabling
+          terminal tricks like continuation of the
+          terminal session in daemon mode.
+        </para> 
+      </listitem>
+      <listitem>
+        <para>
+          <package>vim-enhanced</package>, for being
+          able to use colorization based on syntax
+          and many other text editor tricks.
+        </para> 
+      </listitem>
+      <listitem>
+        <para>
+          <package>xauth</package>, for enabling the
+          use of X programs.
+        </para> 
+      </listitem>
+    </orderedlist>
+    Hence, we come up with the following activation key:
+    <screen>
+&sw1p; <userinput>cat ak-support.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   ak-support.sh
+# DESCRIPTION
+#   This script creates the support
+#   activation key.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+#   This script depends on a functioning Satellite server to
+#   connect to.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-18 19:50
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   ak-support.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   ak-support.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+msat_mk_ak.py \
+  --activationkey-label support \
+  --activationkey-description support \
+  --activationkey-basechannel centos-x86_64-server-5 \
+  --activationkey-monitoring false \
+  --activationkey-provisioning true \
+  --activationkey-virtualization false \
+  --activationkey-node false \
+  --activationkey-configuration true \
+  --activationkey-universal false \
+  --activationkey-childchannels 'con-tools-centos-x86_64-server-5' \
+  --activationkey-packages 'mozldap-tools,vim-enhanced,xauth,screen' \
+  --activationkey-configchannels ''
+    </screen>
+  </para>
+
+  <para>
+    How do we install the system from scratch? We need a
+    kickstart file. The Spacewalk server provides kickstart
+    profiles for this purpose. We use the kickstart profile
+    called <emphasis role="bold">test01</emphasis> to
+    provide basic kickstart information, like the
+    partitioning scheme among others, and to make sure that
+    we connect to the two aforementioned activation keys.
+    The kickstart profile is shown below in the msat script
+    regeneration format:
+    <screen>
+&sw1p; <userinput>kp-test01.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   kp-test01.sh
+# DESCRIPTION
+#   This script creates the test01
+#   kickstart profile.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+#   If you put single quotes around value, but forget to
+#   escape embedded single quotes, this script will fail.
+#   Escaping works like this:
+#   $ echo 'don'"'"'t'
+#   don't
+#   So ' -> '"'"'
+#   Complicated huh?
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-19 19:38
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   kp-test01.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   kp-test01.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+
+ORGNUM=$(msat_ls_org.py)
+
+SATELLITE=$(msat_ls_sn.py)
+
+msat_mk_kp.py \
+  --kickstart-label "test01" \
+  --kickstart-virt none \
+  --kickstart-tree ks-centos-x86_64-server-5u8 \
+  --kickstart-satellite $SATELLITE \
+  --kickstart-root redhat \
+  --kickstart-childchannels '' \
+  --kickstart-configmgt true \
+  --kickstart-remotecmds true \
+  --kickstart-partitioning 'part /boot --fstype=ext3 --size=200,part pv.01 --size=1 --grow,part swap --size=512,volgroup myvg pv.01,logvol / --vgname=myvg --name=rootvol --size=1 --grow' \
+  --kickstart-keys 'RHN-ORG-TRUSTED-SSL-CERT,RPM-GPG-KEY-spacewalk-2012,RPM-GPG-KEY-CentOS-5,RPM-GPG-KEY-EPEL-5' \
+  --kickstart-install true \
+  --kickstart-text true \
+  --kickstart-url '--url /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8' \
+  --kickstart-lang 'en_US' \
+  --kickstart-keyboard 'us' \
+  --kickstart-zerombr 'true' \
+  --kickstart-clearpart '--all' \
+  --kickstart-bootloader '--location mbr' \
+  --kickstart-timezone '--utc Europe/Amsterdam' \
+  --kickstart-auth '--enablemd5 --enableshadow' \
+  --kickstart-rootpw '$1$yfdvYZ2s$mXFhCqaiSjZ0mt9M3ZKFr0' \
+  --kickstart-selinux '--enforcing' \
+  --kickstart-reboot true \
+  --kickstart-firewall '--enabled' \
+  --kickstart-skipx true \
+  --kickstart-key '--skip' \
+  --kickstart-software '@Base' \
+  --kickstart-activationkey $ORGNUM-support,$ORGNUM-test01 \
+  --kickstart-script '/bin/rm /etc/yum.repos.d/CentOS-*.repo'
+    </screen>
+  </para>
+
+  <para>
+    The last part of the information on the Spacewalk server
+    is not placed in the Spacewalk software, but in Cobbler.
+    We mean the system information of our virtual machine:
+    <screen>
+&sw1p; <userinput>sudo cobbler system list | grep dmm01</userinput>
+   SpacewalkDefaultOrganization_kvm_dmm01
+    </screen>
+    We can also save this information is a regeneration
+    script:
+    <screen>
+&sw1p; <userinput>msat_wr_cb_sys.py -n SpacewalkDefaultOrganization_kvm_dmm01 | sed 's/SpacewalkDefaultOrganization_kvm_dmm01/dmm01/g' > cobbler_dmm01.sh</userinput>
+
+&sw1p; <userinput>vim cobbler_dmm01.sh</userinput>
+.. edit SpacewalkDefault192.168.5.100... line ..
+.. edit cobbler system remove --name=dmm01 line ..
+
+&sw1p; <userinput>cat cobbler_dmm01.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler_dmm01.sh
+# DESCRIPTION
+#   This script should be run on the Satellite server:
+#   # ./cobbler_dmm01.sh
+#
+#   IP details
+#
+#   Host            Prod            Cluster         ILO
+#   dmm01           192.168.5.100   -               -               
+#
+#   DNS servers:
+#   * 192.168.5.11
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   cobbler system remove --name=SpacewalkDefaultOrganization_kvm_dmm01
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2013-06-19 19:58
+# HISTORY
+# LICENSE
+#   Copyright (C) 2013 Allard Berends
+# 
+#   cobbler_dmm01.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cobbler_dmm01.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+########## PARAMETERS TO EDIT ##########
+NAME=dmm01
+OWNERS="example"
+PROFILE="test01"
+ORG="SpacewalkDefaultOrganization"
+ORG_NUMBER=1
+COMMENT="empty"
+GATEWAY=192.168.5.1
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="dmsat1.org"
+HOSTNAME=${NAME}.${NAMESERVERS_SEARCH}
+PROD_IP=192.168.5.100
+PROD_SUBNET=255.255.255.0
+PROD_DNS_NAME=${HOSTNAME}
+#CLUSTER_IP=
+#CLUSTER_SUBNET=
+#CLUSTER_DNS_NAME=
+MAC_ETH0=52:54:00:a8:05:64
+
+########## START SCRIPT ##########
+cobbler system add \
+  --name=${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORG_NUMBER}:${ORG} \
+  --kopts="ksdevice=${MAC_ETH0} console=ttyS0,115200n8" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;'
+  #--uid=UID
+  #--image=IMAGE
+  #--kopts-post=KOPTS_POST
+  #--ksmeta=KSMETA
+  #--kickstart=KICKSTART
+  #--depth=DEPTH
+  #--server=SERVER
+  #--virt-path=VIRT_PATH
+  #--virt-type=VIRT_TYPE
+  #--virt-cpus=VIRT_CPUS
+  #--virt-file-size=VIRT_FILE_SIZE
+  #--virt-ram=VIRT_RAM
+  #--virt-auto-boot=VIRT_AUTO_BOOT
+  #--ctime=CTIME
+  #--mtime=MTIME
+  #--power-address=POWER_ADDRESS
+  #--power-user=POWER_USER
+  #--power-pass=POWER_PASS
+  #--power-id=POWER_ID
+  #--ipv6-default-device=IPV6_DEFAULT_DEVICE
+  #--ipv6-autoconfiguration=IPV6_AUTOCONFIGURATION
+  #--mgmt-classes=MGMT_CLASSES
+  #--template-files=TEMPLATE_FILES
+  #--template-remote-kickstarts=TEMPLATE_REMOTE_KICKSTARTS
+  #--clobber
+  #--template-files=TEMPLATE_FILES
+  #--in-place
+
+cobbler system edit \
+  --name=${NAME} \
+  --mac-address="${MAC_ETH0}" \
+  --ip-address=${PROD_IP} \
+  --static=1 \
+  --subnet=${PROD_SUBNET} \
+  --dns-name=${PROD_DNS_NAME} \
+  --interface=eth0
+  #--mtu=MTU
+  #--bonding=BONDING
+  #--bonding-master=BONDING_MASTER
+  #--bonding-opts=BONDING_OPTS
+  #--dhcp-tag=DHCP_TAG
+  #--static-routes=STATIC_ROUTES
+  #--virt-bridge=VIRT_BRIDGE
+  #--ipv6-address=IPV6_ADDRESS
+  #--ipv6-secondaries=IPV6_SECONDARIES
+  #--ipv6-mtu=IPV6_MTU
+  #--ipv6-static-routes=IPV6_STATIC_ROUTES
+  #--ipv6-default-gateway=IPV6_DEFAULT_GATEWAY
+    </screen>
+  </para>
+
+  <para>
+    Putting it all together:
+    <screen>
+&sw1p; <userinput>mkdir /root/test01</userinput>
+&sw1p; <userinput>cd /root/test01</userinput>
+    </screen>
+    We place all the regeneration scripts we discussed above
+    in the newly created directory and run them to make sure
+    that the Spacewalk is loaded with their content, just
+    like Cobbler:
+    <screen>
+&sw1p; <userinput>ls -1</userinput>
+ak-support.sh
+ak-test01.sh
+cc-autofs-5-1_0.sh
+cc-base.sh
+cc-ldap-5-1_0.sh
+cc-ssh.sh
+cc-test01.sh
+cobbler_dmm01.sh
+kp-test01.sh
+
+&sw1p; <userinput>for i in cc-*; do ./$i; done</userinput>
+&sw1p; <userinput>for i in ak-*; do ./$i; done</userinput>
+&sw1p; <userinput>./kp-test01.sh</userinput>
+&sw1p; <userinput>./cobbler_dmm01.sh</userinput>
+    </screen>
+  </para>
+
+  <para>
+    To view how it is in Spacewalk:
+    <screen>
+&sw1p; <userinput>msat_ls_kp_hy.py -l test01</userinput>
+kp test01
+ak   1-support
+ak   1-test01
+cc     test01
+cc     autofs-5-1_0
+cf       /etc/auto.homes
+cf       /etc/auto.master
+cc     ldap-5-1_0
+cf       /etc/ldap.conf
+cf       /etc/nsswitch.conf
+cf       /etc/openldap/ldap.conf
+cf       /etc/pam.d/system-auth-ac
+cf       /etc/sysconfig/authconfig
+cc     ssh
+cf       /root/.ssh/authorized_keys
+cf       /root/.ssh/config
+cc     base
+cf       /etc/motd
+cf       /etc/profile.d/mozldap.sh
+    </screen>
+  </para>
+
+  <para>
+    The last part is creating the Cobbler boot ISO:
+    <screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos5u8-test01-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_dmm01" --tempdir=/tmp</userinput>
+task started: 2013-06-23_165919_buildiso
+task started (id=Build Iso, time=Sun Jun 23 16:59:19 2013)
+using/creating buildisodir: /tmp/buildiso
+building tree for isolinux
+copying miscellaneous files
+copying kernels and initrds for profiles
+copying kernels and initrds for systems
+generating a isolinux.cfg
+generating profile list
+generating system list
+ - ksdevice 52:54:00:a8:05:64 set for system SpacewalkDefaultOrganization_kvm_dmm01
+append line length is greater than 254 chars: (302 chars)
+done writing config
+running: mkisofs -o /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso -r -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -V Cobbler\ Install -R -J -T /tmp/buildiso
+received on stdout: 
+received on stderr: I: -input-charset not specified, using utf-8 (detected in locale settings)
+Size of boot image is 4 sectors -> No emulation
+ 68.62% done, estimate finish Sun Jun 23 16:59:21 2013
+Total translation table size: 4029
+Total rockridge attributes bytes: 1320
+Total directory bytes: 4096
+Path table size(bytes): 40
+Max brk space used 1c000
+7301 extents written (14 MB)
+
+ISO build complete
+You may wish to delete: /tmp/buildiso
+The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
+*** TASK COMPLETE ***
+
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso root@192.168.5.1:/tmp</userinput>
+.. output skipped ..
+    </screen>
+  </para>
+
+  <para>
+    We reinstall (wipe and install) the system with:
+    <screen>
+&srvprompt; <userinput>virsh destroy dmm01</userinput>
+&srvprompt; <userinput>virsh undefine dmm01</userinput>
+
+&srvprompt; <userinput>virt-install \</userinput>
+  <userinput>--connect qemu:///system \</userinput>
+  <userinput>--name=dmm01 \</userinput>
+  <userinput>--ram=512 \</userinput>
+  <userinput>--arch=x86_64 \</userinput>
+  <userinput>--description="Provisioning test machine" \</userinput>
+  <userinput>--cdrom /tmp/centos5u8-test01-kvm.iso \</userinput>
+  <userinput>--os-type=linux \</userinput>
+  <userinput>--os-variant=rhel5.4 \</userinput>
+  <userinput>--disk path=/dev/e/mm,device=disk,bus=scsi \</userinput>
+  <userinput>--network=network=dmsat1,mac=52:54:00:a8:05:64 \</userinput>
+  <userinput>--graphics vnc \</userinput>
+  <userinput>--hvm \</userinput>
+  <userinput>--autostart</userinput>
+.. output skipped, about 10 minutes ..
+    </screen>
+  </para>
+
+</section>

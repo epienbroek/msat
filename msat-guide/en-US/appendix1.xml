@@ -12,6 +12,22 @@
 
   <para>
     <variablelist>
+      <varlistentry id="msat-guide-appendix1-centos_ds_setup">
+        <term>CentOS DS setup</term>
+        <listitem>
+          <para>
+            HowTos/DirectoryServerSetup - CentOS Wiki,
+            CentOS Directory Server, Basic Install,
+          </para>
+
+          <para>
+            <ulink
+            url="http://wiki.centos.org/HowTos/DirectoryServerSetup"><citetitle>HowTos/DirectoryServerSetup
+            - CentOS Wiki</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry id="msat-guide-appendix1-rhds_install_guide">
         <term>RHDS install guide</term>
         <listitem>
@@ -27,7 +43,25 @@
             <ulink
             url="https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/8.2/html-single/Installation_Guide/index.html"><citetitle>Installation
             Guide - Red Hat Customer
-            Portal</citetitle></citetitle></ulink>
+            Portal</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="msat-guide-appendix1-storage_admin">
+        <term>Storage admin guide</term>
+        <listitem>
+          <para>
+            Fedora 14,
+            Storage Administration Guide,
+            Deploying and configuring single-node storage in
+            Fedora,
+            Copyright &copy; 2010 Red Hat, Inc. and others.
+          </para>
+
+          <para>
+            <ulink
+            url="http://docs.fedoraproject.org/en-US/Fedora/14/html-single/Storage_Administration_Guide/index.html"><citetitle>Storage Administration Guide</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>

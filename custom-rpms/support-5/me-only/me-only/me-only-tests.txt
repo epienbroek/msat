@@ -1,0 +1,144 @@
+VERIFYING THE FUNCTIONING OF ME-ONLY
+
+
+AUTHOR
+
+Allard Berends
+
+
+HISTORY
+
+Date with 'LC_TIME=en_US date +"\%d-\%b-\%Y \%H:\%M", '.
+04-Aug-2012 17:29, Allard Berends, start
+
+
+ME ONLY TESTS
+
+The purpose of the me-only program is to run a script on a
+system with the garantee that only one instance of the
+script is running.
+
+In the test, we want to verify that if 2 or more instances
+are started via "me-only" that only 1 is run. Furthermore,
+we want to be sure that if the run script crashes, another
+instance can start running. Of course, still under the
+condition that only one instance runs at a time.
+
+The test script we are using, is called my-pid.sh. It loops
+for $1 amount of times. In the loop it prints its own PID.
+No waiting is done, so we do a busy loop.
+
+An example run:
+$ ./my-pid.sh 4
+running 12026 running 12026 running 12026 running 12026
+
+An example run wrapped by me-only:
+$ ./me-only /tmp/me-only-xxy ./my-pid.sh 4
+running 12796 running 12796 running 12796 running 12796
+
+T.  TEST FUNCTIONAL RUN
+
+    The script we use to test is called: "my-pid.sh" and
+    takes as argument the number of times it has to print
+    its PID.
+
+    Verify the script itself:
+    $ ./my-pid.sh 4
+    running 12039 running 12039 running 12039 running 12039
+
+    Now, wrapped with me only:
+    ./me-only /tmp/aaaa ./my-pid.sh 4
+    running 12892 running 12892 running 12892 running 12892
+
+R.  Success.
+
+T.  TEST SINGLE INSTANCE RUN
+
+    For this test, we need two terminals. Furthermore, to
+    give us time to start the second script, we need a high
+    number of loop counts, say at least 10 million.
+
+    Before you execute the command in terminal one, set up
+    terminal two first to give yourself time to start it
+    before the run in terminal one ends!
+
+    In terminal one:
+    $ ./me-only /tmp/aaaa ./my-pid.sh 10000000
+    .. output skipped ..
+
+    In terminal two:
+    $ ./me-only /tmp/aaaa ./my-pid.sh 10000000
+    File me-only.c, function main, error at line 229.
+    Address already in use
+R.  Success.
+
+T.  TEST SEQUENTIAL RUN
+
+    For this test, we need two terminals. Furthermore, in
+    order not to have to wait very long, we have a loop
+    count of 100000.
+
+    In terminal one:
+    $ ./me-only /tmp/aaaa ./my-pid.sh 100000
+    .. output skipped ..
+
+    Start script in terminal two after script in terminal
+    one has finished:
+    $ ./me-only /tmp/aaaa ./my-pid.sh 100000
+    .. output skipped ..
+R.  Success.
+
+T.  TEST PARALLEL RUN
+
+    For this test, we need two terminals. By using different
+    abstract paths, /tmp/aaaa and /tmp/bbbb, we can run the
+    script parallel.
+
+    In terminal one:
+    $ ./me-only /tmp/aaaa ./my-pid.sh 100000
+    .. output skipped ..
+
+    Start script in terminal two after script in terminal
+    one has finished:
+    $ ./me-only /tmp/bbbb ./my-pid.sh 100000
+    .. output skipped ..
+R.  Success.
+
+T.  TEST CRASH RUN GIVES SPACE FOR OTHER INSTANCE
+
+    For this test, we need two terminals. Furthermore, to
+    give us time to let the first running script crash, we
+    need a high number of loop counts, say at least 10
+    million.
+
+    In terminal one:
+    $ while true; do ./me-only /tmp/aaaa ./my-pid.sh 1000000; done
+    .. output skipped ..
+
+    In terminal two:
+    $ while true; do ./me-only /tmp/aaaa ./my-pid.sh 1000000; done
+    .. output skipped ..
+    .. starts running after interrupt in terminal 1 ..
+
+    Now, when both scripts with while loops around them are
+    running, type Ctrl-C in the one that is running.
+    Immediately the other one starts running.
+R.  Success.
+
+T.  COMPETING RUN
+
+    For this test, we need two terminals. This time we use a
+    smaller number of cycles in the loop to verify that both
+    can run after the other has finished.
+
+    In terminal one:
+    $ while true; do ./me-only /tmp/aaaa ./my-pid.sh 10000; done
+    .. output skipped ..
+
+    In terminal two:
+    $ while true; do ./me-only /tmp/aaaa ./my-pid.sh 10000; done
+    .. output skipped ..
+
+    Eventually, the scripts can be stopped by pressing
+    Ctrl-C in the terminal.
+R.  Success.

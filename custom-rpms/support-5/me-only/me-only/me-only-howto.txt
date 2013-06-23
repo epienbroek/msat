@@ -1,0 +1,81 @@
+USING ME-ONLY
+
+
+AUTHOR
+
+Allard Berends
+
+
+HISTORY
+
+Date with 'LC_TIME=en_US date +"\%d-\%b-\%Y \%H:\%M", '.
+19-Aug-2012 10:52, Allard Berends, start
+
+
+WHY USE ME-ONLY
+
+In shell scripting one normally has a problem running a
+single instance of a shell script. Inside a shell script,
+one can make tests for lockfiles, one can try to create a
+temp directory (which is atomic), or one can try to find
+another process with the same name via "ps".
+
+Choosing from the methods above, the creation of a temp
+directory is the preferred one, since it is atomic. So, it
+is a good way to synchronise on. The only problem occurs
+when the single instance script crashes and never removes
+the stale lock directory.
+
+A way around the existence of the stale lock directory is to
+create code that checks for the stale lock directory and
+remove it, when it is older than a certain age. Again, we
+end up with another problem: assume the shell script was
+running way longer than expected and the lock directory is
+not stale at all!
+
+In software, this problem has been solved by creating a
+third independent party that grants locks. If the third
+party has crashed, noone ever receives a lock. If the third
+party is running correctly, then the script code could
+nicely ask for locks.
+
+with me-only the third party is the Linux kernel. We ask the
+kernel for a process resource. This is atomic, since the
+kernel synchronises for us. If our process crashes, the
+kernel automatically cleans up the resource. Hence, we can
+atomically run as a single instance script, and we
+circumvent the problem of stale lock directories.
+
+
+HOW TO USE ME-ONLY
+
+The calling signature is:
+$ me-only <lock_path> <script_path> <script_arguments>
+
+For example:
+$ me-only /tmp/my-pid /usr/share/doc/me-only/my-pid.sh 1000
+
+Return codes:
+0: success
+1: general failure, happens when the script path cannot be
+   found.
+2: Invalid precondition, for example: not the right number
+   of arguments.
+3: error in socket funtion call, must never occur, because
+   otherwise something is seriously wrong with the system.
+4: error in bind function call, means that the lock_path is
+   not unique. Hence, we are not the only instance. This
+   error happens if we start a script twice or more.
+
+In shell script, me-only can be used like:
+
+me-only /tmp/a /path/script 1 2 3 || { echo "ERROR: ..." >&2; exit 1; }
+
+or
+
+me-only /tmp/a /path/script 1 2 3
+RC=$?
+if [ $RC -ne 0 ]; then
+  echo "ERROR: ..." 2>&1
+  exit 1
+fi

@@ -13,12 +13,13 @@
   </para>
 
   <para>
-    After the RHDS is installed, we want to make the system
-    dummy proof. In short, if an administrator is logged in
-    on the system, he should not be able to simply change it
-    by running <command>yum update</command>.
-    Hence, the requirements we impose on the installed
-    system and its connection to the Spacewalk server are:
+    After the RHDS (Red Hat Directory Server) is installed,
+    we want to make the system dummy proof. In short, if an
+    administrator is logged in on the system, he should not
+    be able to simply change it by running <command>yum
+    update</command>.  Hence, the requirements we impose on
+    the installed system and its connection to the Spacewalk
+    server are:
     <orderedlist>
       <listitem>
         <para>
@@ -40,5 +41,19 @@
     explained in <xref
     linkend="msat-guide-appendix1-rhds_install_guide" />.
   </para>
+
+  <para>
+    In order to install the RHDS software, we first need to
+    create a new software channel. The remainder of this
+    chapter explains all the steps to come up with a
+    directory server that retrieves its software from cloned
+    channels.
+  </para>
+
+  <xi:include href="software/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/host.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/sw_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/node.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>
 
