@@ -84,7 +84,16 @@ uid                  Allard Berends (dmsat1 env RPM signing) <msat.disruptivefos
 sub   1024g/7E2EDF0B 2013-06-23
 ------
 
-Another way is to import an existing GPG key. Assume the GPG
+To change the passphrase:
+$ gpg --edit-key 'Allard Berends (dmsat1 env RPM signing) <msat.disruptivefoss@gmail.com>'
+gpg> passwd
+Enter passphrase: oldpassword
+Enter the new passphrase for this secret key.
+Enter passphrase: redhat
+Repeat passphrase: redhat
+gpg> save
+
+One can also import an existing GPG key. Assume the GPG
 private key is in the file gpg_key.txt, then it can be added
 to the user's keyring with:
 $ gpg --import ./gpg_key.txt

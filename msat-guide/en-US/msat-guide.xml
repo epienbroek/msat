@@ -10,6 +10,7 @@
   <xi:include href="software.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="msat.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="references.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_idm.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="appendix1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <index />

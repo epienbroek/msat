@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_idm-host_access">
+  <title>Host access control</title>
+  <table>
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>virtual network creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>storage creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>memory verification</entry>
+          <entry>3 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  <para>
+    In this section we discuss how we can avoid letting
+    users log in on nodes using configuration placed in
+    LDAP.
+  </para>
+
+  <section id="apdx_idm-host_access-ldap">
+    <title>LDAP configuration</title>
+    <para>
+      As far as we can judge, based on our investigation on
+      the Internet, multiple options exist to make host
+      based access control happen. The options are:
+      <itemizedlist>
+        <listitem>
+          <para>
+            Enable the
+            <computeroutput>pam_check_host_attr</computeroutput>
+            parameter in <filename>/etc/ldap.conf</filename>
+            and add the
+            <computeroutput>host</computeroutput> attribute
+            to the user entry in LDAP.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Enable the
+            <computeroutput>pam_groupdn</computeroutput>
+            parameter in
+            <filename>/etc/ldap.conf</filename>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Enable the
+            <computeroutput>pam_member_attribute</computeroutput>
+            parameter in
+            <filename>/etc/ldap.conf</filename>.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      All options above have the same disadvantage: it is
+      not possible to have exactly one
+      <filename>/etc/ldap.conf</filename> on all hosts. One
+      needs a mechanism like
+      <application>puppet</application> to distribute the
+      file on a per-host basis.
+    </para>
+
+    <para>
+      The option we are looking for, is to have a mechanism
+      where the user is first authenticated, the primary
+      group and secondary groups of the user are cached. In
+      these groups we have the option to add host
+      attributes. So, based on the groups a user is a member
+      of, we can find out in the LDAP database if a user is
+      allowed to log in on a host or not.
+    </para>
+  </section>
+  
+</section>
