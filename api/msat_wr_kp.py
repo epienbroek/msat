@@ -357,6 +357,8 @@ for o in order:
       if o == 'url':
         dummy = re.sub('org/\d+/', 'org/$ORGNUM/', map[o])
         print "  --kickstart-%s \"%s\" \\" % (o, dummy)
+      elif o == 'rootpw':
+        print "  --kickstart-%s \'%s\' \\" % (o, map[o])
       else:
         print "  --kickstart-%s \"%s\" \\" % (o, map[o])
     else:
