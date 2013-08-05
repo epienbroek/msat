@@ -1,4 +1,4 @@
-Name:		    ds_setup
+Name:		    ds-setup
 Version:    1.0.0
 Release:    0
 Summary:    Directory server node specific setup file
@@ -9,9 +9,8 @@ Source:     %{name}.tar.gz
 BuildRoot:  %{_tmppath}/%{name}-root
 
 %description
-This software package has no contents. The package is merely
-used to create a directory server setup file during
-installation.
+This software package only has a template file as contents,
+which is adapted in the post install scriptlet.
 
 What is configured?
 FullMachineName = ds1.dmsat1.org
@@ -61,7 +60,6 @@ IP=$(/bin/hostname --ip-address)
 # Empty.
 
 %files
-%doc %attr(0644,root,root) /usr/share/doc/%{name}/README
 %attr(0644,root,root) /root/setup.inf
 
 %changelog
