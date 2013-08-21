@@ -364,6 +364,22 @@ for o in order:
     else:
       print "  --kickstart-%s true \\" % (o, )
 
+# Get custom options: Systems > Kickstart > Profiles >
+# Kickstart Details > Advanced Options > last item (Custom
+# options)
+try:
+  custom_options = client.kickstart.profile.getCustomOptions(
+    key,
+    options.kickstart_label,
+  )
+except xmlrpclib.Fault, e:
+  print >> sys.stderr, str(e)
+  print >> sys.stderr, options
+  sys.exit(1)
+
+if custom_options:
+  print "  --kickstart-custom \'%s\' \\" % (custom_options[0]['arguments'],)
+
 # Get rpms: Systems > Kickstart > Profiles > Software >
 # Package Groups
 try:

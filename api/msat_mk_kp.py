@@ -647,6 +647,15 @@ parser.add_option(
   default  = None,
   help     = "zfcp kickstart advanced option"
 )
+parser.add_option(
+  "--kickstart-custom",
+  action   = "callback",
+  callback = config.parse_string,
+  dest     = "kickstart_custom",
+  type     = "string",
+  default  = None,
+  help     = "custom kickstart option"
+)
 
 (options, args) = config.get_conf(parser)
 
@@ -935,6 +944,17 @@ if advanced_options:
       key,
       options.kickstart_label,
       advanced_options
+    )
+  except xmlrpclib.Fault, e:
+    print >> sys.stderr, str(e)
+    print >> sys.stderr, options
+
+if options.kickstart_custom:
+  try:
+    rc = client.kickstart.profile.setCustomOptions(
+      key,
+      options.kickstart_label,
+      [options.kickstart_custom]
     )
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
