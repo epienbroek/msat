@@ -1,5 +1,5 @@
 #!/bin/bash
-RPM=ds_setup
+RPM=ds-setup
 tar -cz --exclude=.svn -f ~/rpm/SOURCES/${RPM}.tar.gz ${RPM}
 rpmbuild --target noarch --clean -bb ${RPM}.spec
 RC=$?
