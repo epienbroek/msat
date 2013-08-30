@@ -62,10 +62,11 @@ import os.path
 import shutil
 import sys
 import xmlrpclib
+import urllib2
 
-usage = '''list kickstart profiles'''
+usage = '''retrieves RPMs from a software channel'''
 
-description = '''This script lists the kickstart profiles on the specified Satellite server.'''
+description = '''This script retrieves all RPMs in a software channel from the specified Satellite server.'''
 
 parser = optparse.OptionParser(
   usage = usage,
@@ -187,18 +188,19 @@ if os.path.exists(export_path):
 os.makedirs(export_path)
 
 for pkg in list:
-  id = pkg.get('id')
-
   try:
-    details = client.packages.getDetails(
+    pkg_url = client.packages.getPackageUrl(
       key,
-      id,
+      pkg['id'],
     )
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, id
 
-  shutil.copy(os.path.join(options.satellite_rpmpath, details['path']),
-              export_path)
+  filename = pkg['name'] + '-' + pkg['version'] + '-' + pkg['release']  + '.' + pkg['arch_label'] + '.rpm'
+  data = urllib2.urlopen(pkg_url)
+  fd = open(export_path + '/' + filename, 'wb')
+  fd.write(data.read())
+  fd.close
 
 client.auth.logout(key)
