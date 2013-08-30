@@ -427,15 +427,24 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, options
   sys.exit(1)
 
-if len(scripts) > 1:
-  print >> sys.stderr, "Error: only one script allowed in kickstart convention"
+if len(scripts) > 2:
+  print >> sys.stderr, "Error: only a pre and post script allowed in kickstart convention"
   sys.exit(1)
 
 if scripts:
   for s in scripts:
     c = escape_quote(s['contents'])
-    print "  --kickstart-script '%s'" % (c, )
+    if s['script_type'] == 'pre':
+      pre = "  --kickstart-prescript '%s' \\" % (c, )
+    else:
+      post = "  --kickstart-postscript '%s'" % (c, )
+  if pre:
+    print pre
+  if post:
+    print post
+  else:
+    print "  --kickstart-postscript ''"
 else:
-  print "  --kickstart-script ''"
+  print "  --kickstart-postscript ''"
 
 client.auth.logout(key)

@@ -234,6 +234,24 @@ parser.add_option(
   help = "software kickstart option"
 )
 parser.add_option(
+  "--kickstart-prescript",
+  action = "callback",
+  callback = config.parse_file,
+  dest = "kickstart_prescript",
+  type = "string",
+  default = None,
+  help = "pre script kickstart option"
+)
+parser.add_option(
+  "--kickstart-postscript",
+  action = "callback",
+  callback = config.parse_file,
+  dest = "kickstart_postscript",
+  type = "string",
+  default = None,
+  help = "post script kickstart option"
+)
+parser.add_option(
   "--kickstart-script",
   action = "callback",
   callback = config.parse_file,
@@ -1033,6 +1051,34 @@ if options.kickstart_software:
     print >> sys.stderr, options
 
 if options.satellite_version == '5.5':
+  if options.kickstart_prescript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        options.kickstart_prescript,
+        '',
+        'pre',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+  if options.kickstart_postscript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        options.kickstart_postscript,
+        '',
+        'post',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
   if options.kickstart_script:
     try:
       rc = client.kickstart.profile.addScript(
