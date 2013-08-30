@@ -431,6 +431,8 @@ if len(scripts) > 2:
   print >> sys.stderr, "Error: only a pre and post script allowed in kickstart convention"
   sys.exit(1)
 
+pre = None
+post = None
 if scripts:
   for s in scripts:
     c = escape_quote(s['contents'])
