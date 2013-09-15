@@ -173,24 +173,43 @@ options $*
 verify
 
 # Verify existance of Kickstart profile
-msat_ls_kp.py | grep -q -w ${L_OPTION}
-RC=`echo $?`
+msat_ls_kp.py | grep -q ^${L_OPTION}\$
+RC=$?
 
 if [ "$RC" != 0 ]; then
-	echo "Supplied kickstart label cannot be found!"
+	echo "ERROR: supplied kickstart label cannot be found!"
 	exit 1
 fi
 
 # Get ORG id to use in the Activation Key
-ORGNUM=`msat_ls_org.py`
+ORGNUM=$(msat_ls_org.py)
 
 # Deduce name of Activation Key to remove
-AK_NAME=`echo ${L_OPTION} | cut -f1 -d-`
-AK_VERSION=`echo ${L_OPTION} | cut -f4 -d-`
+# AB: the naming convetion of a kp dictates:
+#     <name>-<r>u<m>-<x_y_z>, where:
+#     <name>: name of the app
+#     <r>: RHEL major, minimally a one-digit number
+#     <m>: RHEL minor, minimally a one-digit number
+#     <x_y_z>: tag release, e.g. 1_0 or 5_8_3.
+# The app type ak is:
+#     <orgnum>-<name>-<r>u<m>-<x_y_z>. Here we assume that
+#     an app version propagates to the kp, ak, cc (of the
+#     app) version.
+# Since the '-' character may be part of the <name>, we can
+# only deduce the name by chopping of the part
+# -<r>u<m>-<x_y_z>.
+#AK_NAME=$(echo ${L_OPTION} | cut -f1 -d-)
+AK_NAME=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}u[0-9]\{1,\}.*$//')
+#AK_VERSION=$(echo ${L_OPTION} | cut -f4 -d-)
+AK_VERSION=$(echo ${L_OPTION} | sed 's/^.*-[0-9]\{1,\}u[0-9]\{1,\}-//')
 
 # Deduce name of Config Channel to remove
-RHEL_MAJOR=`echo $L_OPTION | cut -f3 -d- | cut -c1`
-CC_NAME=`echo ${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION}`
+#RHEL_MAJOR=$(echo $L_OPTION | cut -f3 -d- | cut -c1)
+# AB: deducing major version is not 100%. One can have
+# <number>u in the app name!
+RHEL_MAJOR=$(echo ${L_OPTION} | sed 's/^.*-\([0-9]\{1,\}\)u[0-9]\{1,\}-.*/\1/')
+#CC_NAME=$(echo ${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION})
+CC_NAME="${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION}"
 
 # Removing the hierarchy from top to bottom
 
