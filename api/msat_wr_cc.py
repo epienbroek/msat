@@ -18,6 +18,8 @@
 #   Gerben Welter (GW),  2013-04-28 22:40
 # HISTORY
 #   2013-04-28 22:40, GW added SELinux context support.
+#   2013-09-15 23:02 (GW), also allow to save as symbolic
+#                          link
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 #
@@ -48,10 +50,13 @@ import time
 import urlparse
 import xmlrpclib
 
-def escape_quote(s):
+def replace_unicode(s):
   # Remove nasty long dash u'u2013' with --
+  # This is a common occurrence when editing or copy/pasting
+  # in a Microsoft environment
   s = re.sub(u'(?ms)[\u2013\u00ad]', '--', s)
-  s = s.encode('ascii')
+  #s = s.encode('ascii')
+  s = (s.encode('utf-8'))[:-1]
   # We use here documents, so no ' escaping
   #e = re.sub('(?ms)\'', '\'"\'"\'', s)
   #s = re.sub('(?ms)`', '\`', s)
@@ -253,11 +258,19 @@ except xmlrpclib.Fault, e:
   sys.exit(1)
 
 for f in files:
-  print "msat_mk_cc_cf.py \\"
+  #print "msat_mk_cc_cf.py \\"
+  if f['type'] == 'file' or f['type'] == 'directory':
+    print "msat_mk_cc_cf.py \\"
+  else:
+    print "msat_mk_cc_sl.py \\"
 
   # Set configchannel label.
   print "  --configchannel-label %s \\" % (options.configchannel_label, )
-  print "  --configpath-path %s \\" % (f['path'], )
+  #print "  --configpath-path %s \\" % (f['path'], )
+  if f['type'] == 'file' or f['type'] == 'directory':
+    print "  --configpath-path %s \\" % (f['path'], )
+  else:
+    print "  --configpath-link %s \\" % (f['path'], )
 
   if f['type'] == 'file':
     print "  --configpath-dir false \\"
@@ -300,7 +313,7 @@ for f in files:
       sys.exit(1)
     else:
       try:
-        c = escape_quote(f['contents'])
+        c = replace_unicode(f['contents'])
       except UnicodeEncodeError, e:
         print >> sys.stderr, "ERROR: %s: %s: unicode characters not supported" % (options.configchannel_label, f['path'])
         sys.exit(1)

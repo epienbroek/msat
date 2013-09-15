@@ -22,6 +22,7 @@
 #   Gerben Welter  (GW),  2013-04-28 22:04
 # HISTORY
 #   2013-04-28 22:04, GW added support for SELinux.
+#   2013-09-15 23:04 GW: added support for symlinks.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
@@ -130,19 +131,19 @@ parser.add_option(
   help = "config channel label"
 )
 parser.add_option(
-  "--configpath-link",
+  "--configpath-target",
   action = "callback", 
   callback = config.parse_string,
-  dest = "configpath_link",
+  dest = "configpath_target",
   type = "string",
   default = None,
   help = "symbolic link path to file or dir"
 )
 parser.add_option(
-  "--configpath-path",
+  "--configpath-link",
   action = "callback", 
   callback = config.parse_string,
-  dest = "configpath_path",
+  dest = "configpath_link",
   type = "string",
   default = None,
   help = "path of file or dir"
@@ -163,15 +164,15 @@ if options.configchannel_label is None:
   parser.error('Error: specify label, -l or --configchannel-label')
 if options.configpath_link is None:
   parser.error('Error: specify link, --configpath-link')
-if options.configpath_path is None:
-  parser.error('Error: specify path, --configpath-path')
+if options.configpath_target is None:
+  parser.error('Error: specify target, --configpath-target')
 
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
 path_info = {}
-path_info['target_path'] = options.configpath_path
+path_info['target_path'] = options.configpath_target
 
 if options.satellite_version in ['5.4', '5.5']:
   if options.configpath_context:

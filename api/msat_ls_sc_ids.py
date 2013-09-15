@@ -13,7 +13,10 @@
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
 #   Allard Berends (AB), 2013-05-20 19:24
+#   Gerben Welter (GW), 2013-09-15 22:49
 # HISTORY
+#   2013-09-15 22:47 (AB): added suggestion of Gerben Welter
+#                          to e:n-v-r.a output
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 # 
@@ -157,10 +160,13 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, kickstart
 
 for i in rpms:
-  nvra = "%s-%s-%s-%s" % (i['name'], i['version'], i['release'], i['arch_label'])
+  if not i['epoch']:
+    rpm = "%s-%s-%s.%s" % (i['name'], i['version'], i['release'], i['arch_label'])
+  else:
+    rpm = "%s:%s-%s-%s.%s" % (i['epoch'], i['name'], i['version'], i['release'], i['arch_label']) 
   try:
-    d[nvra]
-    d[nvra] = i['id']
+    d[rpm]
+    d[rpm] = i['id']
   except KeyError, e:
     pass
 
