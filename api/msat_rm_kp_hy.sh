@@ -199,15 +199,15 @@ ORGNUM=$(msat_ls_org.py)
 # only deduce the name by chopping of the part
 # -<r>u<m>-<x_y_z>.
 #AK_NAME=$(echo ${L_OPTION} | cut -f1 -d-)
-AK_NAME=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}u[0-9]\{1,\}.*$//')
+AK_NAME=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}w\?u[0-9]\{1,\}.*$//')
 #AK_VERSION=$(echo ${L_OPTION} | cut -f4 -d-)
-AK_VERSION=$(echo ${L_OPTION} | sed 's/^.*-[0-9]\{1,\}u[0-9]\{1,\}-//')
+AK_VERSION=$(echo ${L_OPTION} | sed 's/^.*-[0-9]\{1,\}w\?u[0-9]\{1,\}-//')
 
 # Deduce name of Config Channel to remove
-#RHEL_MAJOR=$(echo $L_OPTION | cut -f3 -d- | cut -c1)
+#RHEL_MAJOR=$(echo $L_OPTION | cut -f3 -d- | cut -c2)
 # AB: deducing major version is not 100%. One can have
 # <number>u in the app name!
-RHEL_MAJOR=$(echo ${L_OPTION} | sed 's/^.*-\([0-9]\{1,\}\)u[0-9]\{1,\}-.*/\1/')
+RHEL_MAJOR=$(echo ${L_OPTION} | sed 's/^.*-\([0-9]\{1,\}w\?\)u[0-9]\{1,\}-.*/\1/')
 #CC_NAME=$(echo ${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION})
 CC_NAME="${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION}"
 

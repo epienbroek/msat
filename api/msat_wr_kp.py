@@ -359,6 +359,8 @@ for o in order:
         print "  --kickstart-%s \"%s\" \\" % (o, dummy)
       elif o == 'rootpw':
         print "  --kickstart-%s \'%s\' \\" % (o, map[o])
+      elif o == 'bootloader':
+        print "  --kickstart-%s \'%s\' \\" % (o, map[o])
       else:
         print "  --kickstart-%s \"%s\" \\" % (o, map[o])
     else:
