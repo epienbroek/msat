@@ -470,10 +470,10 @@ parser.add_option(
 parser.add_option(
   "--kickstart-reboot",
   action   = "callback",
-  callback = config.parse_string,
+  callback = config.parse_boolean,
   dest     = "kickstart_reboot",
   type     = "string",
-  default  = "true",
+  default  = True,
   help     = "reboot kickstart advanced option"
 )
 parser.add_option(
