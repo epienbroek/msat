@@ -221,6 +221,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.exit(1)
 
 print "  --activationkey-description %s \\" % (details['description'], )
 if details['base_channel_label'] == 'none':
@@ -254,6 +255,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
+  sys.exit(1)
 
 if cfgdep:
   print "  --activationkey-configuration true \\"
@@ -279,9 +281,10 @@ try:
     options.activationkey_label,
   )
 except xmlrpclib.Fault, e:
-  print >> sys.stderr, str(e)
-  print >> sys.stderr, options
-
-print "  --activationkey-configchannels '%s'" % (','.join([c['label'] for c in cfgchannels]), )
+  print "  --activationkey-configchannels ''"
+  #print >> sys.stderr, str(e)
+  #print >> sys.stderr, options
+else:
+  print "  --activationkey-configchannels '%s'" % (','.join([c['label'] for c in cfgchannels]), )
 
 client.auth.logout(key)
