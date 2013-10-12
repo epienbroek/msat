@@ -156,10 +156,10 @@ if options.key_content == '-':
   f = sys.stdin
 else:
   try:
-    f = open(options.configpath_content, 'r')
+    f = open(options.key_content, 'r')
   except IOError, e:
     print >> sys.stderr, str(e)
-    print >> sys.stderr, options.configpath_content
+    print >> sys.stderr, options.key_content
     sys.exit(1)
 content = ''.join(f.readlines())
 
