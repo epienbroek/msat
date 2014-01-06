@@ -20,6 +20,9 @@
 #   2013-04-28 22:40, GW added SELinux context support.
 #   2013-09-15 23:02 (GW), also allow to save as symbolic
 #                          link
+#   2014-01-06 15:04 (AB), replace_unicode no longer strips
+#                          last character in
+#                          s.encode('utf-8')
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
 #
@@ -56,7 +59,7 @@ def replace_unicode(s):
   # in a Microsoft environment
   s = re.sub(u'(?ms)[\u2013\u00ad]', '--', s)
   #s = s.encode('ascii')
-  s = (s.encode('utf-8'))[:-1]
+  s = (s.encode('utf-8'))
   # We use here documents, so no ' escaping
   #e = re.sub('(?ms)\'', '\'"\'"\'', s)
   #s = re.sub('(?ms)`', '\`', s)
