@@ -1050,7 +1050,53 @@ if options.kickstart_software:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
 
-if options.satellite_version == '5.5':
+if options.satellite_version == '5.6':
+  if options.kickstart_prescript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        'Pre script',
+        options.kickstart_prescript,
+        '',
+        'pre',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+  if options.kickstart_postscript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        'Post script',
+        options.kickstart_postscript,
+        '',
+        'post',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+  if options.kickstart_script:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        'Script',
+        options.kickstart_script,
+        '',
+        'post',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+elif options.satellite_version == '5.5':
   if options.kickstart_prescript:
     try:
       rc = client.kickstart.profile.addScript(
