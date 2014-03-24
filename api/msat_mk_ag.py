@@ -104,7 +104,6 @@ parser.add_option(
   default = None,
   help = "password belonging to Satellite admin account",
 )
-
 parser.add_option(
   "-g",
   "--gpg-keyid",
@@ -125,24 +124,7 @@ parser.add_option(
   default = None,
   help = "GPG Provider name"
 )
-parser.add_option(
-  "--org-login",
-  action = "callback",
-  callback = config.parse_string,
-  dest = "org_login",
-  type = "string",
-  default = None,
-  help = "Satellite admin's login name"
-)
-parser.add_option(
-  "--org-password",
-  action = "callback",
-  callback = config.parse_string,
-  dest = "org_password",
-  type = "string",
-  default = None,
-  help = "Satellite admin's password"
-)
+
 (options, args) = config.get_conf(parser)
 
 if not options.gpg_keyid:
