@@ -48,7 +48,7 @@ import xmlrpclib
 
 usage = '''Associate GPG key ID to provider name'''
 
-description = '''This script creates a association between the GPG key ID and the Content Provider name in Satellite.'''
+description = '''This script creates an association between the GPG key ID and the Content Provider name in Satellite.'''
 
 parser = optparse.OptionParser(
   usage = usage,
