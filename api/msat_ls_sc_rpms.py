@@ -144,7 +144,8 @@ try:
   )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
-  print >> sys.stderr, kickstart
+  print >> sys.stderr, options.softwarechannel_label
+  sys.exit(1)
 
 if options.rpm_id:
   for i in rpms:
