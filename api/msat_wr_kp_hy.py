@@ -233,9 +233,7 @@ for a in akeys:
       a['key'],
     )
   except xmlrpclib.Fault, e:
-    print >> sys.stderr, str(e)
-    print >> sys.stderr, options.activationkey_label
-    sys.exit(1)
+    continue
 
   for cc in config_channels:
     script = 'cc-' + cc['label'] + '.sh'
