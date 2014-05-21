@@ -207,6 +207,15 @@ parser.add_option(
   help = "remotecmds kickstart option"
 )
 parser.add_option(
+  "--kickstart-registrationtype",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "kickstart_registrationtype",
+  type = "string",
+  default = "deletion",
+  help = "registrationtype kickstart option (reactivation, deletion, none). Default is set to deletion"
+)
+parser.add_option(
   "--kickstart-partitioning",
   action = "callback",
   callback = config.parse_string,
@@ -966,6 +975,7 @@ if advanced_options:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 if options.kickstart_custom:
   try:
@@ -977,6 +987,7 @@ if options.kickstart_custom:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 try:
   if child_channels:
@@ -989,6 +1000,7 @@ try:
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
 except NameError, e:
   pass
 
@@ -1004,6 +1016,7 @@ try:
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
 except NameError, e:
   pass
 
@@ -1016,6 +1029,7 @@ if options.kickstart_configmgt:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 if options.kickstart_partitioning:
   try:
@@ -1027,6 +1041,7 @@ if options.kickstart_partitioning:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 if options.kickstart_keys:
   try:
@@ -1038,6 +1053,7 @@ if options.kickstart_keys:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 if options.kickstart_software:
   try:
@@ -1049,6 +1065,7 @@ if options.kickstart_software:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
 
 if options.satellite_version == '5.5':
   if options.kickstart_prescript:
@@ -1065,6 +1082,7 @@ if options.satellite_version == '5.5':
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
   if options.kickstart_postscript:
     try:
       rc = client.kickstart.profile.addScript(
@@ -1079,6 +1097,7 @@ if options.satellite_version == '5.5':
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
   if options.kickstart_script:
     try:
       rc = client.kickstart.profile.addScript(
@@ -1093,6 +1112,7 @@ if options.satellite_version == '5.5':
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
 else:
   if options.kickstart_script:
     try:
@@ -1107,6 +1127,7 @@ else:
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
+      sys.exit(1)
 
 # Due to bug 679846 we run this one always to force the
 # client.kickstart.profile.addScript to function!
@@ -1127,4 +1148,15 @@ if not options.kickstart_remotecmds:
   except xmlrpclib.Fault, e:
     print >> sys.stderr, str(e)
     print >> sys.stderr, options
+    sys.exit(1)
+try:
+  rc = client.kickstart.profile.system.setRegistrationType(
+    key,
+    options.kickstart_label,
+    options.kickstart_registrationtype,
+  )
+except xmlrpclib.Fault, e:
+  print >> sys.stderr, str(e)
+  print >> sys.stderr, options
+  sys.exit(1)
 client.auth.logout(key)

@@ -132,6 +132,7 @@ try:
   )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
+  sys.exit(1)
 
 for i in k:
   print i['label']
