@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<appendix id="msat-guide-apdx_sw21">
+  <title>Spacewalk 2.1</title>
+  <para>
+    This appendix discusses how to setup the KVM to run
+    Spacewalk 2.1 on and how to install Spacewalk 2.1 on it.
+  </para>
+
+  <para>
+    We make a distinction between the following items:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Resources need for the Spacewalk KVM
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Installation of the KVM and Spacewalk software
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <xi:include href="apdx_sw21/resources.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_sw21/install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</appendix>
+

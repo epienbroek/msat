@@ -213,7 +213,7 @@ zone "5.168.192.in-addr.arpa." IN {
 <screen>
 &sw1p; <userinput>cat /var/named/chroot/var/named/127.in-addr.arpa</userinput>
 $TTL    86400
-@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+@       IN SOA d21sw1.dmsat1.org. root.d21sw1.dmsat1.org. (
         2012012300      ; serial, format: YYYYMMDDNN, where
       ; NN is the daily sequence number.
       ; After editing this file, always
@@ -243,7 +243,7 @@ $TTL    86400
 ;
 ; @ is implied!
 ;
-        IN NS   d19sw1.dmsat1.org.
+        IN NS   d21sw1.dmsat1.org.
 
 ;
 ; 127.0.0.0/8
@@ -255,7 +255,7 @@ $TTL    86400
 <screen>
 &sw1p; <userinput>cat /var/named/chroot/var/named/192.168.5.in-addr.arpa</userinput>
 $TTL    86400
-@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+@       IN SOA d21sw1.dmsat1.org. root.d21sw1.dmsat1.org. (
         2012012300      ; serial, format: YYYYMMDDNN, where
       ; NN is the daily sequence number.
       ; After editing this file, always
@@ -285,7 +285,7 @@ $TTL    86400
 ;
 ; @ (short for domain name) is implied!
 ;
-        IN NS   d19sw1.dmsat1.org.
+        IN NS   d21sw1.dmsat1.org.
 
 ;
 ; 192.168.5.0/24
@@ -293,7 +293,7 @@ $TTL    86400
 
 ; Development Spacewalk server.
 10  IN  PTR d19sw0.dmsat1.org.
-11  IN  PTR d19sw1.dmsat1.org.
+11  IN  PTR d21sw1.dmsat1.org.
 12  IN  PTR d19sw2.dmsat1.org.
 13  IN  PTR ds0.dmsat1.org.
 14  IN  PTR ds1.dmsat1.org.
@@ -304,7 +304,7 @@ $TTL    86400
 <screen>
 &sw1p; <userinput>cat /var/named/chroot/var/named/dmsat1.org.zone</userinput>
 $TTL    86400
-@       IN SOA d19sw1.dmsat1.org. root.d19sw1.dmsat1.org. (
+@       IN SOA d21sw1.dmsat1.org. root.d21sw1.dmsat1.org. (
         2012012300      ; serial, format: YYYYMMDDNN, where
       ; NN is the daily sequence number.
       ; After editing this file, always
@@ -334,7 +334,7 @@ $TTL    86400
 ;
 ; @ (short for domain name) is implied!
 ;
-        IN NS   d19sw1.dmsat1.org.
+        IN NS   d21sw1.dmsat1.org.
 
 ;
 ; 192.168.5.0/24
@@ -345,7 +345,7 @@ $TTL    86400
 ; MAC_ETH0=52:54:00:a8:05:0a, not used (virtual)
 d19sw0     IN      A       192.168.5.10
 ; MAC_ETH0=52:54:00:a8:05:0b
-d19sw1     IN      A       192.168.5.11
+d21sw1     IN      A       192.168.5.11
 ; MAC_ETH0=52:54:00:a8:05:0c
 d19sw2     IN      A       192.168.5.12
 ; MAC_ETH0=52:54:00:a8:05:0d, not used (virtual)
@@ -440,7 +440,7 @@ $TTL    86400
 
 	</para>
 	 <para>
-		Reconfigure the <filename>/etc/resolv.conf</filename> so that the <systemitem class="fqdomainname">d19sw1.dmsat1.org</systemitem> also resolvs to its own DNS: 
+		Reconfigure the <filename>/etc/resolv.conf</filename> so that the <systemitem class="fqdomainname">d21sw1.dmsat1.org</systemitem> also resolvs to its own DNS: 
 <screen>
 &sw1p; <userinput>sed -i 's/^DNS1=.*$/DNS1=192.168.5.11/' /etc/sysconfig/network-scripts/ifcfg-eth0</userinput>
 .. inotify informs NetworkManager ..
@@ -465,17 +465,17 @@ ln -s '/usr/lib/systemd/system/named-chroot.service' '/etc/systemd/system/multi-
 	 <para>
 		Do some tests: 
 <screen>
-&sw1p; <userinput>for i in d19sw0.dmsat1.org d19sw1.dmsat1.org d19sw2.dmsat1.org &t1;.dmsat1.org d19sw0 d19sw1 d19sw2 dmm01 192.168.5.10 192.168.5.11 192.168.5.12 192.168.5.100; do host $i; done</userinput>
+&sw1p; <userinput>for i in d19sw0.dmsat1.org d21sw1.dmsat1.org d19sw2.dmsat1.org &t1;.dmsat1.org d19sw0 d21sw1 d19sw2 dmm01 192.168.5.10 192.168.5.11 192.168.5.12 192.168.5.100; do host $i; done</userinput>
 d19sw0.dmsat1.org has address 192.168.5.10
-d19sw1.dmsat1.org has address 192.168.5.11
+d21sw1.dmsat1.org has address 192.168.5.11
 d19sw2.dmsat1.org has address 192.168.5.12
 &t1;.dmsat1.org has address 192.168.5.100
 d19sw0.dmsat1.org has address 192.168.5.10
-d19sw1.dmsat1.org has address 192.168.5.11
+d21sw1.dmsat1.org has address 192.168.5.11
 d19sw2.dmsat1.org has address 192.168.5.12
 &t1;.dmsat1.org has address 192.168.5.100
 10.5.168.192.in-addr.arpa domain name pointer d19sw0.dmsat1.org.
-11.5.168.192.in-addr.arpa domain name pointer d19sw1.dmsat1.org.
+11.5.168.192.in-addr.arpa domain name pointer d21sw1.dmsat1.org.
 12.5.168.192.in-addr.arpa domain name pointer d19sw2.dmsat1.org.
 100.5.168.192.in-addr.arpa domain name pointer &t1;.dmsat1.org.
 </screen>

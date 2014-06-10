@@ -326,7 +326,7 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-ds-kvm.iso
     <para>
       On the host machine we need to create storage space for our test machine: 
       <screen>
-&srvprompt; <userinput>pvs</userinput>
+&hostp; <userinput>pvs</userinput>
   PV         VG        Fmt  Attr PSize   PFree
   /dev/sda3  vg_server lvm2 a--  931.00g      0
   /dev/sdb   b         lvm2 a--  931.51g 638.54g
@@ -335,11 +335,11 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-ds-kvm.iso
   /dev/sde   e         lvm2 a--  931.51g 926.63g
   /dev/sdf   f         lvm2 a--  931.51g 931.51g
 
-&srvprompt; <userinput>pvs -o +vg_extent_size /dev/sde</userinput>
+&hostp; <userinput>pvs -o +vg_extent_size /dev/sde</userinput>
   PV         VG   Fmt  Attr PSize   PFree   Ext
   /dev/sde   e    lvm2 a--  931.51g 931.51g 4.00m
 
-&srvprompt; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) e</userinput>
+&hostp; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) e</userinput>
   Logical volume "ds1" created
 
       </screen>
@@ -369,7 +369,7 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-ds-kvm.iso
     <para>
       The installation is started with: 
       <screen>
-&srvprompt; <userinput>virt-install \</userinput>
+&hostp; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
   <userinput>--name=ds1 \</userinput>
   <userinput>--ram=512 \</userinput>
@@ -778,7 +778,7 @@ Log file is '/tmp/setup7eq8sU.log'
 &ds1p; <userinput>yum install xauth</userinput>
 .. output skipped ..
 Ctrl-D
-&srvprompt; <userinput>ssh -X -l root 192.168.5.14</userinput>
+&hostp; <userinput>ssh -X -l root 192.168.5.14</userinput>
 .
 .
 /usr/bin/xauth:  creating new authority file /root/.Xauthority

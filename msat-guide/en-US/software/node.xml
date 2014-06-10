@@ -1470,10 +1470,10 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
   <para>
     We reinstall (wipe and install) the system with:
     <screen>
-&srvprompt; <userinput>virsh destroy dmm01</userinput>
-&srvprompt; <userinput>virsh undefine dmm01</userinput>
+&hostp; <userinput>virsh destroy dmm01</userinput>
+&hostp; <userinput>virsh undefine dmm01</userinput>
 
-&srvprompt; <userinput>virt-install \</userinput>
+&hostp; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
   <userinput>--name=dmm01 \</userinput>
   <userinput>--ram=512 \</userinput>

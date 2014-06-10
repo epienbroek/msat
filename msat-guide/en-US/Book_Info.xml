@@ -4,14 +4,14 @@
 %BOOK_ENTITIES;
 ]>
 <bookinfo id="book-msat-guide-msat_guide">
-	<title>msat-guide</title>
-	 <subtitle>MSAT guide</subtitle>
-	 <productname>MSAT</productname>
-	 <productnumber>0.3</productnumber>
-	 <edition>0.1</edition>
-	 <pubsnumber>0</pubsnumber>
-	 <abstract>
-		<para>
+  <title>msat-guide</title>
+  <subtitle>MSAT guide</subtitle>
+  <productname>MSAT</productname>
+  <productnumber>0.3</productnumber>
+  <edition>0.1</edition>
+  <pubsnumber>0</pubsnumber>
+  <abstract>
+    <para>
       This guide explains how to setup a Spacewalk server to
       demonstrate the functioning of the MSAT scripts. The
       MSAT scripts use the Spacewalk API to automatically
@@ -20,19 +20,16 @@
       types. The goal is to make the mechanisme efficient,
       to avoid errors and be versionable with system
       definitions.
-		</para>
-
-	</abstract>
-	 <corpauthor>
-		<inlinemediaobject>
-			<imageobject>
-				<imagedata fileref="Common_Content/images/title_logo.svg" format="SVG" />
-			</imageobject>
-
-		</inlinemediaobject>
-
-	</corpauthor>
-	 <xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-	 <xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    </para>
+  </abstract>
+  <corpauthor>
+    <inlinemediaobject>
+      <imageobject>
+        <imagedata fileref="Common_Content/images/title_logo.svg" format="SVG" />
+      </imageobject>
+    </inlinemediaobject>
+  </corpauthor>
+  <xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </bookinfo>
 

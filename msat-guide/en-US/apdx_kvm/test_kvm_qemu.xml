@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_kvm-test_kvm_qemu">
+  <title>Test KVM and qemu software</title>
+  <table>
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>prepare host for KVM's</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>test KVM</entry>
+          <entry>10 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    Before we can create KVM's to run on the host, we need
+    to make some preparations on the host:
+<screen>
+&hostp; <userinput>parted /dev/sda</userinput>
+GNU Parted 3.1
+Using /dev/sda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) <userinput>p</userinput>
+Model: ATA Samsung SSD 840 (scsi)
+Disk /dev/sda: 750GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End    Size   Type     File system  Flags
+ 1      1049kB  525MB  524MB  primary  ext4         boot
+ 2      525MB   323GB  323GB  primary               lvm
+
+(parted) <userinput>mkpart primary 323GB 100%</userinput>
+(parted) <userinput>p</userinput>
+Model: ATA Samsung SSD 840 (scsi)
+Disk /dev/sda: 750GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End    Size   Type     File system  Flags
+ 1      1049kB  525MB  524MB  primary  ext4         boot
+ 2      525MB   323GB  323GB  primary               lvm
+ 3      323GB   750GB  427GB  primary
+
+(parted) <userinput>q</userinput>
+Information: You may need to update /etc/fstab.
+&hostp; <userinput>partprobe</userinput>
+&hostp; <userinput>ls /dev/sda*</userinput>
+/dev/sda  /dev/sda1  /dev/sda2  /dev/sda3
+</screen>
+    Since we have a new partition, we can now use it as a
+    container to obtain LV's (Logical Volumes) from:
+<screen>
+&hostp; <userinput>pvcreate /dev/sda3</userinput>
+  Physical volume "/dev/sda3" successfully created
+&hostp; <userinput>vgcreate vg_vm /dev/sda3</userinput>
+  Volume group "vg_vm" successfully created
+&hostp; <userinput>vgs --noheadings -o vg_extent_size vg_vm</userinput>
+  4.00m
+&hostp; <userinput>lvcreate -n sw21 -l $((25*10*5)) vg_vm</userinput>
+WARNING: LVM2_member signature detected on /dev/vg_vm/sw21 at offset 536. Wipe it? [y/n] <userinput>y</userinput>
+  Wiping LVM2_member signature on /dev/vg_vm/sw21.
+  Logical volume "sw21" created
+&hostp; <userinput>lvs vg_vm/sw21</userinput>
+  LV   VG    Attr       LSize Pool Origin Data%  Move Log Cpy%Sync Convert
+  sw21 vg_vm -wi-a----- 4.88g
+</screen>
+  </para>
+
+  <para>
+    To test if we can run a KVM guest machine on the host,
+    we use <command>virt-manager</command>. The parameters
+    we give in are:
+    <table>
+      <title>Parameters for test KVM guest</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>value</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>install method</entry>
+            <entry>ISO image</entry>
+          </row>
+          <row>
+            <entry>ISO image</entry>
+            <entry>/var/lib/libvirt/isos/Fedora-20-x86_64-DVD.iso</entry>
+          </row>
+          <row>
+            <entry>OS type</entry>
+            <entry>Linux</entry>
+          </row>
+          <row>
+            <entry>Version</entry>
+            <entry>Fedora 20 (or later)</entry>
+          </row>
+          <row>
+            <entry>Memory (RAM)</entry>
+            <entry>4096 MB</entry>
+          </row>
+          <row>
+            <entry>CPUs</entry>
+            <entry>1</entry>
+          </row>
+          <row>
+            <entry>Enable storage for this vm</entry>
+            <entry>checked</entry>
+          </row>
+          <row>
+            <entry>Select managed or other existing storage</entry>
+            <entry>/dev/vg_vm/sw21</entry>
+          </row>
+          <row>
+            <entry>Name</entry>
+            <entry>sw21</entry>
+          </row>
+          <row>
+            <entry>Host device em1</entry>
+            <entry>macvtap</entry>
+          </row>
+          <row>
+            <entry>Source mode</entry>
+            <entry>Bridge</entry>
+          </row>
+          <row>
+            <entry>Set a fixed MAC adress</entry>
+            <entry>52:52:00:a8:01:14<footnote>
+              <para>
+                the MAC address is derived from the IP
+                adres, 192.168.1.20. Since, by convention,
+                the MAC address of a KVM guest must start
+                with 52:52:00, only the bytes 2, 3, and 4 of
+                the IPv4 address are used, so 168.1.20,
+                which turns in a8:01:14
+              </para></footnote>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    When typing <emphasis>Finish</emphasis> in
+    <command>virt-manager</command>, the installation
+    automatically starts. Use the following parameters:
+    <table>
+      <title>User settings</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>value</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>hostname</entry>
+            <entry>sw21.home.org</entry>
+          </row>
+          <row>
+            <entry>IPv4</entry>
+            <entry>192.168.1.20/24</entry>
+          </row>
+          <row>
+            <entry>Gateway</entry>
+            <entry>192.168.1.1</entry>
+          </row>
+          <row>
+            <entry>DNS servers</entry>
+            <entry>192.168.1.5</entry>
+          </row>
+          <row>
+            <entry>Search Domains</entry>
+            <entry>home.org</entry>
+          </row>
+          <row>
+            <entry>Software selection</entry>
+            <entry>Minimal install</entry>
+          </row>
+          <row>
+            <entry>Date &amp; Time</entry>
+            <entry>Europe/Amsterdam</entry>
+          </row>
+          <row>
+            <entry>root password</entry>
+            <entry>redhat</entry>
+          </row>
+          <row>
+            <entry>user name</entry>
+            <entry>John Smith</entry>
+          </row>
+          <row>
+            <entry>user account</entry>
+            <entry>john</entry>
+          </row>
+          <row>
+            <entry>user password</entry>
+            <entry>redhat</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+</section>

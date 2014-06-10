@@ -47,10 +47,10 @@
 &sw1p; <userinput>grep sealert /var/log/messages</userinput>
 .
 .
-May 10 15:34:57 d19sw1 setroubleshoot: SELinux is preventing /usr/bin/python2.7 from link access on the file vmlinuz. For complete SELinux messages. run sealert -l 6cc70fe5-a8b9-4320-bf39-cac3b8c10656
+May 10 15:34:57 d21sw1 setroubleshoot: SELinux is preventing /usr/bin/python2.7 from link access on the file vmlinuz. For complete SELinux messages. run sealert -l 6cc70fe5-a8b9-4320-bf39-cac3b8c10656
 .
 .
-May 10 19:48:07 d19sw1 setroubleshoot: SELinux is preventing /usr/sbin/httpd from search access on the directory /var/log/cobbler. For complete SELinux messages. run sealert -l 4fd01220-fd4c-4d89-9862-fe9d8e4397c0
+May 10 19:48:07 d21sw1 setroubleshoot: SELinux is preventing /usr/sbin/httpd from search access on the directory /var/log/cobbler. For complete SELinux messages. run sealert -l 4fd01220-fd4c-4d89-9862-fe9d8e4397c0
 .
 .
 </screen>

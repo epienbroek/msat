@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="500"
+   height="650"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="sat_data_model.svg"
+   inkscape:export-filename="/home/allard/projects/prorail/msat/msat-guide/en-US/images/sat_data_model.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective3610"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3648"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3686"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3728"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3772"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3806"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3854"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3912"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3954"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3988"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4022"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4044"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4066"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4092"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4121"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4146"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4171"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4196"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4221"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4246"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4271"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="238.79037"
+     inkscape:cy="309.00002"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1308"
+     inkscape:window-height="984"
+     inkscape:window-x="3"
+     inkscape:window-y="48"
+     inkscape:window-maximized="0"
+     fit-margin-top="0.2"
+     fit-margin-left="0.2"
+     showborder="true"
+     borderlayer="true"
+     inkscape:showpageshadow="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-121.26598,-179.18266)">
+    <g
+       id="g3596"
+       transform="translate(12,-224.4026)"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           id="tspan2818"
+           sodipodi:role="line">kickstart</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           id="tspan2820"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line">profile</tspan></text>
+    </g>
+    <g
+       transform="translate(140.18665,-224.4026)"
+       id="g3596-0"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           id="tspan2820-2"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line">software</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3638">channel</tspan></text>
+    </g>
+    <g
+       id="g3841"
+       transform="translate(12,-308)"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="618.23425"
+         x="250.45264"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8"
+         y="655.58423"
+         x="293.453"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="655.58423"
+           x="293.453"
+           sodipodi:role="line"
+           id="tspan3718">RPM</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 478.53368,667.95018 44.41361,0"
+       id="path3676"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       transform="translate(140.18665,-7.59198)"
+       id="g3596-0-1-8"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-3"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714">activation</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3834">key</tspan></text>
+    </g>
+    <g
+       id="g3759"
+       transform="translate(12,-200.11841)"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="618.23425"
+         x="380.27222"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-2"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-1"
+         y="655.58423"
+         x="423.27258"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="655.58423"
+           x="423.27258"
+           sodipodi:role="line"
+           id="tspan3718-6">RPM</tspan></text>
+    </g>
+    <g
+       transform="translate(270.00623,100.28961)"
+       id="g3596-0-1-8-5"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9-1"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-3-9"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714-1">child</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3902">channel</tspan></text>
+    </g>
+    <g
+       transform="translate(270.00623,320.523)"
+       id="g3596-0-1-8-5-7"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9-1-2"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:8, 8;stroke-dashoffset:0" />
+      <text
+         id="text2816-1-8-3-9-5"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3638-6-4-7-3">cobbler</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714-1-7">snippet</tspan></text>
+    </g>
+    <g
+       transform="translate(400.79353,209.14109)"
+       id="g3596-0-1-8-5-8"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9-1-5"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-3-9-4"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714-1-9">config</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3902-4">file</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 220.43147,218.94939 c 20.64286,0.32311 21.45369,15.41773 41.95786,15.25542"
+       id="path3938"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 220.43147,228.1085 c 41.6477,0.0648 15.36335,114.71572 40.84838,114.05426"
+       id="path3940"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 220.34801,238.50839 c 38.81599,-0.26172 6.66573,213.27848 40.93184,212.58338"
+       id="path3942"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 220.42206,249.0658 c 34.03597,-0.29578 -0.25018,527.41901 41.54399,527.90983"
+       id="path3944"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       transform="translate(140.18665,320.523)"
+       id="g3596-0-1-8-5-7-6-6"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9-1-2-7-7"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-3-9-5-2-3"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3638-6-4-7-3-7-2">cobbler</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714-1-7-4-2">snippet</tspan></text>
+    </g>
+    <g
+       transform="translate(270.00623,209.14109)"
+       id="g3596-0-1-8-5-3"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="8.3722315"
+         y="425.70782"
+         x="122.26598"
+         height="65.951851"
+         width="86.024155"
+         id="rect2822-8-0-9-1-0"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text2816-1-8-3-9-0"
+         y="454.49429"
+         x="164.87962"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="454.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3714-1-1">config</tspan><tspan
+           style="font-size:12px;text-align:center;text-anchor:middle"
+           y="469.49429"
+           x="164.87962"
+           sodipodi:role="line"
+           id="tspan3902-5">channel</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 348.82991,439.06796 c 15.13309,-0.156 23.37013,11.8244 41.95786,11.90165"
+       id="path3938-4"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 348.82991,451.7736 c 38.77304,0.0648 14.64468,107.52907 43.24393,107.34672"
+       id="path3940-9"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 348.69989,463.53141 c 38.81599,-0.26172 -0.0418,204.17539 43.3274,204.19895"
+       id="path3942-3"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="514.16052"
+       y="668.17163"
+       id="text4080"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082"
+         x="514.16052"
+         y="668.17163"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="382.2402"
+       y="780.17145"
+       id="text4080-6"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0"
+         x="382.2402"
+         y="780.17145"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="249.13269"
+       y="226.53027"
+       id="text4109"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4111"
+         x="249.13269"
+         y="226.53027"
+         style="font-size:12px">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="254.17023"
+       y="337.30554"
+       id="text4080-6-1"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-3"
+         x="254.17023"
+         y="337.30554"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="253.63283"
+       y="447.16721"
+       id="text4080-6-2"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-9"
+         x="253.63283"
+         y="447.16721"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="254.1716"
+       y="769.21631"
+       id="text4080-6-3"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-8"
+         x="254.1716"
+         y="769.21631"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="383.20578"
+       y="451.64966"
+       id="text4080-6-9"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-35"
+         x="383.20578"
+         y="451.64966"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="383.74454"
+       y="555.23132"
+       id="text4080-6-4"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-1"
+         x="383.74454"
+         y="555.23132"
+         style="font-size:12px">*</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="383.20645"
+       y="663.4726"
+       id="text4080-6-22"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4082-0-7"
+         x="383.20645"
+         y="663.4726"
+         style="font-size:12px">*</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
+       d="m 348.37768,780.85619 44.41361,0"
+       id="path3676-7"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/allard/projects/lea/doc/msat/sat_data_model.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="375.3746"
+       y="214.2184"
+       id="text4348"><tspan
+         sodipodi:role="line"
+         id="tspan4350"
+         x="375.3746"
+         y="214.2184"
+         style="font-size:12px;font-family:DejaVu Sans Mono;-inkscape-font-specification:DejaVu Sans Mono">          * == 0 or more elements</tspan><tspan
+         sodipodi:role="line"
+         x="375.3746"
+         y="229.2184"
+         style="font-size:12px;font-family:DejaVu Sans Mono;-inkscape-font-specification:DejaVu Sans Mono"
+         id="tspan4352">          + == 1 or more elements</tspan><tspan
+         sodipodi:role="line"
+         x="375.3746"
+         y="244.2184"
+         style="font-size:12px;font-family:DejaVu Sans Mono;-inkscape-font-specification:DejaVu Sans Mono"
+         id="tspan4356"> solid line == relation</tspan><tspan
+         sodipodi:role="line"
+         x="375.3746"
+         y="259.21838"
+         style="font-size:12px;font-family:DejaVu Sans Mono;-inkscape-font-specification:DejaVu Sans Mono"
+         id="tspan4358">dashed line == recursive relation</tspan></text>
+  </g>
+</svg>

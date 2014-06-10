@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_f20-filling">
+  <title>LDAP filling</title>
+  <table>
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>virtual network creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>storage creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>memory verification</entry>
+          <entry>3 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  <para>
+    In this section we discuss how we can fill the LDAP
+    datase.
+  </para>
+
+  <para>
+    After some testing we found that we can use the
+    <command>passwd</command> command to use the same
+    setting as the LDAP server:
+    <screen>
+&ds1p; <userinput>grep ^pam_password /etc/ldap.conf</userinput>
+pam_password sha512
+    </screen>
+    Now, changing the password from the command line works!
+  </para>
+
+  <para>
+    <screen>
+&ds1p; <userinput>ldapsearch -h 192.168.5.14 -b 'dc=dmsat1,dc=org' '(uid=aberends)'</userinput> 
+version: 1
+dn: uid=aberends,ou=People,dc=dmsat1,dc=org
+uid: aberends
+givenName: Allard
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixaccount
+sn: Berends
+cn: Allard Berends
+gidNumber: 1000
+uidNumber: 1000
+homeDirectory: /homes/aberends
+loginShell: /bin/bash
+    </screen>
+
+    <screen>
+&ds1p; <userinput>/usr/lib64/mozldap/ldapmodify -D "cn=Directory Manager" -w redhat123 -p 389 -h 192.168.5.14 -f filling.ldif</userinput> 
+    </screen>
+    The contents of <filename>filling.ldif</filename> is:
+    <screen>
+&ds1p; <userinput>cat filling.ldif</userinput>
+# First add the groups
+dn: cn=linuxadmins,ou=Groups,dc=dmsat1,dc=org
+objectClass: top
+objectClass: groupofuniquenames
+objectClass: posixgroup
+cn: linuxadmins
+gidNumber: 1000
+
+# Add the users
+dn: uid=aberends,ou=People,dc=dmsat1,dc=org
+uid: aberends
+givenName: Allard
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetorgperson
+objectClass: posixaccount
+sn: Berends
+cn: Allard Berends
+gidNumber: 1000
+uidNumber: 1000
+homeDirectory: /homes/aberends
+loginShell: /bin/bash
+userPassword: {SSHA}oz4OML5I2udlmp5sxx976vIS7iApRDPmrkUB5A==
+    </screen>
+
+  </para>
+</section>

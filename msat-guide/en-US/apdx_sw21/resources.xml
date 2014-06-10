@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_sw20-resources">
+  <title>Resources needed for Spacewalk 2.1</title>
+  <table>
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>new partition creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>storage creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    The resources needed on the KVM Spacewalk machine:
+    <table>
+      <title>Spacewalk 2.1 KVM resources</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>resource</entry>
+            <entry>amount</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>Memory</entry>
+            <entry>4 GB</entry>
+          </row>
+          <row>
+            <entry>System storage</entry>
+            <entry>5 GB</entry>
+          </row>
+          <row>
+            <entry>DB storage</entry>
+            <entry>15 GB</entry>
+          </row>
+          <row>
+            <entry>Channel storage</entry>
+            <entry>120 GB</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    How do we make these resources available? On the host
+    system, we have 2 disks:
+    <itemizedlist>
+      <listitem>
+        <para>
+          SSD with 750 GB
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Mechanical disk with 2 TB
+        </para>
+      </listitem>
+    </itemizedlist>
+    Since the SSD is much faster than the mechanical disk,
+    we make the division: system storage is coming from the
+    SSD, the DB storage and channel storage is coming from
+    the mechanical disk.
+<screen>
+&hostp; <userinput>parted /dev/sdb</userinput>
+GNU Parted 3.1
+Using /dev/sdb
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) <userinput>p</userinput>
+Model: ATA WDC WD20EARS-00M (scsi)
+Disk /dev/sdb: 2000GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start  End  Size  Type  File system  Flags
+
+(parted) <userinput>mkpart primary 0% 100%</userinput>
+(parted) <userinput>p</userinput>
+Model: ATA WDC WD20EARS-00M (scsi)
+Disk /dev/sdb: 2000GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  2000GB  2000GB  primary  ext4
+
+(parted) <userinput>q</userinput>
+Information: You may need to update /etc/fstab.
+
+&hostp; <userinput>partprobe</userinput>
+&hostp; <userinput>ls /dev/sdb*</userinput>
+/dev/sdb  /dev/sdb1
+&hostp; <userinput>pvcreate /dev/sdb1</userinput>
+WARNING: ext4 signature detected on /dev/sdb1 at offset 1080. Wipe it? [y/n] <userinput>y</userinput>
+  Wiping ext4 signature on /dev/sdb1.
+  Physical volume "/dev/sdb1" successfully created
+&hostp; <userinput>vgcreate vg_slow /dev/sdb1</userinput>
+  Volume group "vg_slow" successfully created
+&hostp; <userinput>vgs --noheadings -o extent_size vg_slow</userinput>
+  4.00m
+&hostp; <userinput>lvcreate -n swdb -l $((25*10*15)) vg_slow</userinput>
+  Logical volume "swdb" created
+&hostp; <userinput>lvcreate -n swsc -l $((25*10*120)) vg_slow</userinput>
+  Logical volume "swsc" created
+</screen>
+  </para>
+
+</section>

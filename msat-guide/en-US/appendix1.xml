@@ -12,6 +12,20 @@
 
   <para>
     <variablelist>
+      <varlistentry id="msat-guide-appendix1-spacewalk21_install">
+        <term>HowToInstall - spacewalk 2.1</term>
+        <listitem>
+          <para>
+            HowToInstall - spacewalk 2.1
+          </para>
+
+          <para>
+            <ulink
+            url="https://fedorahosted.org/spacewalk/wiki/HowToInstall"><citetitle>HowToInstall - spacewalk</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry id="msat-guide-appendix1-centos_ds_setup">
         <term>CentOS DS setup</term>
         <listitem>

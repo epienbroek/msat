@@ -174,7 +174,7 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 path_info = {}
 path_info['target_path'] = options.configpath_target
 
-if options.satellite_version in ['5.4', '5.5']:
+if options.satellite_version in ['5.4', '5.5', '5.6']:
   if options.configpath_context:
     path_info['selinux_ctx'] = options.configpath_context
 

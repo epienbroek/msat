@@ -1,0 +1,708 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="software-test">
+  <title>Test software channels</title>
+
+  <table id="software-ds_install-time">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Build kickstart profile</entry>
+          <entry>60 minutes</entry>
+        </row>
+        <row>
+          <entry>Test bare machine deployment</entry>
+          <entry>15 minutes</entry>
+        </row>
+        <row>
+          <entry>Test puppet functioning</entry>
+          <entry>60 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    For the kickstart profile to install bare machines, we
+    need the following items: 
+    <itemizedlist>
+      <listitem>
+        <para>
+          An activation key with the RPM to setup a basic
+          puppet configuration. Furthermore, this activation
+          keys makes it possible for the target system to
+          interact with the Spacewalk server.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A Cobbler snippet to remove all the original
+          CentOS yum repositories. We want to manage the
+          software on a Linux node via the Spacewalk server.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A Cobbler snippet to set the installation
+          environment of the target node. Furthermore, if
+          needed, the correct kernel version can be updated
+          from here with a <command>yum update</command>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Kickstart post install script to include the
+          Cobbler snippet.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Configure the kickstart software to install:
+          @Core, perl, rhn-setup, and wget.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <section id="software-test-kp">
+    <title>Build kickstart profile</title>
+
+    <para>
+      A kickstart profile is a hierarchical structure. The
+      kickstart profile in the Spacewalk server is at the
+      top level. It uses an activation key and a Cobbler
+      snippet. So, in order to create the kickstart profile,
+      we need to create the activation key and the Cobbler
+      snippet first.
+    </para>
+
+    <para>
+      The activation key is created with:
+<screen>
+&sw1p; <userinput>cat ak-bare-kvm-6u5-x_y_z.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   ak-bare-6u5-x_y_z.sh
+# DESCRIPTION
+#   This script creates the bare-6u5-x_y_z
+#   activation key.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+#   This script depends on a functioning Satellite server to
+#   connect to.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-08 14:45
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   ak-bare-6u5-x_y_z.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   ak-bare-6u5-x_y_z.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+msat_mk_ak.py \
+  --activationkey-label bare-6u5-x_y_z \
+  --activationkey-description bare-6u5-x_y_z \
+  --activationkey-basechannel centos-x86_64-server-6 \
+  --activationkey-monitoring false \
+  --activationkey-provisioning true \
+  --activationkey-virtualization false \
+  --activationkey-node false \
+  --activationkey-universal false \
+  --activationkey-childchannels 'example-puppet-6u5-1_0,example-puppet-deps-6u5-1_0,example-puppet-conf-6u5-1_0,con-tools-centos-x86_64-server-6' \
+  --activationkey-packages '' \
+  --activationkey-configchannels ''
+&sw1p; <userinput>./ak-bare-kvm-6u5-x_y_z.sh</userinput>
+.. no output upon success ..
+</screen>
+    </para>
+
+    <para>
+      The Cobbler snippet to control the yum repo's is
+      created with:
+<screen>
+&sw1p; <userinput>cat cs-repo-6-x_y_z.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cs-repo-6-x_y_z.sh
+# DESCRIPTION
+#   This script creates the repo-6-x_y_z
+#   cobbler snippet.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+#   If you put single quotes around value, but forget to
+#   escape embedded single quotes, this script will fail.
+#   Escaping works like this:
+#   $ echo 'don'"'"'t'
+#   don't
+#   So ' -&gt; '"'"'
+#   Complicated huh?
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-09 10:04
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cs-repo-6-x_y_z.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cs-repo-6-x_y_z.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+msat_mk_cs.py \
+  --snippet-name "repo-6-x_y_z" \
+  --snippet-content '# Snippet: repo-6-x_y_z
+# Generic CentOS 6 Cobbler snippet.
+
+# AB: only Spacewalk channels as repo.
+/bin/rm -f /etc/yum.repos.d/CentOS-*.repo'
+&sw1p; <userinput>./cs-repo-6-x_y_z.sh</userinput>
+</screen>
+    </para>
+
+    <para>
+      The Cobbler snippet for the bare Linux node is created
+      with:
+<screen>
+&sw1p; <userinput>cat cs-bare-6-x_y_z.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cs-bare-6-x_y_z.sh
+# DESCRIPTION
+#   This script creates the bare-6-x_y_z
+#   cobbler snippet.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+#   If you put single quotes around value, but forget to
+#   escape embedded single quotes, this script will fail.
+#   Escaping works like this:
+#   $ echo 'don'"'"'t'
+#   don't
+#   So ' -&gt; '"'"'
+#   Complicated huh?
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-09 10:04
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cs-bare-6-x_y_z.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cs-bare-6-x_y_z.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+msat_mk_cs.py \
+  --snippet-name "bare-6-x_y_z" \
+  --snippet-content '# Snippet: bare-6-x_y_z
+# Specific snippet for node type.
+
+# AB: obtain environment
+environment=\$(/bin/cat /proc/cmdline | /bin/sed '"'"'s/.*environment=\([^ ]\{1,\}\).*\$/\1/'"'"')
+/bin/cat &lt;&lt; EOF &gt; /etc/profile.d/environment.sh
+export FACTER_environment="\$environment"
+EOF
+
+# AB: if we want to update the kernel, do it here. Use the
+# exact kernel version.
+#yum -y update kernel-2.6.32-431.el6.x86_64 kernel-firmware-2.6.32-431.el6.noarch'
+&sw1p; <userinput>./cs-bare-6-x_y_z.sh</userinput>
+</screen>
+    </para>
+
+    <para>
+      Since we have the activation key and the Cobbler
+      snippet on which the kickstart profile depends, we can
+      create the kickstart profile now:
+<screen>
+&sw1p; <userinput>cat kp-bare-kvm-6u5-x_y_z.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   kp-bare-kvm-6u5-x_y_z.sh
+# DESCRIPTION
+#   This script creates the bare-kvm-6u5-x_y_z
+#   kickstart profile.
+# ARGUMENTS
+#   None.
+# RETURN
+#   0: success.
+# DEPENDENCIES
+# FAILURE
+#   If you put single quotes around value, but forget to
+#   escape embedded single quotes, this script will fail.
+#   Escaping works like this:
+#   $ echo 'don'"'"'t'
+#   don't
+#   So ' -> '"'"'
+#   Complicated huh?
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-08 12:58
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   kp-bare-kvm-6u5-x_y_z.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   kp-bare-kvm-6u5-x_y_z.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+ORGNUM=$(msat_ls_org.py)
+
+SATELLITE=$(msat_ls_sn.py)
+
+msat_mk_kp.py \
+  --kickstart-label "bare-kvm-6u5-x_y_z" \
+  --kickstart-virt none \
+  --kickstart-tree ks-centos-x86_64-server-6u5 \
+  --kickstart-satellite $SATELLITE \
+  --kickstart-root redhat \
+  --kickstart-childchannels '' \
+  --kickstart-configmgt false \
+  --kickstart-remotecmds false \
+  --kickstart-partitioning 'part /boot --fstype=ext4 --size=256 --ondisk=vda,part pv.01 --size=1024 --grow --ondisk=vda,part swap --size=512 --maxsize=1024 --ondisk=vda,volgroup myvg pv.01,logvol / --vgname=myvg --name=rootvol --size=1024 --grow,logvol /var/log --vgname=myvg --name=logvol --size=1024' \
+  --kickstart-keys 'RHN-ORG-TRUSTED-SSL-CERT,Example-GPG-KEY,RPM-GPG-KEY-puppetlabs,RPM-GPG-KEY-CentOS-6,RPM-GPG-KEY-spacewalk-2012,RPM-GPG-KEY-EPEL-6' \
+  --kickstart-install true \
+  --kickstart-text true \
+  --kickstart-url "--url /ks/dist/org/$ORGNUM/ks-centos-x86_64-server-6u5" \
+  --kickstart-lang "en_US" \
+  --kickstart-keyboard "us" \
+  --kickstart-device "scsi" \
+  --kickstart-zerombr "yes" \
+  --kickstart-clearpart "--drives=vda --initlabel" \
+  --kickstart-bootloader '--location mbr --driveorder=vda' \
+  --kickstart-timezone "--utc Europe/Amsterdam" \
+  --kickstart-auth "--enablemd5 --enableshadow" \
+  --kickstart-rootpw '$1$va8.kEE9$0Ld3I/9lDYPeoqclA8yWo1' \
+  --kickstart-selinux "--enforcing" \
+  --kickstart-reboot true \
+  --kickstart-firewall "--enabled" \
+  --kickstart-skipx true \
+  --kickstart-key "--skip" \
+  --kickstart-software '@Core,perl,rhn-setup,wget' \
+  --kickstart-activationkey $ORGNUM-bare-6u5-x_y_z \
+  --kickstart-postscript '$SNIPPET('"'"'spacewalk/'"$ORGNUM"'/repo-6-x_y_z'"'"')
+$SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
+</screen>
+    </para>
+
+    <para>
+      We still need to add a sample system to Cobbler. This
+      is done with:
+<screen>
+&sw1p; <userinput>cat cobbler-ds1.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler_ds1.sh
+# DESCRIPTION
+#   This script should be run on the Satellite server:
+#   # ./cobbler_ds1.sh
+#
+#   IP details
+#
+#   Host     Prod            Cluster          ILO
+#   ds1      192.168.5.14    -                -
+#            backup          admin
+#            -               -
+#
+#   Subnets:
+#   192.168.5.0/24     gw: 192.168.5.1
+#   -
+#   -
+#   -
+#   -
+#   -
+#   -
+#
+#   DNS servers:
+#   * 192.168.5.11
+#
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   sudo cobbler system remove --name=tbeheer1_dl3x0_ds1
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-09 11:31
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cobbler_ds1.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cobbler_ds1.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+COBBLER="sudo cobbler"
+# AB: extra Satellite organizations have != 1
+ORGNUM="$(msat_ls_org.py)"
+
+########## PARAMETERS TO EDIT ##########
+NAME="ds1"
+OWNERS="example"
+PROFILE="bare-kvm-6u5-x_y_z"
+ORG="SpacewalkDefaultOrganization"
+MACH="kvm"
+COMMENT="empty"
+GATEWAY="192.168.5.1"
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="dmsat1.org"
+HOSTNAME="${NAME}.${NAMESERVERS_SEARCH}"
+PROD_IP="192.168.5.14"
+PROD_SUBNET="255.255.255.0"
+PROD_DNS_NAME="${HOSTNAME}"
+#CLUSTER_IP=
+#CLUSTER_SUBNET=
+#OCN1_IP=
+#OCN1_SUBNET=
+#OCN2_IP=
+#OCN2_SUBNET=
+#BACKUP_IP=
+#BACKUP_SUBNET=
+#BHR_IP=
+#BHR_SUBNET=
+MAC_ETH1="52:54:00:a8:05:0e"
+#MAC_ETH2=
+#MAC_ETH3=
+#MAC_ETH4=
+#MAC_ETH5=
+#MAC_ETH6=
+#MAC_ETH7=
+#MAC_ETH8=
+ETH1_NAME="em1"
+#ETH2_NAME=em2
+#ETH3_NAME=em3
+#ETH4_NAME=em4
+#ETH5_NAME=em5
+#ETH6_NAME=em6
+#ETH7_NAME=em7
+#ETH8_NAME=em8
+#PROXY=
+
+$COBBLER system list | grep -q ${ORG}_${MACH}_${NAME}
+if [ $? -eq 0 ]; then
+  echo "$NAME already exists. Removing system ...."
+  $COBBLER system remove --name=${ORG}_${MACH}_${NAME}
+fi
+
+########## START SCRIPT ##########
+$COBBLER system add \
+  --name=${ORG}_${MACH}_${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORGNUM}:${ORG} \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} nostorage environment=dmsat1 ipv6.disable=1 biosdevname=1" \
+  --kopts-post="ipv6.disable=1 biosdevname=1" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;'
+  #--uid=UID
+  #--image=IMAGE
+  #--kopts-post=KOPTS_POST
+  #--ksmeta=KSMETA
+  #--kickstart=KICKSTART
+  #--depth=DEPTH
+  #--server=SERVER
+  #--virt-path=VIRT_PATH
+  #--virt-type=VIRT_TYPE
+  #--virt-cpus=VIRT_CPUS
+  #--virt-file-size=VIRT_FILE_SIZE
+  #--virt-ram=VIRT_RAM
+  #--virt-auto-boot=VIRT_AUTO_BOOT
+  #--ctime=CTIME
+  #--mtime=MTIME
+  #--power-address=POWER_ADDRESS
+  #--power-user=POWER_USER
+  #--power-pass=POWER_PASS
+  #--power-id=POWER_ID
+  #--ipv6-default-device=IPV6_DEFAULT_DEVICE
+  #--ipv6-autoconfiguration=IPV6_AUTOCONFIGURATION
+  #--mgmt-classes=MGMT_CLASSES
+  #--template-files=TEMPLATE_FILES
+  #--template-remote-kickstarts=TEMPLATE_REMOTE_KICKSTARTS
+  #--clobber
+  #--template-files=TEMPLATE_FILES
+  #--in-place
+
+# Add the Production ethernet interface.
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${NAME} \
+  --interface=${ETH1_NAME} \
+  --mac=${MAC_ETH1} \
+  --static=1 \
+  --ip-address=${PROD_IP} \
+  --subnet=${PROD_SUBNET} \
+  --dns-name=${DNS_NAME}
+
+# ETH2 ethernet interface not available
+
+# CIC ethernet interfaces not available
+
+# OCN-1 ethernet interface not available
+
+# OCN-2 ethernet interface not available
+
+# Backup ethernet interface not available
+
+# Beheer ethernet interface not available
+
+</screen>
+      Also, make sure that the system is in the DNS resource
+      files. Otherwise, the installation via the Spacewalk
+      server fails.
+    </para>
+
+    <para>
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-bare-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds1" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso</userinput>
+...
+</screen>
+    </para>
+
+  </section>
+  
+  <section id="software-test-bare">
+    <title>Bare machine deployment test</title>
+
+    <para>
+      The boot IS,
+      <filename>/var/www/cobbler/pub/example/centos6u5-bare-kvm.iso</filename>,
+      needs to be copied to the machine on which we run the
+      KVM guest:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>secretpassw</userinput>
+centos6u5-bare-kvm.iso                        100%   36MB  36.3MB/s   00:00
+</screen>
+    </para>
+
+    <para>
+      We prepare storage for the test machine:
+<screen>
+&sw1p; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) vg_vm</userinput>
+  Logical volume "ds1" created
+</screen>
+    </para>
+
+    <para>
+      Now we can start the installation of the
+      <emphasis>bare</emphasis> profile. We use the
+      <command>virt-install</command> command. The options
+      of the command are given in the order as they appear
+      in the man page:
+<screen>
+&hostp; <userinput>virt-install \</userinput>
+  <userinput>--connect qemu:///system \</userinput>
+  <userinput>--name=ds1 \</userinput>
+  <userinput>--ram=512 \</userinput>
+  <userinput>--arch=x86_64 \</userinput>
+  <userinput>--description="LVS LDAP 1" \</userinput>
+  <userinput>--cdrom /var/lib/libvirt/isos/centos6u5-bare-kvm.iso \</userinput>
+  <userinput>--os-type=linux \</userinput>
+  <userinput>--os-variant=rhel6 \</userinput>
+  <userinput>--disk path=/dev/vg_vm/ds1,device=disk,bus=virtio \</userinput>
+  <userinput>--network=network=dmsat1,mac=52:54:00:a8:05:0e \</userinput>
+  <userinput>--graphics vnc \</userinput>
+  <userinput>--hvm \</userinput>
+  <userinput>--autostart</userinput>
+.. output skipped, about 10 minutes ..
+</screen>
+    </para>
+
+
+  </section>
+  
+  <section id="software-test-puppet">
+    <title>Test puppet functioning</title>
+
+    <para>
+      The installation of the <systemitem
+      class="systemname">ds1</systemitem> machine is done.
+      Now, we want to verify if we can run Puppet on it. The
+      first step is to install the Puppet software:
+<screen>
+&t1p; <userinput>yum install puppet</userinput>
+.
+.
+================================================================================
+ Package          Arch   Version              Repository                   Size
+================================================================================
+Installing:
+ puppet           noarch 3.4.3-1.el6          example-puppet-6u5-1_0      1.1 M
+Installing for dependencies:
+ augeas-libs      x86_64 1.0.0-5.el6          centos-x86_64-server-6      308 k
+ compat-readline5 x86_64 5.2-17.1.el6         centos-x86_64-server-6      130 k
+ dmidecode        x86_64 1:2.11-2.el6         centos-x86_64-server-6       71 k
+ facter           x86_64 1:1.7.5-1.el6        example-puppet-6u5-1_0       87 k
+ hiera            noarch 1.3.2-1.el6          example-puppet-6u5-1_0       23 k
+ libselinux-ruby  x86_64 2.0.94-5.3.el6_4.1   centos-x86_64-server-6       99 k
+ pciutils         x86_64 3.1.10-2.el6         centos-x86_64-server-6       85 k
+ ruby             x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      534 k
+ ruby-augeas      x86_64 0.4.1-3.el6          example-puppet-deps-6u5-1_0  21 k
+ ruby-irb         x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      313 k
+ ruby-libs        x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      1.6 M
+ ruby-rdoc        x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      376 k
+ ruby-rgen        noarch 0.6.5-2.el6          example-puppet-deps-6u5-1_0 237 k
+ ruby-shadow      x86_64 1:2.2.0-2.el6        example-puppet-deps-6u5-1_0  13 k
+ rubygem-json     x86_64 1.5.5-1.el6          example-puppet-deps-6u5-1_0 763 k
+ rubygems         noarch 1.3.7-5.el6          centos-x86_64-server-6      207 k
+ virt-what        x86_64 1.11-1.2.el6         centos-x86_64-server-6       24 k
+.
+.
+.. success ..
+</screen>
+    </para>
+
+    <para>
+      Next, we want to conduct some simple Puppet tests, to
+      see if Puppet functions:
+<screen>
+&t1p; <userinput>facter environment</userinput>
+dmsat1
+
+&t1p; <userinput>hiera -d somekey</userinput>
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Hiera YAML backend starting
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Looking up somekey in YAML backend
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Looking for data source defaults
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Cannot find datafile /var/lib/hiera/defaults.yaml, skipping
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Looking for data source global
+DEBUG: Mon Jun 09 17:29:52 +0200 2014: Cannot find datafile /var/lib/hiera/global.yaml, skipping
+nil
+
+&t1p; <userinput>puppet apply --configprint hiera_config</userinput>
+/etc/puppet/hiera.yaml
+&t1p; <userinput>ls /etc/puppet/hiera.yaml</userinput>
+ls: cannot access /etc/puppet/hiera.yaml: No such file or directory
+
+&t1p; cat &gt; /var/lib/hiera/defaults.yaml &lt;&lt; EOF
+mything::one: one for bare01
+mything::two: two for bare01
+EOF
+&t1p; <userinput>hiera -d mything::one</userinput>
+DEBUG: Mon Jun 09 17:34:56 +0200 2014: Hiera YAML backend starting
+DEBUG: Mon Jun 09 17:34:56 +0200 2014: Looking up mything::one in YAML backend
+DEBUG: Mon Jun 09 17:34:56 +0200 2014: Looking for data source defaults
+DEBUG: Mon Jun 09 17:34:56 +0200 2014: Found mything::one in defaults
+one for bare01
+&t1p; <userinput>hiera mything::two</userinput>
+two for bare01
+</screen>
+    </para>
+
+  </section>
+
+</section>

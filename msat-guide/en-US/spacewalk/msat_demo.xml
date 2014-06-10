@@ -224,7 +224,7 @@ centos5u8-test01-kvm.iso                      100%   14MB  14.3MB/s   00:00
    <para>
     The installation is started with: 
 <screen>
-&srvprompt; <userinput>virt-install \</userinput>
+&hostp; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
   <userinput>--name=&t1; \</userinput>
   <userinput>--ram=512 \</userinput>

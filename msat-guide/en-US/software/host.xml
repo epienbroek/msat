@@ -71,7 +71,7 @@
       We provide it by means of a LV (Logical Volume)
       created on the host. The creation is done as follows: 
 <screen>
-&srvprompt; <userinput>pvs</userinput>
+&hostp; <userinput>pvs</userinput>
   PV         VG        Fmt  Attr PSize   PFree
   /dev/sda3  vg_server lvm2 a--  931.00g      0
   /dev/sdb   b         lvm2 a--  931.51g 931.51g
@@ -80,11 +80,11 @@
   /dev/sde   e         lvm2 a--  931.51g 931.51g
   /dev/sdf   f         lvm2 a--  931.51g 931.51g
 
-&srvprompt; <userinput>pvs -o +vg_extent_size /dev/sdb</userinput>
+&hostp; <userinput>pvs -o +vg_extent_size /dev/sdb</userinput>
   PV         VG   Fmt  Attr PSize   PFree   Ext
   /dev/sdb   b    lvm2 a--  931.51g 931.51g 4.00m
 
-&srvprompt; <userinput>lvcreate -n sw -l $((25 * 10 * 300)) b</userinput>
+&hostp; <userinput>lvcreate -n sw -l $((25 * 10 * 300)) b</userinput>
   Logical volume "sw" created
 
 </screen>
@@ -111,7 +111,7 @@
       have 16GB of internal memory, which can be
       demonstrated with: 
       <screen>
-&srvprompt; <userinput>cat /proc/meminfo | grep ^MemTotal</userinput>
+&hostp; <userinput>cat /proc/meminfo | grep ^MemTotal</userinput>
 MemTotal:       16435452 kB
       </screen>
     </para>

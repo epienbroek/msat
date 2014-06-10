@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="software">
+  <title>Software channels</title>
+  <para>
+    This chapter discusses how to setup software channels
+    inside the Spacewalk server to use for Puppet
+    deployments. To illustrate that we have the correct set
+    of software, we create a bare Linux system. This is the
+    basis on which we do our provisioning with Puppet.
+  </para>
+
+  <para>
+    Tasks we need to conduct:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Analyze the CentOS 6.5 channel. We want our
+          systems to run on the CentOS 6.5 channel.
+          Consequently, puppet also needs to run on CentOS
+          6.5.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Construct a puppet software channel. The minimal
+          set of puppet software, coming from <ulink
+          url="http://yum.puppetlabs.com/el/6.5/products/x86_64/">Puppet
+          Labs, EL (Enterprise Linux) products for
+          x86_64</ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Construct a puppet supporting software channel.
+          The supporting software is needed to run Puppet,
+          for example, ruby-augeas is needed. The supporting
+          software comes from <ulink
+          url="http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/">Puppet
+          Labs, EL (Enterprise Linux) dependencies</ulink>.
+          It is important here to check which RPM's are
+          already present in the CentOS 6.5 channel. If they
+          are already include, then we prefer to obtain them
+          form the CentOS 6.5 channel, not from the
+          supporting channel.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Construct a puppet provisioning software channel.
+          In this channel we place our own code to
+          provisioning systems with Puppet. We use the RPM
+          mechanism to get this software on the Linux nodes.
+          This means that we run Puppet in <emphasis
+          role="bold">agentless</emphasis> mode.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <xi:include href="software/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/channels.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="software/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</chapter>
+

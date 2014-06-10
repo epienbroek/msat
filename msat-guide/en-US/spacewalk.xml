@@ -42,38 +42,22 @@
         <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
         <thead valign="top">
           <row>
-            <entry>
-              test
-            </entry>
-            <entry>
-              speed
-            </entry>
+            <entry>test</entry>
+            <entry>speed</entry>
           </row>
         </thead>
         <tbody valign="top">
           <row>
-            <entry>
-              ping
-            </entry>
-            <entry>
-              6 ms
-            </entry>
+            <entry>ping</entry>
+            <entry>6 ms</entry>
           </row>
           <row>
-            <entry>
-              download
-            </entry>
-            <entry>
-              7.71 Mbps
-            </entry>
+            <entry>download</entry>
+            <entry>7.71 Mbps</entry>
           </row>
            <row>
-            <entry>
-              upload
-            </entry>
-             <entry>
-              0.84 Mbps
-            </entry>
+            <entry>upload</entry>
+             <entry>0.84 Mbps</entry>
           </row>
         </tbody>
       </tgroup>
@@ -83,14 +67,14 @@
     times.
   </para>
   <para>
-    Setting up a spacewalk server takes a number of steps.
-    We mention them here and elaborate on them in later
-    sections. We think that it is important to give the
-    recipe here in order to get the concept accross: 
+    Setting up a spacewalk server, consists of a number of
+    steps.  We mention them here and elaborate on them in
+    later sections. We think that it is important to give
+    the recipe here in order to get the concept accross: 
     <orderedlist>
       <listitem>
         <para>
-          Download the Fedora 18 DVD ISO image and store it
+          Download the Fedora 20 DVD ISO image and store it
           on the Linux host on which we install the
           Spacewalk KVM machine.
         </para>
@@ -98,7 +82,7 @@
        <listitem>
         <para>
           Prepare a Linux host on which we can install a
-          Fedora 18 x86_64 KVM machine. On the host, enough
+          Fedora 20 x86_64 KVM machine. On the host, enough
           memory (&gt;4 GB) and disk space (&gt; 300 GB,
           initially 80 GB will do), must be made available
           to the Spacewalk node.
@@ -106,13 +90,13 @@
       </listitem>
       <listitem>
         <para>
-          Install the Fedora 18 distribution on the KVM
+          Install the Fedora 20 distribution on the KVM
           machine and configure the system.
         </para>
       </listitem>
       <listitem>
         <para>
-          Install Spacewalk 1.9 on the Fedora 18 KVM machine
+          Install Spacewalk 2.1 on the Fedora 20 KVM machine
           and configure Spacewalk.
         </para>
       </listitem>
@@ -121,6 +105,11 @@
           Create a minimal working Spacewalk server by
           filling it with CentOS 5.8 RPM's and creating a
           kickstartable tree.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Create a GPG key pair to sign RPM's with.
         </para>
       </listitem>
       <listitem>
@@ -144,6 +133,7 @@
   <xi:include href="spacewalk/dns_conf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/sw_install.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/sw_filling.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="spacewalk/gpg_key.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/selinux.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/msat_demo.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

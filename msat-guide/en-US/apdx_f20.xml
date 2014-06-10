@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<appendix id="msat-guide-apdx_f20">
+  <title>Fedora 20 Virtual Machine</title>
+  <para>
+    This appendix discusses how to create a KVM based
+    Virtual Machine (VM) on which we can install the
+    Spacewalk 2.0 server.
+  </para>
+
+  <para>
+    We make a distinction between the following items:
+    <itemizedlist>
+      <listitem>
+        <para>
+          LDAP filling
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          LDAP host access control
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Execution restrictions via sudoers
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <xi:include href="apdx_f20/host_access.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</appendix>
+

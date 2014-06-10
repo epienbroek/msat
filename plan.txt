@@ -1,0 +1,101 @@
+BUILD MSAT GUIDE
+
+
+AUTHOR
+
+Allard Berends
+
+
+HISTORY
+
+Date with 'LC_TIME=en_US date +"\%d-\%b-\%Y \%H:\%M", '.
+25-Apr-2014 09:36, Allard Berends, start
+
+
+REFERENCES
+
+[1]     ...
+[2]     ...
+
+
+ABBREVIATIONS
+
+API     Application Programmer's Interface
+
+
+HOW TO BUILD GUIDES
+
+Go into the directory msat-guide:
+$ cd .../msat-guide
+$ ls
+en-US  publican.cfg  todo.txt
+
+$ publican build --formats html-single --langs en-US
+.. skipped lines ..
+FATAL ERROR: XInclude:1604 in references.xml on line 104: could not load references/msat_wr_sc_rpms.xml, and no fallback was found
+ at /usr/bin/publican line 1033.
+
+To avoid the error above, see section "how to build man
+pages".
+
+A successfull run:
+$ publican build --formats html-single --langs en-US
+.. many lines of output ..
+Beginning work on en-US
+DTD Validation OK
+  Starting html-single
+  Using XML::LibXSLT on /usr/share/publican/xsl/html-single.xsl
+  Finished html-single
+
+Now, the single html book is located in:
+$ cd .../msat-guide/tmp/en-US/html-single
+
+From a browser, one can check the result:
+file:///...msat-guide/tmp/en-US/html-single/index.html
+
+
+HOW TO BUILD MAN PAGES
+
+Go into the directory references:
+$ cd .../msat-guide/en-US/references
+$ ls
+create-man-pages.py  msat_cmds_list.sh
+.. many *.src ..
+
+To create the XML man pages, run the command:
+$ ./create-man-pages.py
+$ ls
+.. many *.xml ..
+
+
+HOW THE REFERENCES SECTION IS CREATED
+
+First of all, how do we know where the references are
+included from?
+
+Have a look at:
+$ vim .../msat-guide/en-US/msat-guide.xml
+
+Here we find an xi:include statement where the
+references.xml file is included. From the references.xml,
+all the man page references are xi:include'd. The include
+list in references.xml is created with:
+
+$ cd .../msat-guide/en-US/references
+$ ./msat_cmds_list.sh
+.. one example line given ..
+<xi:include href="references/msat_ls_ak_cc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+.. output skipped ..
+
+So, how to deal with a new man page? Create a new source
+file in the references subdirectory:
+$ cp msat_ls_ak_cc.src msat_new_cmd.src
+$ vim msat_new_cmd.src
+.. edit content ..
+
+
+FAQ
+
+Q.  ...
+A.  ...
+

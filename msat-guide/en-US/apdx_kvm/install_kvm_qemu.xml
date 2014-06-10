@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_kvm-install_kvm_qemu">
+  <title>Install KVM and qemu software</title>
+  <table>
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>install qemu-kvm</entry>
+          <entry>1 minute</entry>
+        </row>
+        <row>
+          <entry>install virt-*</entry>
+          <entry>1 minute</entry>
+        </row>
+        <row>
+          <entry>configure host network</entry>
+          <entry>10 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  <para>
+    In this section we discuss how the KVM/qemu software is
+    installed on the host system.
+  </para>
+
+  <para>
+    The KVM/qemu software is part of the Fedora 20 yum
+    repository. Check with <command>yum repolist</command>
+    if the host is configured to use this repository.
+<screen>
+&hostp; <userinput>yum repolist</userinput>
+Loaded plugins: fastestmirror, langpacks, refresh-packagekit
+Loading mirror speeds from cached hostfile
+ * fedora: mirror.1000mbps.com
+ * rpmfusion-free: mirror.proserve.nl
+ * rpmfusion-free-updates: mirror.proserve.nl
+ * rpmfusion-nonfree: mirror.proserve.nl
+ * rpmfusion-nonfree-updates: mirror.proserve.nl
+ * updates: mirror.1000mbps.com
+repo id                              repo name                            status
+!adobe-linux-x86_64                  Adobe Systems Incorporated                2
+fedora/20/x86_64                     Fedora 20 - x86_64                   38,597
+rpmfusion-free/20/x86_64             RPM Fusion for Fedora 20 - Free         468
+!rpmfusion-free-updates/20/x86_64    RPM Fusion for Fedora 20 - Free - Up    322
+rpmfusion-nonfree/20/x86_64          RPM Fusion for Fedora 20 - Nonfree      203
+!rpmfusion-nonfree-updates/20/x86_64 RPM Fusion for Fedora 20 - Nonfree -    205
+!updates/20/x86_64                   Fedora 20 - x86_64 - Updates         15,775
+repolist: 55,572
+</screen>
+  </para>
+
+  <para>
+    Next, we do the installation:
+<screen>
+&hostp; <userinput>yum install qemu-kvm</userinput> 
+.. output skipped ..
+Package 2:qemu-kvm-1.6.2-1.fc20.x86_64 already installed and latest version
+Nothing to do
+</screen>
+    After the KVM software is installed, we need to ensure
+    that the service is on:
+<screen>
+&hostp; <userinput>systemctl list-unit-files | grep virt</userinput>      
+libvirt-guests.service                      disabled
+libvirtd.service                            enabled 
+virtlockd.service                           static  
+virtlockd.socket                            disabled
+</screen>
+    Important to see here is that
+    <emphasis>libvirtd.service</emphasis> is enabled.
+  </para>
+
+  <para>
+    The host is now ready to run KVM guest systems. To make
+    it possible to configure guests, we need extra software,
+    in the form of RPM packages,
+    <package>virt-manager</package> and
+    <package>virt-install</package>.
+<screen>
+&hostp; <userinput>yum install virt-manager virt-install</userinput> 
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    We want the KVM guest systems to be in the same network
+    as the host system. This means that we need to configure
+    bridging on the host. The following steps are needed:
+    <itemizedlist>
+      <listitem>
+        <para>
+          removal of the host physical interface
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          creation of a Bridge interface on the host
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          addition of the physical host interface to the
+          bridge
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    Make sure to become root with: <command>sudo su
+    -</command> or <command>su -</command>. From the command
+    line, start the program
+    <command>nm-connection-editor</command>. Remove the
+    Ethernet interface <emphasis>em1</emphasis>, or whatever
+    the physical interface is called on the host.
+  </para>
+
+  <para>
+    Now, we create the bridge interface, by clicking
+    <emphasis role="strong">Add</emphasis>. Set the
+    following parameters:
+    <table>
+      <title>Bridge parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>value</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>Connection name</entry>
+            <entry>br0</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">General</emphasis></entry>
+          </row>
+          <row>
+            <entry>Automatically connect ...</entry>
+            <entry>checked</entry>
+          </row>
+          <row>
+            <entry>All users ...</entry>
+            <entry>checked</entry>
+          </row>
+          <row>
+            <entry>remaining parameters</entry>
+            <entry>unchecked</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">Bridge</emphasis></entry>
+          </row>
+          <row>
+            <entry>Interface name</entry>
+            <entry>br0</entry>
+          </row>
+          <row>
+            <entry>Bridged connections</entry>
+            <entry>br0 slave 1<footnote><para>this one is
+            added by pressing the <emphasis
+            role="strong">Add</emphasis> button. Slave
+            parameters are detailed in the table
+            below</para></footnote></entry>
+          </row>
+          <row>
+            <entry>Aging time</entry>
+            <entry>300 (default)</entry>
+          </row>
+          <row>
+            <entry>Enable STP</entry>
+            <entry>checked (default)</entry>
+          </row>
+          <row>
+            <entry>Priority</entry>
+            <entry>128 (default)</entry>
+          </row>
+          <row>
+            <entry>Forward delay</entry>
+            <entry>15 (default)</entry>
+          </row>
+          <row>
+            <entry>Hello time</entry>
+            <entry>2 (default)</entry>
+          </row>
+          <row>
+            <entry>Max age</entry>
+            <entry>20 (default)</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">IPv4 Settings</emphasis></entry>
+          </row>
+          <row>
+            <entry>Adress</entry>
+            <entry>192.168.1.5</entry>
+          </row>
+          <row>
+            <entry>Netmask</entry>
+            <entry>24</entry>
+          </row>
+          <row>
+            <entry>Gateway</entry>
+            <entry>192.168.1.1</entry>
+          </row>
+          <row>
+            <entry>DNS servers</entry>
+            <entry>192.168.1.1</entry>
+          </row>
+          <row>
+            <entry>Search domains</entry>
+            <entry>home.org</entry>
+          </row>
+          <row>
+            <entry>remaining parameters</entry>
+            <entry>uncheck or unset</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">IPv6 Settings</emphasis></entry>
+          </row>
+          <row>
+            <entry>parameters</entry>
+            <entry>untouched</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    Setting for the <emphasis>br0 slave 1</emphasis>:
+    <table>
+      <title>br0 slave 1 parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>value</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>Connection name</entry>
+            <entry>br0 slave 1</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">General</emphasis></entry>
+          </row>
+          <row>
+            <entry>Automatically connect ...</entry>
+            <entry>checked</entry>
+          </row>
+          <row>
+            <entry>All users ...</entry>
+            <entry>checked</entry>
+          </row>
+          <row>
+            <entry>remaining parameters</entry>
+            <entry>unchecked</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">Ethernet</emphasis></entry>
+          </row>
+          <row>
+            <entry>Device MAC address</entry>
+            <entry>uu:vv:ww:xx:yy:zz
+            (em1)<footnote><para>important here is to
+            recognize that the MAC address belongs to the
+            device that we remove in step 1</para></footnote></entry>
+          </row>
+          <row>
+            <entry>remaining parameters</entry>
+            <entry>untouched</entry>
+          </row>
+          <row>
+            <entry namest="c1" nameend="c2"><emphasis
+            role="strong">Other tabs</emphasis></entry>
+          </row>
+          <row>
+            <entry>remaining parameters</entry>
+            <entry>untouched</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+
+</section>

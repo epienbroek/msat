@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_configuration-prerequisites">
+  <title>Prerequisites</title>
+
+  <table id="puppet_configuration-prerequisites-time">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Build a working Spacewalk server</entry>
+          <entry>16 hours at least</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    We construct the target Linux systems in several phases.
+    The minimal phases we need when we provisioning a Linux
+    system with Puppet:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Bare metal deployment of the machine with the
+          Linux OS via the Spacewalk server. The Cobbler
+          part is used. We need a very bare kickstart
+          profile to execute this task.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          OS provisioning of the bare Linux system with help
+          of Puppet. In this phase, we configure basic infa
+          clients, like NTP, DNS, etc.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+</section>
+

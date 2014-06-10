@@ -940,7 +940,7 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, options
   sys.exit(1)
 
-if options.satellite_version == '5.5':
+if options.satellite_version in ['5.5', '5.6']:
   try:
     rc = client.kickstart.profile.setCfgPreservation(
       key,
@@ -952,7 +952,7 @@ if options.satellite_version == '5.5':
     print >> sys.stderr, options
     sys.exit(1)
 
-if options.satellite_version == '5.5':
+if options.satellite_version in ['5.5', '5.6']:
   try:
     rc = client.kickstart.profile.setLogging(
       key,
@@ -1103,6 +1103,55 @@ if options.satellite_version == '5.5':
       rc = client.kickstart.profile.addScript(
         key,
         options.kickstart_label,
+        options.kickstart_script,
+        '',
+        'post',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+      sys.exit(1)
+elif options.satellite_version == '5.6':
+  if options.kickstart_prescript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        '1',
+        options.kickstart_prescript,
+        '',
+        'pre',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+      sys.exit(1)
+  if options.kickstart_postscript:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        '1',
+        options.kickstart_postscript,
+        '',
+        'post',
+        True,
+        True
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+      sys.exit(1)
+  if options.kickstart_script:
+    try:
+      rc = client.kickstart.profile.addScript(
+        key,
+        options.kickstart_label,
+        '1',
         options.kickstart_script,
         '',
         'post',

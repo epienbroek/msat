@@ -33,8 +33,8 @@
     Consequently, we need to create a software channel on
     the Spacewalk server to contain the Extras repository:
     <screen>
-&srvprompt; <userinput>msat_mk_sc.py -l centos-x86_64-server-extras-5 -n centos-x86_64-server-extras-5 -s centos-x86_64-server-extras-5 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-5</userinput>
-&srvprompt; <userinput>msat_ls_sc.py</userinput>
+&hostp; <userinput>msat_mk_sc.py -l centos-x86_64-server-extras-5 -n centos-x86_64-server-extras-5 -s centos-x86_64-server-extras-5 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-5</userinput>
+&hostp; <userinput>msat_ls_sc.py</userinput>
 con-tools-centos-x86_64-server-5
 centos-x86_64-server-extras-5
 centos-x86_64-server-5

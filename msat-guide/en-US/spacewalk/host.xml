@@ -96,8 +96,8 @@
     </para>
     <para>
       We have the following XML file: 
-      <screen>
-&srvprompt; <userinput>cat dmsat1.xml</userinput>
+<screen>
+&hostp; <userinput>cat dmsat1.xml</userinput>
 &lt;network&gt;
   &lt;name&gt;dmsat1&lt;/name&gt;
   &lt;forward mode='nat'/&gt;
@@ -106,7 +106,7 @@
   &lt;domain name='dmsat1.org'/&gt;
   &lt;ip address='192.168.5.1' netmask='255.255.255.0'/&gt;
 &lt;/network&gt;
-      </screen>
+</screen>
 
     </para>
     <para>
@@ -135,17 +135,17 @@
     <para>
       Now, create the network, mark it as autostart and
       activate it, with: 
-      <screen>
-&srvprompt; <userinput>virsh net-define dmsat1.xml</userinput>
+<screen>
+&hostp; <userinput>virsh net-define dmsat1.xml</userinput>
 Network dmsat1 defined from test.xml
 
-&srvprompt; <userinput>virsh net-autostart dmsat1</userinput>
+&hostp; <userinput>virsh net-autostart dmsat1</userinput>
 Network dmsat1 marked as autostarted
 
-&srvprompt; <userinput>virsh net-start dmsat1</userinput>
+&hostp; <userinput>virsh net-start dmsat1</userinput>
 Network dmsat1 started
 
-      </screen>
+</screen>
     </para>
     <para>
       The command line method above, requires that one knows
@@ -192,8 +192,8 @@ Network dmsat1 started
       class="directory">/etc/libvirt/qemu/networks</filename>,
       named <filename>dmsat1.xml</filename>. It can be shown
       with: 
-      <screen>
-&srvprompt; <userinput>virsh net-dumpxml dmsat1</userinput>
+<screen>
+&hostp; <userinput>virsh net-dumpxml dmsat1</userinput>
 &lt;network&gt;
   &lt;name&gt;dmsat1&lt;/name&gt;
   &lt;forward mode='nat'/&gt;
@@ -202,20 +202,20 @@ Network dmsat1 started
   &lt;domain name='dmsat1.org'/&gt;
   &lt;ip address='192.168.5.1' netmask='255.255.255.0'/&gt;
 &lt;/network&gt;
-      </screen>
+</screen>
 
     </para>
     <para>
       Make sure that the network is active and that it
       auto-starts: 
-      <screen>
-&srvprompt; <userinput>virsh net-list</userinput>
+<screen>
+&hostp; <userinput>virsh net-list</userinput>
 Name                 State      Autostart
 -----------------------------------------
 default              active     yes       
 dmsat1               active     yes
 
-      </screen>
+</screen>
     </para>
   </section>
   
@@ -225,8 +225,8 @@ dmsat1               active     yes
       The KVM Spacewalk server needs disk space to run on.
       We provide it by means of a LV (Logical Volume)
       created on the host. The creation is done as follows: 
-      <screen>
-&srvprompt; <userinput>pvs</userinput>
+<screen>
+&hostp; <userinput>pvs</userinput>
   PV         VG        Fmt  Attr PSize   PFree
   /dev/sda3  vg_server lvm2 a--  931.00g      0
   /dev/sdb   b         lvm2 a--  931.51g 931.51g
@@ -235,14 +235,14 @@ dmsat1               active     yes
   /dev/sde   e         lvm2 a--  931.51g 931.51g
   /dev/sdf   f         lvm2 a--  931.51g 931.51g
 
-&srvprompt; <userinput>pvs -o +vg_extent_size /dev/sdb</userinput>
+&hostp; <userinput>pvs -o +vg_extent_size /dev/sdb</userinput>
   PV         VG   Fmt  Attr PSize   PFree   Ext
   /dev/sdb   b    lvm2 a--  931.51g 931.51g 4.00m
 
-&srvprompt; <userinput>lvcreate -n sw -l $((25 * 10 * 300)) b</userinput>
+&hostp; <userinput>lvcreate -n sw -l $((25 * 10 * 300)) b</userinput>
   Logical volume "sw" created
 
-      </screen>
+</screen>
     </para>
     <para>
       The newly created LV, <filename
@@ -265,10 +265,10 @@ dmsat1               active     yes
       that on our host this requirement is no problem. We
       have 16GB of internal memory, which can be
       demonstrated with: 
-      <screen>
-&srvprompt; <userinput>cat /proc/meminfo | grep ^MemTotal</userinput>
+<screen>
+&hostp; <userinput>cat /proc/meminfo | grep ^MemTotal</userinput>
 MemTotal:       16435452 kB
-      </screen>
+</screen>
     </para>
   </section>
 

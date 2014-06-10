@@ -4,77 +4,71 @@
 %BOOK_ENTITIES;
 ]>
 <section id="spacewalk-sw_install">
-	<title>Spacewalk installation</title>
-	 <table id="tabl-msat-guide-Spacewalk_installation-Time_needed">
-		<title>Time needed</title>
-		 <tgroup align="left" cols="2" colsep="1" rowsep="1">
-			<colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-			 <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-			 <thead valign="top">
-				<row>
-					<entry>
-						action
-					</entry>
-					 <entry>
-						time
-					</entry>
+  <title>Spacewalk installation</title>
+  <table id="tabl-msat-guide-Spacewalk_installation-Time_needed">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Spacewalk installation</entry>
+          <entry>35 minutes</entry>
+        </row>
+        <row>
+          <entry>Spacewalk configuration</entry>
+          <entry>15 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  <para>
+    The information in this section is obtained from <ulink
+    url="https://fedorahosted.org/spacewalk/wiki/HowToInstall">fedorahosted.org/spacewalk/wiki/HowToInstall</ulink>
+    and our own experimenting.
+  </para>
 
-				</row>
-
-			</thead>
-			 <tbody valign="top">
-				<row>
-					<entry>
-						Spacewalk installation
-					</entry>
-					 <entry>
-						35 minutes
-					</entry>
-
-				</row>
-				 <row>
-					<entry>
-						Spacewalk configuration
-					</entry>
-					 <entry>
-						15 minutes
-					</entry>
-
-				</row>
-
-			</tbody>
-
-		</tgroup>
-
-	</table>
-	 <para>
-		The information in this section is obtained from <ulink url="https://fedorahosted.org/spacewalk/wiki/HowToInstall">fedorahosted.org/spacewalk/wiki/HowToInstall</ulink> and our own experimenting.
-	</para>
-	 <para>
-		Because we experienced some problems with SELinux, we switch it off during the installation. Afterwards, we generate a new policy to ensure that Spacewalk run with SELinux in <emphasis role="bold">enforcing</emphasis> mode. So, now set: 
+  <para>
+    Because we experienced some problems with SELinux, we
+    switch it off during the installation. Afterwards, we
+    generate a new policy to ensure that Spacewalk run with
+    SELinux in <emphasis role="bold">enforcing</emphasis>
+    mode. So, now set: 
 <screen>
 &sw1p; <userinput>vim /etc/selinux/config</userinput>
 &sw1p; <userinput>grep ^SELINUX= /etc/selinux/config</userinput>
 SELINUX=permissive
-&sw1p; <userinput>setenforce 0</userinput></screen>
+&sw1p; <userinput>setenforce 0</userinput>
+</screen>
+  </para>
 
-	</para>
-	 <para>
-		We first show the screen dumps of the installation. At some points we skip output. Otherwise a lot of space (about 4000 lines) is consumed. When noticable, but ignorable errors occur, we show them. Packages that just install well are skipped in the output.
-	</para>
-	 <para>
-		
+  <para>
+    We first show the screen dumps of the installation. At
+    some points we skip output. Otherwise a lot of space
+    (about 4000 lines) is consumed. When noticable, but
+    ignorable errors occur, we show them. Packages that just
+    install well are skipped in the output.
+  </para>
+
+  <para>
 <screen>
-&sw1p; <userinput>rpm -Uvh http://yum.spacewalkproject.org/1.9/Fedora/18/x86_64/spacewalk-repo-1.9-1.fc18.noarch.rpm</userinput>
-Retrieving http://yum.spacewalkproject.org/1.9/Fedora/18/x86_64/spacewalk-repo-1.9-1.fc18.noarch.rpm
-warning: /var/tmp/rpm-tmp.R8ZEmI: Header V4 DSA/SHA1 Signature, key ID 863a853d: NOKEY
+&sw1p; <userinput>rpm -Uvh http://yum.spacewalkproject.org/2.1/Fedora/20/x86_64/spacewalk-repo-2.1-2.fc20.noarch.rpm</userinput>
+Retrieving http://yum.spacewalkproject.org/2.1/Fedora/20/x86_64/spacewalk-repo-2.1-2.fc20.noarch.rpm
+warning: /var/tmp/rpm-tmp.wicQUJ: Header V3 DSA/SHA1 Signature, key ID 863a853d: NOKEY
 Preparing...                          ################################# [100%]
 Updating / installing...
-   1:spacewalk-repo-1.9-1.fc18        ################################# [100%]
+   1:spacewalk-repo-2.1-2.fc20        ################################# [100%]
 </screen>
-		 
+     
 <screen>
-&sw1p; <userinput>cat &gt; /etc/yum.repos.d/jpackage-generic.repo &lt;&lt; EOF</userinput>
+<userinput>&sw1p; cat &gt;
+/etc/yum.repos.d/jpackage-generic.repo &lt;&lt; EOF</userinput>
 <userinput>[jpackage-generic]</userinput>
 <userinput>name=JPackage generic</userinput>
 <userinput>#baseurl=http://mirrors.dotsrc.org/pub/jpackage/5.0/generic/free/</userinput>
@@ -82,46 +76,54 @@ Updating / installing...
 <userinput>enabled=1</userinput>
 <userinput>gpgcheck=1</userinput>
 <userinput>gpgkey=http://www.jpackage.org/jpackage.asc</userinput>
-<userinput>EOF</userinput></screen>
-		 
-<screen>
-&sw1p; <userinput>yum install spacewalk-setup-embedded-postgresql</userinput>
+<userinput>EOF</userinput>
+
+&sw1p; <userinput>yum install spacewalk-setup-postgresql</userinput>
 .
 .
 ================================================================================
- Package                              Arch    Version          Repository  Size
+ Package                       Arch      Version             Repository    Size
 ================================================================================
 Installing:
- spacewalk-setup-embedded-postgresql  noarch  1.9.1-1.fc18     spacewalk   12 k
+ spacewalk-setup-postgresql    noarch    2.1.4-1.fc20        spacewalk     15 k
 Installing for dependencies:
- postgresql                           x86_64  9.2.3-1.fc18     updates    3.2 M
- postgresql-libs                      x86_64  9.2.3-1.fc18     updates    221 k
- postgresql-server                    x86_64  9.2.3-1.fc18     updates    3.6 M
+ libxslt                       x86_64    1.1.28-5.fc20       fedora       241 k
+ postgresql                    x86_64    9.3.4-1.fc20        updates      3.1 M
+ postgresql-contrib            x86_64    9.3.4-1.fc20        updates      587 k
+ postgresql-libs               x86_64    9.3.4-1.fc20        updates      229 k
+ postgresql-pltcl              x86_64    9.3.4-1.fc20        updates       58 k
+ postgresql-server             x86_64    9.3.4-1.fc20        updates      3.8 M
+ tcl                           x86_64    1:8.5.14-1.fc20     fedora       1.9 M
+ uuid                          x86_64    1.6.2-21.fc20       fedora        53 k
 
 Transaction Summary
 ================================================================================
-Install  1 Package (+3 Dependent packages)
+Install  1 Package (+8 Dependent packages)
 
-Total download size: 7.0 M
-Installed size: 33 M
+Total download size: 9.9 M
+Installed size: 40 M
 Is this ok [y/N]: <userinput>y</userinput>
 .
 .
 </screen>
-		 Note, the following step takes about 30 minutes! 
+     Note, the following step takes about 30 minutes! 
 <screen>
+&sw1p; <userinput>yum install -y rpm-build rpm-python</userinput>
+.. output skipped ..
+&sw1p; <userinput>yum downgrade -y rpm{,-build-libs,-devel,-libs,-python,-build,-apidocs,-cron,-sign,-python3}-4.11.1-7.fc20</userinput>
+.. output skipped ..
 &sw1p; <userinput>yum install spacewalk-postgresql</userinput>
 .
 .
 Transaction Summary
 ================================================================================
-Install  1 Package  (+478 Dependent packages)
-Upgrade             (  10 Dependent packages)
+Install  1 Package (+546 Dependent packages)
 
-Total download size: 209 M
+Total download size: 202 M
+Installed size: 504 M
 Is this ok [y/N]: <userinput>y</userinput>
 Downloading Packages:
-(1/489): MessageQueue-3.26.7-1.fc18.noarch.rpm             |  18 kB   00:00
+(1/547): MessageQueue-3.26.9-1.fc20.noarch.rpm             |  18 kB   00:00
 .
 .
 Retrieving key from http://www.jpackage.org/jpackage.asc
@@ -132,43 +134,38 @@ Importing GPG key 0xC431416D:
 Is this ok [y/N]: <userinput>y</userinput>
 .
 .
-  Installing : java-1.5.0-gcj-1.5.0.0-40.fc18.x86_64                    277/499
-/var/tmp/rpm-tmp.Cn2QAL: line 11: /usr/share/java-utils/abs2rel.sh: No such file or directory
-/var/tmp/rpm-tmp.Cn2QAL: line 18: /usr/share/java-utils/abs2rel.sh: No such file or directory
-/var/tmp/rpm-tmp.Cn2QAL: line 24: /usr/share/java-utils/abs2rel.sh: No such file or directory
-/var/tmp/rpm-tmp.Cn2QAL: line 28: /usr/share/java-utils/abs2rel.sh: No such file or directory
-  Installing : sinjdoc-0.5-13.fc18.x86_64                               278/499
+  Installing : spacewalk-postgresql-2.0.1-1.fc20.noarch                 547/547
 .
 .
 </screen>
+  </para>
 
-	</para>
-	 <para>
-		At this point we have the Spacewalk software installed. Now we will configure it. Again, we show this in screen dumps. 
-		<note>
-			<title>Follow the instructions exactly</title>
-			 <para>
-				It turns out that deviating from the installation instructions can result in a lot of trouble. Here, we want to make sure that we end up with a working Spacewalk server. Tweaking and experimenting can be done later!
-			</para>
+  <para>
+    At this point we have the Spacewalk software installed.
+    Now we will configure it. Again, we show this in screen
+    dumps. 
+  </para>
 
-		</note>
-		 
+  <note>
+    <title>Follow the instructions exactly</title>
+    <para>
+      It turns out that deviating from the installation
+      instructions can result in a lot of trouble. Here,
+      we want to make sure that we end up with a working
+      Spacewalk server. Tweaking and experimenting can be
+      done later!
+    </para>
+  </note>
+  <para>
+     Completing the following section takes about 5 minutes! 
 <screen>
-&sw1p; <userinput>passwd postgres</userinput>
-Changing password for user postgres.
-New password: <userinput>redhat</userinput>
-BAD PASSWORD: The password is shorter than 8 characters
-Retype new password: <userinput>redhat</userinput>
-passwd: all authentication tokens updated successfully.
-</screen>
-		 Completing the following section takes about 5 minutes! 
-<screen>
+&sw1p; <userinput>restorecon -Rv /var/lib/pgsql</userinput>
 &sw1p; <userinput>spacewalk-setup --disconnected</userinput>
 ** Database: Setting up database connection for PostgreSQL backend.
 ** Database: Installing the database:
 ** Database: This is a long process that is logged in:
 ** Database:   /var/log/rhn/install_db.log
-*** Progress: ###
+*** Progress: #
 ** Database: Installation complete.
 ** Database: Populating database.
 *** Progress: ###################################
@@ -186,16 +183,15 @@ Admin Email Address? <userinput>root@localhost</userinput>
 * Configuring apache SSL virtual host.
 Should setup configure apache's default ssl server for you (saves original ssl.conf) [Y]? <userinput>&lt;Enter&gt;</userinput>
 ** /etc/httpd/conf.d/ssl.conf has been backed up to ssl.conf-swsave
+* Configuring editarea.
+** /etc/httpd/conf.d/editarea.conf has been backed up to editarea.conf-swsave
 * Configuring tomcat.
-** /etc/sysconfig//tomcat has been backed up to tomcat-swsave
-** /etc/tomcat//server.xml has been backed up to server.xml-swsave
-** /etc/tomcat//web.xml has been backed up to web.xml-swsave
 * Configuring jabberd.
 * Creating SSL certificates.
-CA certificate password? <userinput>&lt;redhat&gt;</userinput>
-Re-enter CA certificate password? <userinput>&lt;redhat&gt;</userinput>
+CA certificate password? <userinput>redhat</userinput>
+Re-enter CA certificate password? <userinput>redhat</userinput>
 Organization? <userinput>Example</userinput>
-Organization Unit [d19sw1.dmsat1.org]? <userinput>dmsat1</userinput>
+Organization Unit [d21sw1.dmsat1.org]? <userinput>dmsat1</userinput>
 Email Address [root@localhost]? <userinput>&lt;Enter&gt;</userinput>
 City? <userinput>Utrecht</userinput>
 State? <userinput>Utrecht</userinput>
@@ -211,136 +207,94 @@ Processing /etc/cobbler/modules.conf
 ‘/etc/cobbler/modules.conf’ -&gt; ‘/etc/cobbler/modules.conf-swsave’
 Processing /etc/cobbler/settings
 ‘/etc/cobbler/settings’ -&gt; ‘/etc/cobbler/settings-swsave’
-cobblerd does not appear to be running/accessible
-Cobbler requires tftp and xinetd services be turned on for PXE provisioning functionality. Enable these services [Y]? <userinput>Enter</userinput>
-ln -s '/usr/lib/systemd/system/tftp.socket' '/etc/systemd/system/sockets.target.wants/tftp.socket'
-cobblerd does not appear to be running/accessible
+Cobbler requires tftp and xinetd services be turned on for PXE provisioning functionality. Enable these services [Y]? <userinput>&lt;Enter&gt;</userinput>
 * Restarting services.
-*******************************************************************
- Using the default of SSL_verify_mode of SSL_VERIFY_NONE for client
- is depreciated! Please set SSL_verify_mode to SSL_VERIFY_PEER
- together with SSL_ca_file|SSL_ca_path for verification.
- If you really don't want to verify the certificate and keep the
- connection open to Man-In-The-Middle attacks please set
- SSL_verify_mode explicitly to SSL_VERIFY_NONE in your application.
-*******************************************************************
-  at /usr/share/perl5/LWP/Protocol/http.pm line 31.
-*******************************************************************
- Using the default of SSL_verify_mode of SSL_VERIFY_NONE for client
- is depreciated! Please set SSL_verify_mode to SSL_VERIFY_PEER
- together with SSL_ca_file|SSL_ca_path for verification.
- If you really don't want to verify the certificate and keep the
- connection open to Man-In-The-Middle attacks please set
- SSL_verify_mode explicitly to SSL_VERIFY_NONE in your application.
-*******************************************************************
-  at /usr/share/perl5/LWP/Protocol/http.pm line 31.
-Installation complete.
-Visit https://d19sw1.dmsat1.org to create the Spacewalk administrator account.
+* Installation complete.
+* Visit https://d21sw1.dmsat1.org to create the Spacewalk administrator account.
 </screen>
+  </para>
 
-	</para>
-	 <para>
-		The installation program points us to the Spacewalk's web interface: <ulink url="http://192.168.5.11">http://192.168.5.11</ulink>. Here we need to configure the Spacewalk administrator account. We use the following set of parameters: 
-		<table id="tabl-msat-guide-Spacewalk_installation-Spacewalk_admin_parameters">
-			<title>Spacewalk admin parameters</title>
-			 <tgroup align="left" cols="2" colsep="1" rowsep="1">
-				<!--        
+  <para>
+    The installation program points us to the Spacewalk's
+    web interface: <ulink
+    url="http://192.168.5.11">http://192.168.5.11</ulink>.
+    Here we need to configure the Spacewalk administrator
+    account. We use the following set of parameters: 
+    <table id="tabl-msat-guide-Spacewalk_installation-Spacewalk_admin_parameters">
+      <title>Spacewalk admin parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <!--        
         The width of a column by default is 1* or just *. So,
         with 2 columns and column 2 needing 2 times more space,
         we say column 1 has 1* width and column 2 has 2* width.
-              --> <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-				 <colspec colname="c2" colnum="2" colwidth="2*"></colspec>
-				 <thead valign="top">
-					<row>
-						<entry>
-							parameter
-						</entry>
-						 <entry>
-							value
-						</entry>
+        -->
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="2*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>value</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>Desired Login:</entry>
+            <entry>example</entry>
+          </row>
+          <row>
+            <entry>Desired Password:</entry>
+            <entry>redhat</entry>
+          </row>
+          <row>
+            <entry>Confirm Password:</entry>
+            <entry>redhat</entry>
+          </row>
+          <row>
+            <entry>Firt, Last Name:</entry>
+            <entry>Mr. Example Example</entry>
+          </row>
+          <row>
+            <entry>Email:</entry>
+            <entry>root@localhost</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+      Now click Create Login. Click on the link at the top
+      of the page to finalize. Remove <guilabel>HTTP proxy
+      settings</guilabel> and check <guilabel>Disconnected
+      Spacewalk</guilabel> and press Update.
+  </para>
 
-					</row>
-
-				</thead>
-				 <tbody valign="top">
-					<row>
-						<entry>
-							Desired Login:
-						</entry>
-						 <entry>
-							example
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Desired Password:
-						</entry>
-						 <entry>
-							redhat
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Confirm Password:
-						</entry>
-						 <entry>
-							redhat
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Firt, Last Name:
-						</entry>
-						 <entry>
-							Mr. Example Example
-						</entry>
-
-					</row>
-					 <row>
-						<entry>
-							Email:
-						</entry>
-						 <entry>
-							root@localhost
-						</entry>
-
-					</row>
-
-				</tbody>
-
-			</tgroup>
-
-		</table>
-		 Now click Create Login. Remove <guilabel>HTTP proxy settings</guilabel> and uncheck <guilabel>Disconnected Spacewalk</guilabel> and press Update.
-	</para>
-	 <para>
-		The Spacewalk server mentions on the web interface that we need to restart the Spacewalk server: 
+  <para>
+    The Spacewalk server mentions on the web interface that
+    we need to restart the Spacewalk server: 
 <screen>
 &sw1p; <userinput>spacewalk-service restart</userinput>
 .. output skipped ..
 </screen>
+  </para>
 
-	</para>
-	 <para>
-		In our case the Spacewalk certificate was still missing, so we copy it: 
-<screen>
-&sw1p; <userinput>cd ~/ssl-build</userinput>
-&sw1p; <userinput>cp RHN-ORG-TRUSTED-SSL-CERT /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT</userinput></screen>
-
-	</para>
-	 <para>
-		We also want the Spacewalk service to start automatically at system boot: 
+  <para>
+    We also want the Spacewalk service to start
+    automatically at system boot: 
 <screen>
 &sw1p; <userinput>systemctl enable spacewalk.target</userinput>
 ln -s '/usr/lib/systemd/system/spacewalk.target' '/etc/systemd/system/multi-user.target.wants/spacewalk.target'
 </screen>
+  </para>
 
-	</para>
-	 <para>
-		The Cobbler daemon still needs some adjustments. Change the following parameters in <filename>/etc/cobbler/settings</filename>: 
+  <para>
+    We need to copy the generated SSL certificate:
+<screen>
+&sw1p; <userinput>cp /root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT /usr/share/rhn</userinput>
+</screen>
+  </para>
+
+  <para>
+    The Cobbler daemon still needs some adjustments. Change
+    the following parameters in
+    <filename>/etc/cobbler/settings</filename>: 
 <screen>
 &sw1p; <userinput>vim /etc/cobbler/settings</userinput>
 .
@@ -351,10 +305,10 @@ allow_duplicate_macs: 1
 redhat_management_permissive: 1
 .
 .
-&sw1p; <userinput>systemctl restart cobblerd.service</userinput></screen>
-
-	</para>
-	 <!--        
+&sw1p; <userinput>systemctl restart cobblerd.service</userinput>
+</screen>
+  </para>
+  <!--        
   <para>
     With SELinux we have some problems. To cure them, we make
     sure that all files have SELinux contexts according to the
@@ -390,9 +344,10 @@ semodule -i mypol.pp
     without <emphasis role="bold">sealert</emphasis> messages in
     <filename>/var/log/messages</filename>.
   </para>
-          --> <para>
-		This concludes our Spacewalk installation. The Spacewalk server is still in a state that we cannot provision systems. Hence, it needs filling!
-	</para>
+  -->
+  <para>
+    This concludes our Spacewalk installation. The Spacewalk
+    server is still in a state that we cannot provision
+    systems. Hence, it needs filling!
+  </para>
 </section>
-
-

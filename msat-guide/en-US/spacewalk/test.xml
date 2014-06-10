@@ -12,54 +12,30 @@
       <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
       <thead valign="top">
         <row>
-          <entry>
-            action
-          </entry>
-          <entry>
-            time
-          </entry>
+          <entry>action</entry>
+          <entry>time</entry>
         </row>
       </thead>
       <tbody valign="top">
         <row>
-          <entry>
-            Config channel
-          </entry>
-          <entry>
-            5 minutes
-          </entry>
+          <entry>Config channel</entry>
+          <entry>5 minutes</entry>
         </row>
         <row>
-          <entry>
-            Activation key
-          </entry>
-          <entry>
-            5 minutes
-          </entry>
+          <entry>Activation key</entry>
+          <entry>5 minutes</entry>
         </row>
         <row>
-          <entry>
-            Kickstart profile
-          </entry>
-          <entry>
-            20 minutes
-          </entry>
+          <entry>Kickstart profile</entry>
+          <entry>20 minutes</entry>
         </row>
         <row>
-          <entry>
-            Cobbler
-          </entry>
-          <entry>
-            5 minutes
-          </entry>
+          <entry>Cobbler</entry>
+          <entry>5 minutes</entry>
         </row>
         <row>
-          <entry>
-            Test installation
-          </entry>
-          <entry>
-            15 minutes
-          </entry>
+          <entry>Test installation</entry>
+          <entry>15 minutes</entry>
         </row>
       </tbody>
     </tgroup>
@@ -91,7 +67,8 @@
       </listitem>
       <listitem>
         <para>
-          The environment on the host to create a KVM virtual machine.
+          The environment on the host to create a KVM
+          virtual machine.
         </para>
       </listitem>
     </itemizedlist>
@@ -113,12 +90,8 @@
           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
           <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-              <entry>
-                value
-              </entry>
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
           </thead>
           <tbody valign="top">
@@ -126,705 +99,554 @@
               <entry>
                 <emphasis role="bold">Name:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+               <entry>test01</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Label:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+              <entry>test01</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Description:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+              <entry>test01</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
-
     </para>
-     <para>
+    <para>
       Add a configuration file with: <menuchoice> <guimenuitem>Add Files</guimenuitem> <guimenuitem>Create File</guimenuitem> </menuchoice>
     </para>
-     <para>
+    <para>
       Now, add the following parameters: 
       <table id="tabl-msat-guide-Config_Channel-etcmotd">
         <title><filename>/etc/motd</filename></title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">Filename/Path:</emphasis>
               </entry>
-               <entry>
+              <entry>
                 /etc/motd
               </entry>
-
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">File Contents:</emphasis>
               </entry>
-               <entry>
-                
+              <entry>
 <screen>
 Welcome to test01.
 
 
 </screen>
-
               </entry>
-
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
        Click <guibutton>Create Configuration File</guibutton>.
     </para>
-
   </section>
-  
-   <section id="spacewalk-test-ak">
+  <section id="spacewalk-test-ak">
     <title>Activation Key</title>
-     <para>
-      The <emphasis role="bold">test01</emphasis> config channel needs to be refered to by an activation key. We create it here.
+    <para>
+      The <emphasis role="bold">test01</emphasis> config
+      channel needs to be refered to by an activation key.
+      We create it here.
     </para>
-     <para>
-      <menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Systems</guimenuitem> <guimenuitem>Activation Keys</guimenuitem> <guimenuitem>create new key</guimenuitem> </menuchoice> <table id="tabl-msat-guide-Activation_Key-Activation_Key">
+    <para>
+      <menuchoice> <guimenu>Sign In</guimenu>
+      <guimenuitem>Spacewalk Login: example</guimenuitem>
+      <guimenuitem>Password: redhat</guimenuitem>
+      <guibutton>Sign In</guibutton>
+      <guimenuitem>Systems</guimenuitem>
+      <guimenuitem>Activation Keys</guimenuitem>
+      <guimenuitem>create new key</guimenuitem>
+      </menuchoice>
+      <table id="tabl-msat-guide-Activation_Key-Activation_Key">
         <title>Activation Key</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">Description:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+              <entry>test01</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Key:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+              <entry>test01</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Usage:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Base Channels:</emphasis>
               </entry>
-               <entry>
-                centos-x86_64-server-5
-              </entry>
-
+              <entry>centos-x86_64-server-5</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Add-On Entitlements:</emphasis>
               </entry>
-               <entry>
+              <entry>
                 Provisioning
               </entry>
-
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Universal Default:</emphasis>
               </entry>
-               <entry>
-                &lt;unchecked&gt;
-              </entry>
-
+              <entry>&lt;unchecked&gt;</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
-       Click <guibutton>Create Activation Key</guibutton>
+      Click <guibutton>Create Activation Key</guibutton>
     </para>
-     <para>
-      Make sure to also check <emphasis role="bold">Configuration File Deployment</emphasis> since we want to deploy configuration file too.
+    <para>
+      Make sure to also check <emphasis
+      role="bold">Configuration File Deployment</emphasis>
+      since we want to deploy configuration file too.
     </para>
-     <para>
-      <menuchoice> <guimenuitem>Details</guimenuitem> <guimenuitem>Configuration File Deployment</guimenuitem> <guimenuitem>check</guimenuitem> <guibutton>Update Key</guibutton> </menuchoice>
+    <para>
+      <menuchoice> <guimenuitem>Details</guimenuitem>
+      <guimenuitem>Configuration File
+      Deployment</guimenuitem>
+      <guimenuitem>check</guimenuitem> <guibutton>Update
+      Key</guibutton> </menuchoice>
     </para>
-     <para>
-      Add an RPM package with: <menuchoice> <guimenuitem>Packages</guimenuitem> <guimenuitem>screen</guimenuitem> <guibutton>Update Key</guibutton> </menuchoice>
+    <para>
+      Add an RPM package with: <menuchoice>
+      <guimenuitem>Packages</guimenuitem>
+      <guimenuitem>screen</guimenuitem> <guibutton>Update
+      Key</guibutton> </menuchoice>
     </para>
-     <para>
-      Link the configuration channel with <menuchoice> <guimenuitem>Configuration</guimenuitem> <guimenuitem>Subscribe to Channels</guimenuitem> <guimenuitem>test01</guimenuitem> <guibutton>Continue</guibutton> </menuchoice>
+    <para>
+      Link the configuration channel with <menuchoice>
+      <guimenuitem>Configuration</guimenuitem>
+      <guimenuitem>Subscribe to Channels</guimenuitem>
+      <guimenuitem>test01</guimenuitem>
+      <guibutton>Continue</guibutton> </menuchoice>
     </para>
-
   </section>
   
-   <section id="spacewalk-test-kp">
+  <section id="spacewalk-test-kp">
     <title>Kickstart Profile</title>
-     <para>
-      To further determine how the system should be provisioned, we define the <emphasis role="bold">test01</emphasis> kickstart profile. In it, we refer to the activation key.
+    <para>
+      To further determine how the system should be
+      provisioned, we define the <emphasis
+      role="bold">test01</emphasis> kickstart profile. In
+      it, we refer to the activation key.
     </para>
-     <para>
-      <menuchoice> <guimenu>Sign In</guimenu> <guimenuitem>Spacewalk Login: example</guimenuitem> <guimenuitem>Password: redhat</guimenuitem> <guibutton>Sign In</guibutton> <guimenuitem>Systems</guimenuitem> <guimenuitem>Kickstart</guimenuitem> <guimenuitem>Profiles</guimenuitem> <guimenuitem>create new kickstart profile</guimenuitem> </menuchoice> <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_Profile">
+    <para>
+      <menuchoice> <guimenu>Sign In</guimenu>
+      <guimenuitem>Spacewalk Login: example</guimenuitem>
+      <guimenuitem>Password: redhat</guimenuitem>
+      <guibutton>Sign In</guibutton>
+      <guimenuitem>Systems</guimenuitem>
+      <guimenuitem>Kickstart</guimenuitem>
+      <guimenuitem>Profiles</guimenuitem>
+      <guimenuitem>create new kickstart
+      profile</guimenuitem> </menuchoice>
+      <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_Profile">
         <title>Kickstart Profile</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">Label:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
-
+              <entry>test01</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Base Channel:</emphasis>
               </entry>
-               <entry>
-                cnetos-x86_64-server-5
-              </entry>
-
+              <entry>cnetos-x86_64-server-5</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Kickstartable Tree:</emphasis>
               </entry>
-               <entry>
-                ks-centos-x86_64-server-5u8
-              </entry>
-
+              <entry>ks-centos-x86_64-server-6u5</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Base Channels:</emphasis>
               </entry>
-               <entry>
-                centos-x86_64-server-5
-              </entry>
-
+              <entry>centos-x86_64-server-5</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Virtualization Type:</emphasis>
               </entry>
-               <entry>
-                None
-              </entry>
-
+              <entry>None</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
-       <menuchoice> <guimenu>Next</guimenu> <guimenu>Next</guimenu> </menuchoice> <table id="tabl-msat-guide-Kickstart_Profile-Root_password">
+      <menuchoice> <guimenu>Next</guimenu>
+      <guimenu>Next</guimenu> </menuchoice>
+      <table id="tabl-msat-guide-Kickstart_Profile-Root_password">
         <title>Root password</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">New Root Password:</emphasis>
               </entry>
-               <entry>
-                redhat
-              </entry>
-
+              <entry>redhat</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Verify New Root Password:</emphasis>
               </entry>
-               <entry>
-                redhat
-              </entry>
-
+              <entry>redhat</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
-       <menuchoice> <guimenu>Finish</guimenu> </menuchoice>
+      <menuchoice> <guimenu>Finish</guimenu> </menuchoice>
     </para>
-     <para>
+
+    <para>
+      One notices that the webinterface yield an error:
+      <emphasis role="strong">There are errors in your
+      kickstart template. Please check the 'Kickstart File'
+      tab to determine the problem with the
+      template.</emphasis>. The reason lies in an SELinux
+      denial on <application>cobbler</application>:
+<screen>
+&sw1p; <userinput>tail  /var/log/audit/audit.log | grep denied</userinput>
+type=AVC msg=audit(1399537828.827:1003): avc:  denied  { search } for  pid=1368 comm="/usr/sbin/httpd" name="cobbler" dev="dm-0" ino=154614 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:cobbler_var_log_t:s0 tclass=dir
+type=AVC msg=audit(1399537957.499:1006): avc:  denied  { search } for  pid=1586 comm="/usr/sbin/httpd" name="cobbler" dev="dm-0" ino=154614 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:cobbler_var_log_t:s0 tclass=dir
+type=AVC msg=audit(1399537957.504:1007): avc:  denied  { search } for  pid=1586 comm="/usr/sbin/httpd" name="cobbler" dev="dm-0" ino=154614 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:cobbler_var_log_t:s0 tclass=dir
+</screen>
+      For now, we solve this problem by temporarily
+      disabling SELinux:
+<screen>
+&sw1p; <userinput>setenforce 0</userinput>
+</screen>
+    </para>
+
+    <para>
       <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01">
         <title>Kickstart: test01</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">Kickstart Label:</emphasis>
               </entry>
-               <entry>
-                test01
-              </entry>
+              <entry>test01</entry>
 
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Operating System:</emphasis>
               </entry>
-               <entry>
-                centos-x86_64_server-5
-              </entry>
-
+              <entry>centos-x86_64_server-6</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Virtualization Type:</emphasis>
               </entry>
-               <entry>
-                None
-              </entry>
-
+              <entry>None</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Active:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Log custom post scripts:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Log custom pre scripts:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Preserve ks.cfg:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Organization Default Profile:</emphasis>
               </entry>
-               <entry>
-                &lt;unchecked&gt;
-              </entry>
-
+              <entry>&lt;unchecked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Kernel Options:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Post Kernel Options:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Comments:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
        <menuchoice> <guimenu>Update Kickstart</guimenu> </menuchoice>
     </para>
-     <para>
+    <para>
       <menuchoice> <guimenu>Advanced Options</guimenu> </menuchoice>
     </para>
-     <para>
-      Note, some values need to be unchecked and cleared! Really, only the values presented here must be present. 
+    <para>
+      Note, some values need to be unchecked and cleared!
+      Really, only the values presented here must be
+      present. 
       <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01_System_Details">
         <title>Kickstart: test01, System Details</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">auth:</emphasis>
               </entry>
-               <entry>
-                --enablemd5 --enableshadow
-              </entry>
-
+              <entry>--enablemd5 --enableshadow</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">bootloader:</emphasis>
               </entry>
-               <entry>
-                --location mbr
-              </entry>
-
+              <entry>--location mbr</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">clearpart:</emphasis>
               </entry>
-               <entry>
-                --all
-              </entry>
-
+              <entry>--all</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">firewall:</emphasis>
               </entry>
-               <entry>
-                --enabled
-              </entry>
-
+              <entry>--enabled</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">install:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">key:</emphasis>
               </entry>
-               <entry>
-                --skip
-              </entry>
-
+              <entry>--skip</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">keyboard:</emphasis>
               </entry>
-               <entry>
-                us
-              </entry>
+              <entry>us</entry>
 
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">lang:</emphasis>
               </entry>
-               <entry>
-                en_US
-              </entry>
-
+              <entry>en_US</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">reboot:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">rootpw:</emphasis>
               </entry>
-               <entry>
-                $1$RsnjsSwK$KbtWynXvaUGZ0ZZh0qXQu/
-              </entry>
-
+              <entry>$1$RsnjsSwK$KbtWynXvaUGZ0ZZh0qXQu/</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">selinux:</emphasis>
               </entry>
-               <entry>
-                --enforcing
-              </entry>
-
+              <entry>--enforcing</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">skipx:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">text:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">timezone:</emphasis>
               </entry>
-               <entry>
-                --utc Europe/Amsterdam
-              </entry>
-
+              <entry>--utc Europe/Amsterdam</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">url:</emphasis>
               </entry>
-               <entry>
-                --url /var/satellite/rhn/kickstart/ks-centos-x86_64-server-5u8
+              <entry>
+                --url /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5
               </entry>
-
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">zerombr:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
        <menuchoice> <guimenu>Update Kickstart</guimenu> </menuchoice>
     </para>
-     <para>
-      <menuchoice> <guimenu>System Details</guimenu> <guimenu>Details</guimenu> </menuchoice>
+    <para>
+      <menuchoice> <guimenu>System Details</guimenu>
+      <guimenu>Details</guimenu> </menuchoice>
     </para>
-     <para>
+    <para>
       We only show the checked options and their value! 
       <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_test01_Advanced_Options">
         <title>Kickstart: test01, Advanced Options</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">SeLinux:</emphasis>
               </entry>
-               <entry>
-                Enforcing
-              </entry>
-
+              <entry>Enforcing</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Enable Spacewalk Configuration Management:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Enable Spacewalk Remote Commands:</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Spacewalk Profile:</emphasis>
               </entry>
-               <entry>
+              <entry>
                 Re-connect to the existing system profile. Do not create a new system profile.
               </entry>
-
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">New Root password:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Verify New Root password:</emphasis>
               </entry>
-               <entry>
-                &lt;empty&gt;
-              </entry>
-
+              <entry>&lt;empty&gt;</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
        <menuchoice> <guimenu>Update System Details</guimenu> </menuchoice>
     </para>
-     <para>
-      <menuchoice> <guimenu>System Details</guimenu> <guimenu>Partitioning</guimenu> </menuchoice>
+    <para>
+      <menuchoice> <guimenu>System Details</guimenu>
+      <guimenu>Partitioning</guimenu> </menuchoice>
     </para>
-     <para>
+    <para>
       Partition Details: 
 <screen>
 part /boot --fstype=ext3 --size=200
@@ -833,82 +655,78 @@ part swap --size=512
 volgroup myvg pv.01
 logvol / --vgname=myvg --name=rootvol --size=1 --grow
 </screen>
-       <menuchoice> <guimenu>Update Partitions</guimenu> </menuchoice>
+       <menuchoice> <guimenu>Update Partitions</guimenu>
+       </menuchoice>
     </para>
-     <para>
-      <menuchoice> <guimenu>System Details</guimenu> <guimenu>GPG &amp; SSL</guimenu> <guimenu>Select All</guimenu> <guimenu>Update keys</guimenu> </menuchoice>
+
+    <para>
+      <menuchoice> <guimenu>System Details</guimenu>
+      <guimenu>GPG &amp; SSL</guimenu> <guimenu>Select
+      All</guimenu> <guimenu>Update keys</guimenu>
+      </menuchoice>
     </para>
-     <para>
-      <menuchoice> <guimenu>Activation Keys</guimenu> <guimenu>Select All</guimenu> <guimenu>Update Activation Keys</guimenu> </menuchoice>
+
+    <para>
+      <menuchoice> <guimenu>Software</guimenu>
+      <guimenu>Package Groups</guimenu> <guimenu>Select
+      Don't install @Base package group</guimenu><guimenu>list of
+      RPM items: @ Core, perl, wget</guimenu> <guibutton>Update
+      Packages</guibutton> </menuchoice>
     </para>
-     <para>
-      <menuchoice> <guimenu>Scripts</guimenu> <guimenu>add new kickstart script</guimenu> </menuchoice> <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_Script">
+
+    <para>
+      <menuchoice> <guimenu>Activation Keys</guimenu>
+      <guimenu>Select All</guimenu> <guimenu>Update
+      Activation Keys</guimenu> </menuchoice>
+    </para>
+    <para>
+      <menuchoice> <guimenu>Scripts</guimenu> <guimenu>add
+      new kickstart script</guimenu> </menuchoice>
+      <table id="tabl-msat-guide-Kickstart_Profile-Kickstart_Script">
         <title>Kickstart: Script</title>
-         <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
           <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
-           <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
-           <thead valign="top">
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
             <row>
-              <entry>
-                parameter
-              </entry>
-               <entry>
-                value
-              </entry>
-
+              <entry>parameter</entry>
+              <entry>value</entry>
             </row>
-
           </thead>
-           <tbody valign="top">
+          <tbody valign="top">
             <row>
               <entry>
                 <emphasis role="bold">Script Name</emphasis>
               </entry>
-               <entry>
-                1
-              </entry>
-
+              <entry>1</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Script Contents</emphasis>
               </entry>
-               <entry>
-                
+              <entry>
 <screen>
-/bin/rm /etc/yum.repos.d/CentOS-*.repo
+/bin/rm -f /etc/yum.repos.d/CentOS-*.repo
 </screen>
-
               </entry>
-
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Script Execution Time</emphasis>
               </entry>
-               <entry>
-                Post Script
-              </entry>
-
+              <entry>Post Script</entry>
             </row>
-             <row>
+            <row>
               <entry>
                 <emphasis role="bold">Template</emphasis>
               </entry>
-               <entry>
-                &lt;checked&gt;
-              </entry>
-
+              <entry>&lt;checked&gt;</entry>
             </row>
-
           </tbody>
-
         </tgroup>
-
       </table>
        <menuchoice> <guimenu>Update Kickstart</guimenu> </menuchoice>
     </para>
-
   </section>
   
   <section id="spacewalk-test-cob">
@@ -937,7 +755,7 @@ logvol / --vgname=myvg --name=rootvol --size=1 --grow
 #   192.168.5.0/24  gw: 192.168.5.1
 #
 #   DNS servers:
-#   * 192.168.5.11 (d19sw1.dmsat1.org)
+#   * 192.168.5.11 (d21sw1.dmsat1.org)
 #
 # ARGUMENTS
 #   None.
@@ -1070,9 +888,12 @@ $COBBLER system add \
    SpacewalkDefaultOrganization_kvm_&t1;
       </screen>
     </para>
-    <para>
-      We create the Cobbler boot ISO with: 
-      <screen>
+
+    <note>
+      <para>
+        If CentOS 5 is used, the Cobbler loaders are fetched
+        with:
+<screen>
 &sw1p; <userinput>sudo cobbler get-loaders</userinput>
 task started: 2013-05-02_155133_get_loaders
 task started (id=Download Bootloader Content, time=Thu May  2 15:51:33 2013)
@@ -1087,15 +908,28 @@ downloading http://dgoodwin.fedorapeople.org/loaders/menu.c32-3.61 to /var/lib/c
 downloading http://dgoodwin.fedorapeople.org/loaders/grub-0.97-x86.efi to /var/lib/cobbler/loaders/grub-x86.efi
 downloading http://dgoodwin.fedorapeople.org/loaders/grub-0.97-x86_64.efi to /var/lib/cobbler/loaders/grub-x86_64.efi
 *** TASK COMPLETE ***
+
 &sw1p; <userinput>yum install syslinux</userinput>
 .. might already be installed ..
 &sw1p; <userinput>cd /var/lib/cobbler/loaders</userinput>
 &sw1p; <userinput>cp /usr/share/syslinux/menu.c32 .</userinput>
 &sw1p; <userinput>cp /usr/share/syslinux/vesamenu.c32 .</userinput>
+</screen>
+      </para>
+    </note>
+
+    <para>
+      In CentOS 6, we obtain the Cobbler loaders with:
+<screen>
+&sw1p; <userinput>yum -y install cobbler-loaders</userinput>
+.. output skipped ..
+</screen>
+      We create the Cobbler boot ISO with: 
+      <screen>
 &sw1p; <userinput>mkdir -p /var/www/cobbler/pub/example</userinput>
-&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos5u8-test01-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_&t1;" --tempdir=/tmp</userinput>
-task started: 2013-05-02_155717_buildiso
-task started (id=Build Iso, time=Thu May  2 15:57:17 2013)
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-test01-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_&t1;" --tempdir=/tmp</userinput>
+task started: 2014-05-08_104746_buildiso
+task started (id=Build Iso, time=Thu May  8 10:47:46 2014)
 using/creating buildisodir: /tmp/buildiso
 building tree for isolinux
 copying miscellaneous files
@@ -1104,28 +938,31 @@ copying kernels and initrds for systems
 generating a isolinux.cfg
 generating profile list
 generating system list
- - ksdevice 52:54:00:a8:05:64 set for system SpacewalkDefaultOrganization_kvm_&t1;
+ - ksdevice 52:54:00:a8:05:64 set for system SpacewalkDefaultOrganization_kvm_dmm01
 append line length is greater than 254 chars: (276 chars)
 done writing config
-running: mkisofs -o /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso -r -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -V Cobbler\ Install -R -J -T /tmp/buildiso
+running: mkisofs -o /var/www/cobbler/pub/example/centos6u5-test01-kvm.iso -r -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -V Cobbler\ Install -R -J -T /tmp/buildiso
 received on stdout: 
 received on stderr: I: -input-charset not specified, using utf-8 (detected in locale settings)
-Size of boot image is 4 sectors -&gt; No emulation
- 68.62% done, estimate finish Thu May  2 15:57:18 2013
+Size of boot image is 4 sectors -> No emulation
+ 27.00% done, estimate finish Thu May  8 10:47:47 2014
+ 53.90% done, estimate finish Thu May  8 10:47:47 2014
+ 80.88% done, estimate finish Thu May  8 10:47:47 2014
 Total translation table size: 4029
 Total rockridge attributes bytes: 1320
 Total directory bytes: 4096
 Path table size(bytes): 40
 Max brk space used 1c000
-7301 extents written (14 MB)
+18558 extents written (36 MB)
 
 ISO build complete
 You may wish to delete: /tmp/buildiso
-The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
+The output file is: /var/www/cobbler/pub/example/centos6u5-test01-kvm.iso
 *** TASK COMPLETE ***
-&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso</userinput>
--rw-r--r--. 1 root root 15M May  2 15:57 /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
-&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso root@192.168.5.1:/tmp</userinput>
+
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-test01-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M May  8 10:47 /var/www/cobbler/pub/example/centos6u5-test01-kvm.iso
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-test01-kvm.iso root@192.168.5.1:/tmp</userinput>
       </screen>
     </para>
 
@@ -1146,57 +983,54 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
     <para>
       On the host machine we need to create storage space for our test machine: 
 <screen>
-&srvprompt; <userinput>pvs</userinput>
-  PV         VG        Fmt  Attr PSize   PFree
-  /dev/sda3  vg_server lvm2 a--  931.00g      0
-  /dev/sdb   b         lvm2 a--  931.51g 638.54g
-  /dev/sdc   c         lvm2 a--  931.51g 931.51g
-  /dev/sdd   d         lvm2 a--  931.51g 931.51g
-  /dev/sde   e         lvm2 a--  931.51g 931.51g
-  /dev/sdf   f         lvm2 a--  931.51g 931.51g
+&hostp; <userinput>pvs</userinput>
+  PV         VG      Fmt  Attr PSize   PFree  
+  /dev/sda2  fedora  lvm2 a--  300.79g   4.00m
+  /dev/sda3  vg_vm   lvm2 a--  397.36g 387.59g
+  /dev/sdb1  vg_slow lvm2 a--    1.82t   1.69t
 
-&srvprompt; <userinput>pvs -o +vg_extent_size /dev/sde</userinput>
-  PV         VG   Fmt  Attr PSize   PFree   Ext
-  /dev/sde   e    lvm2 a--  931.51g 931.51g 4.00m
+&hostp; <userinput>pvs --noheadings -o vg_extent_size /dev/sda3</userinput>
+  4.00m
 
-&srvprompt; <userinput>lvcreate -n mm -l $((25 * 10 * 5)) e</userinput>
+&hostp; <userinput>lvcreate -n mm -l $((25 * 10 * 5)) vg_vm</userinput>
   Logical volume "mm" created
 
 </screen>
-
     </para>
-     <para>
-      Explanation of the parameters in the <command>virt-install</command> command: 
+
+    <para>
+      Explanation of the parameters in the
+      <command>virt-install</command> command: 
       <itemizedlist>
         <listitem>
           <para>
             &t1;, d (development), mm (model machine), 01 (first).
           </para>
-
         </listitem>
-         <listitem>
+        <listitem>
           <para>
             mac=52:54:00:a8:05:64, 192.168.5.100 -&gt; 00:a8:05:64, the 52:54:00 is obligatory by libvirt definition.
           </para>
-
         </listitem>
-
       </itemizedlist>
-       To make it easy to verify the <command>virt-install</command> options in the <emphasis>virt-install man page</emphasis>, we specify them in the same order as they appear in the man page.
+      To make it easy to verify the
+      <command>virt-install</command> options in the
+      <emphasis>virt-install man page</emphasis>, we specify
+      them in the same order as they appear in the man page.
     </para>
-     <para>
+    <para>
       The installation is started with: 
 <screen>
-&srvprompt; <userinput>virt-install \</userinput>
+&hostp; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
   <userinput>--name=&t1; \</userinput>
   <userinput>--ram=512 \</userinput>
   <userinput>--arch=x86_64 \</userinput>
   <userinput>--description="Provisioning test machine" \</userinput>
-  <userinput>--cdrom /tmp/centos5u8-test01-kvm.iso \</userinput>
+  <userinput>--cdrom /tmp/centos6u5-test01-kvm.iso \</userinput>
   <userinput>--os-type=linux \</userinput>
-  <userinput>--os-variant=rhel5.4 \</userinput>
-  <userinput>--disk path=/dev/e/mm,device=disk,bus=scsi \</userinput>
+  <userinput>--os-variant=rhel6 \</userinput>
+  <userinput>--disk path=/dev/vg_vm/mm,device=disk,bus=virtio \</userinput>
   <userinput>--network=network=dmsat1,mac=52:54:00:a8:05:64 \</userinput>
   <userinput>--graphics vnc \</userinput>
   <userinput>--hvm \</userinput>
@@ -1205,11 +1039,12 @@ The output file is: /var/www/cobbler/pub/example/centos5u8-test01-kvm.iso
 </screen>
        Select <emphasis role="bold">SpacewalkDefaultOrganization_kvm_&t1;</emphasis> and press <keycap function="enter">Enter</keycap>.
     </para>
-     <para>
-      To check on the installed system if everything is working fine, one does: 
+    <para>
+      To check on the installed system if everything is
+      working fine, one does: 
 <screen>
 &t1p; rhncfg-client list
-Using server name d19sw1.dmsat1.org
+Using server name d21sw1.dmsat1.org
 DoFoS   Config Channel   File
 F           test01     /etc/motd
 &t1p; yum repolist
@@ -1221,12 +1056,8 @@ centos-x86_64-server-5               centos-x86_64-server-5               3,602
 con-tools-centos-x86_64-server-5     con-tools-centos-x86_64-server-5        15
 repolist: 3,617
 </screen>
-
     </para>
-
   </section>
-  
 
 </section>
-
 

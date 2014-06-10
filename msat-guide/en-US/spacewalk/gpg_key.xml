@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="spacewalk-gpg_key">
+  <title>GPG key pair for signing</title>
+  <table id="spacewalk-gpg_key-time">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Install rng-tools</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>GPG keypair creation</entry>
+          <entry>10 minutes</entry>
+        </row>
+        <row>
+          <entry>RPM resource settings</entry>
+          <entry>5 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+<screen>
+&sw1p; <userinput>yum install rng-tools</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    Since the default setting of
+    <application>rngd</application> assumes that a hardware
+    Pseudo Random Number Generator (PRNG) is used with
+    device name <filename>/dev/tpm0</filename>, the
+    <application>rngd</application> service fails. Since we
+    don't have a hardware PRNG, we need to set the device to
+    <filename>/dev/urandom</filename>. We make it work with:
+<screen>
+&sw1p; <userinput>cp /usr/lib/systemd/system/rngd.service /etc/systemd/system</userinput>
+&sw1p; <userinput>sed -i 's#^\(ExecStart=.*\)$#\1 -r /dev/urandom#' /etc/systemd/system/rngd.service</userinput>
+&sw1p; <userinput>systemctl reenable rngd.service</userinput>
+&sw1p; <userinput>systemctl restart rngd.service</userinput>
+&sw1p; <userinput>systemctl status rngd.service</userinput>
+rngd.service - Hardware RNG Entropy Gatherer Daemon
+   Loaded: loaded (/etc/systemd/system/rngd.service; enabled)
+   Active: active (running) since Sun 2014-06-08 16:08:00 CEST; 1h 3min ago
+ Main PID: 5505 (rngd)
+   CGroup: /system.slice/rngd.service
+           └─5505 /sbin/rngd -f -r /dev/urandom
+
+Jun 08 16:08:00 d21sw1.dmsat1.org systemd[1]: Started Hardware RNG Entropy G....
+Hint: Some lines were ellipsized, use -l to show in full.
+</screen>
+  </para>
+
+  <para>
+    The <application>rngd</application> ensures that we have
+    enought entropy on the system for the PRNG. The GPG key
+    pair need enough entropy:
+<screen>
+&sw1p; <userinput>gpg --gen-key</userinput>
+gpg (GnuPG) 1.4.16; Copyright (C) 2013 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Please select what kind of key you want:
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+Your selection? <userinput>3</userinput>
+DSA keys may be between 1024 and 3072 bits long.
+What keysize do you want? (2048) <userinput>1024</userinput>
+Requested keysize is 1024 bits
+Please specify how long the key should be valid.
+         0 = key does not expire
+      &lt;n&gt;  = key expires in n days
+      &lt;n&gt;w = key expires in n weeks
+      &lt;n&gt;m = key expires in n months
+      &lt;n&gt;y = key expires in n years
+Key is valid for? (0) <userinput>&lt;Enter&gt;</userinput>
+Key does not expire at all
+Is this correct? (y/N) <userinput>y</userinput>
+
+You need a user ID to identify your key; the software constructs the user ID
+from the Real Name, Comment and Email Address in this form:
+    "Heinrich Heine (Der Dichter) &lt;heinrichh@duesseldorf.de&gt;"
+
+Real name: <userinput>Example</userinput>
+Email address: <userinput>&lt;Enter&gt;</userinput>
+Comment: <userinput>Example RPM signing</userinput>
+You selected this USER-ID:
+    "Example (Example RPM signing)"
+
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? <userinput>O</userinput>
+You need a Passphrase to protect your secret key.
+
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+++++++++++++++++++++++++++++++..+++++.+++++.+++++..+++++..+++++.++++++++++++++++++++..+++++++++++++++++++++++++++++++++++..+++++++++++++++..+++++..+++++............................................................+++++
+gpg: key F59006AF marked as ultimately trusted
+public and secret key created and signed.
+
+gpg: checking the trustdb
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pub   1024D/F59006AF 2014-06-08
+      Key fingerprint = 7A81 1140 4C09 1093 5B3D  3A73 169F 4ACA F590 06AF
+uid                  Example (Example RPM signing)
+
+Note that this key cannot be used for encryption.  You may want to use
+the command "--edit-key" to generate a subkey for this purpose.
+</screen>
+  </para>
+
+  <para>
+    The public part of the generated key needs to be
+    exported so that we can import it in the Spacewalk
+    server.
+<screen>
+&sw1p; <userinput>gpg --list-keys</userinput>
+/root/.gnupg/pubring.gpg
+------------------------
+pub   1024D/F59006AF 2014-06-08
+uid                  Example (Example RPM signing)
+&sw1p; <userinput>gpg --export --armor 'Example' &gt; /tmp/Example-GPG-KEY</userinput>
+&sw1p; <userinput>msat_mk_cr.py -d 'Example-GPG-KEY' -t GPG -c /tmp/Example-GPG-KEY</userinput>
+.. no output ..
+<userinput>msat_ls_cr.py | sed -n '/Example-GPG-KEY/,/-----END PGP PUBLIC KEY BLOCK-----/p'</userinput>
+Example-GPG-KEY
+GPG
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+mQGiBFOUhnERBADkf/zzmYfRCqtuDaXHxTBtfQn80xiaabf/i0EwmrGe08iApvY5
+0HnsvawsIyrv6xfgLHRWMIMVJmcskH/mt4yCH1W5y/BPi12bsRANxpxYIPvWN4sx
+rogTr1o1Hf2ePu4uxCreIVpS1h8KABQsRgFnLa7OeQM4IF5uv/v6H6cOCwCg90ru
+IT0dK4c/37szTy1tF5DDONMEAKXpC2zAgZT+U4D/b6q7Jl3AMps35MgBA3Bty0G/
+r0HDKTh8ZFvX3nfI3jmbwQOeuk3VF4N85dHczivPVS49nExQ07N0p+Z2IqG5n4c4
+v8wCh3ZkcK7h+ctwYII6jLruJ/jCp12MeH5uNGfgWRtt2VE4d6bEdO5KgOensOoU
+/4ygA/43E7f1qyb7YEk29ZE/k+H1gPGQBWD1ncQDUyVE9e/pWP7zdm40qU22+Y7t
+IIFvyHcy1EN5jDYjICcvXG1T8WcwicjxezBdORoezuf9+DP2ipEtRlpLe8ePckYM
+xFpxYRdL9gTp2DSkjivPheCsY7F7X4PEeMR1IpqHocTfoGEDrLQdRXhhbXBsZSAo
+RXhhbXBsZSBSUE0gc2lnbmluZymIYgQTEQIAIgUCU5SGcQIbAwYLCQgHAwIGFQgC
+CQoLBBYCAwECHgECF4AACgkQFp9KyvWQBq8hNgCeM+ZaTy9eWuAqhozUB1YSdGe0
+lZoAn391msW5Kog/ywW9FTMFFztsFh4v
+=qsSF
+-----END PGP PUBLIC KEY BLOCK-----
+</screen>
+  </para>
+
+  <para>
+    Lastly, we need to set the RPM resource file to use the
+    correct key for signing RPM's:
+<screen>
+&sw1p; <userinput>cat ~/.rpmmacros</userinput>
+%home          %{expand:%%(cd; pwd)}
+%_topdir       %{home}/rpm
+%_tmppath      %{_topdir}/tmp
+
+%debug_package %{nil}
+
+%_signature    gpg
+%_gpg_name     Example (Example RPM signing)
+%_gpg_path     ~/.gnupg
+</screen>
+  </para>
+
+</section>
+

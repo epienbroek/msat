@@ -5,11 +5,11 @@
 
 <!ENTITY rprompt "<prompt>#</prompt>">
 <!ENTITY uprompt "<prompt>$</prompt>">
-<!ENTITY srvprompt "<prompt>server#</prompt>">
-<!ENTITY sw1 "d19sw1">
-<!ENTITY sw1p "<prompt>d19sw1#</prompt>">
-<!ENTITY sw2 "d19sw2">
-<!ENTITY sw2p "<prompt>d19sw2#</prompt>">
+<!ENTITY hostp "<prompt>host#</prompt>">
+<!ENTITY sw1 "dw1sw1">
+<!ENTITY sw1p "<prompt>d21sw1#</prompt>">
+<!ENTITY sw2 "d21sw2">
+<!ENTITY sw2p "<prompt>d21sw2#</prompt>">
 <!ENTITY t1 "dmm01">
 <!ENTITY t1p "<prompt>dmm01#</prompt>">
 <!ENTITY lpc "localpc">

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+%BOOK_ENTITIES;
+]>
+<appendix id="msat-guide-apdx_kvm">
+  <title>Running KVM</title>
+  <para>
+    This appendix discusses how to run KVM on a host system
+    on which we want to build Virtual Machines (VM) for
+    testing.
+  </para>
+
+  <para>
+    In order to make KVM run on the host, we need to conduct
+    the following steps:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Install KVM and qemu software
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Test KVM
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <xi:include href="apdx_kvm/install_kvm_qemu.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_kvm/test_kvm_qemu.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</appendix>
+

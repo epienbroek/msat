@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="software-channels">
+  <title>Puppet software channels</title>
+
+  <table id="software-channels-time">
+    <title>Time needed</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>action</entry>
+          <entry>time</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>Analysis of CentOS 6.5 channel</entry>
+          <entry>120 minutes</entry>
+        </row>
+        <row>
+          <entry>Construction of puppet channel</entry>
+          <entry>60 minutes</entry>
+        </row>
+        <row>
+          <entry>Construction of puppet dependencies channel</entry>
+          <entry>60 minutes</entry>
+        </row>
+        <row>
+          <entry>Construction of puppet configuration channel</entry>
+          <entry>60 minutes</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    In this section we discuss what needs to be done on the
+    host system. For the Directory Server KVM, we need: 
+    <itemizedlist>
+      <listitem>
+        <para>
+          A virtual network in which we let the Directory
+          Server operate. We use the same network as the one
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Disk storage. The amount of disk storage is mostly
+          determined by the amount of data and users one
+          wants to store in the Directory Server. Since, for
+          us, it is just a machine to test the function, we
+          hardly need any disk space. So, a total of 5GB for
+          all should suffice.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Memory for the virutal CPU. Again, since we just
+          test the function and not the performance, we need
+          512MB maximum.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <section id="software-channels-centos65">
+    <title>Analysis of CentOS 6.5 channel</title>
+
+    <para>
+    </para>
+
+  </section>
+  
+  <section id="software-channels-puppet">
+    <title>Construction of puppet channel</title>
+
+    <para>
+      Since these packages from Puppet Labs are signed with
+      the <emphasis
+      role="bold">RPM-GPG-KEY-puppetlabs</emphasis> key, we
+      need to place this GPG key on the Spacewalk server.
+      This is done with:
+<screen>
+&sw1p; <userinput>cd /tmp</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs</userinput>
+&sw1p; <userinput>msat_mk_cr.py -d 'RPM-GPG-KEY-puppetlabs' -t GPG -c /tmp/RPM-GPG-KEY-puppetlabs</userinput>
+</screen>
+    </para>
+
+    <para>
+      In the <emphasis role="bold">Puppet
+      channel</emphasis>, we place the RPM's, needed for the
+      Puppet product itself. The minimal set, we need for
+      our purposes, is:
+      <itemizedlist>
+        <listitem>
+          <para>
+            <package>facter</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>hiera</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>puppet</package>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      Since we want to collaborate with another group of
+      Puppet developers, who have already chosen their
+      packages, we use the specific versions:
+      <table id="software-channels-puppet-rpms">
+        <title>Puppet channel RPM's</title>
+        <tgroup align="left" cols="3" colsep="1" rowsep="1">
+          <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
+          <thead valign="top">
+            <row>
+              <entry>Package</entry>
+              <entry>Summary</entry>
+              <entry>Provider</entry>
+            </row>
+          </thead>
+          <tbody valign="top">
+            <row>
+              <entry>facter-1.7.5-1.el6:1.x86_64</entry>
+              <entry>Ruby module for collecting simple facts
+              about a host operating system</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+            <row>
+              <entry>hiera-1.3.2-1.el6.noarch</entry>
+              <entry>A simple pluggable Hierarchical
+              Database</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+            <row>
+              <entry>puppet-3.4.3-1.el6.noarch</entry>
+              <entry>A network tool for managing many
+              disparate systems</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </para>
+
+    <para>
+      We obtain these packages from <ulink
+      url="http://yum.puppetlabs.com/el/6.5/products/">Index
+      of /el/6.5/products</ulink>. Since they need to be
+      placed on the Spacewalker server, we have to execute,
+      on the Spacewalk server:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-puppet-6u5-1_0</userinput>
+&sw1p; <userinput>cd /var/satellite/example-puppet-6u5-1_0</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/products/x86_64/facter-1.7.5-1.el6.x86_64.rpm</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/products/x86_64/hiera-1.3.2-1.el6.noarch.rpm</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/products/x86_64/puppet-3.4.3-1.el6.noarch.rpm</userinput>
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-puppet-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-puppet-6u5-1_0 -n example-puppet-6u5-1_0 -s example-puppet-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-puppet-6u5-1_0</userinput>
+example-puppet-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-6u5-1_0 -u example -p redhat -d example-puppet-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-puppet-6u5-1_0</userinput>
+facter 1.7.5 1.el6 x86_64
+hiera 1.3.2 1.el6 noarch
+puppet 3.4.3 1.el6 noarch
+</screen>
+    </para>
+
+  </section>
+
+  <section id="software-channels-deps">
+    <title>Construction of puppet dependencies channel</title>
+
+    <para>
+      In the <emphasis role="bold">Puppet Dependencies
+      channel</emphasis>, we place the RPM's, needed to
+      support the Puppet product itself. The minimal set, we
+      need for our purposes, is:
+      <itemizedlist>
+        <listitem>
+          <para>
+            <package>ruby-augeas</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>rubygem-json</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>ruby-rgen</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>ruby-shadow</package>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      Since we want to collaborate with another group of
+      Puppet developers, who have already chosen their
+      packages, we use the specific versions:
+      <table id="software-channels-deps-rpms">
+        <title>Puppet channel RPM's</title>
+        <tgroup align="left" cols="3" colsep="1" rowsep="1">
+          <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
+          <thead valign="top">
+            <row>
+              <entry>Package</entry>
+              <entry>Summary</entry>
+              <entry>Provider</entry>
+            </row>
+          </thead>
+          <tbody valign="top">
+            <row>
+              <entry>ruby-augeas-0.4.1-3.el6.x86_64</entry>
+              <entry>Ruby bindings for Augeas</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+            <row>
+              <entry>rubygem-json-1.5.5-1.el6.x86_64</entry>
+              <entry>A JSON implementation in Ruby</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+            <row>
+              <entry>ruby-rgen-0.6.5-2.el6.noarch</entry>
+              <entry>Ruby Modeling and Generator Framework</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+            <row>
+              <entry>ruby-shadow-2.2.0-2.el6:1.x86_64</entry>
+              <entry>Ruby bindings for shadow password
+              access</entry>
+              <entry>Puppet Labs</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </para>
+
+    <para>
+      We obtain these packages from <ulink
+      url="http://yum.puppetlabs.com/el/6.5/dependencies/">Index
+      of /el/6.5/dependencies</ulink>. Since they need to be
+      placed on the Spacewalker server, we have to execute,
+      on the Spacewalk server:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-puppet-deps-6u5-1_0</userinput>
+&sw1p; <userinput>cd /var/satellite/example-puppet-deps-6u5-1_0</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/ruby-augeas-0.4.1-3.el6.x86_64.rpm</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/rubygem-json-1.5.5-1.el6.x86_64.rpm</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/ruby-rgen-0.6.5-2.el6.noarch.rpm</userinput>
+&sw1p; <userinput>wget http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/ruby-shadow-2.2.0-2.el6.x86_64.rpm</userinput>
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-puppet-deps-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-puppet-deps-6u5-1_0 -n example-puppet-deps-6u5-1_0 -s example-puppet-deps-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-puppet-deps-6u5-1_0</userinput>
+example-puppet-deps-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-deps-6u5-1_0 -u example -p redhat -d example-puppet-deps-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-puppet-deps-6u5-1_0</userinput>
+ruby-augeas 0.4.1 3.el6 x86_64
+rubygem-json 1.5.5 1.el6 x86_64
+ruby-rgen 0.6.5 2.el6 noarch
+ruby-shadow 2.2.0 2.el6 x86_64
+</screen>
+    </para>
+
+  </section>
+
+  <section id="software-channels-conf">
+    <title>Construction of puppet configuration channel</title>
+
+    <para>
+    </para>
+
+  </section>
+
+</section>

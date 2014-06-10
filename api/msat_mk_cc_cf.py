@@ -291,7 +291,7 @@ if type == 'file':
   path_info['macro-start-delimiter'] = options.configpath_startdelimiter
   path_info['macro-end-delimiter']   = options.configpath_enddelimiter
 
-if options.satellite_version == '5.5':
+if options.satellite_version in ['5.5', '5.6']:
   if type == 'file':
     path_info['contents']       = base64.standard_b64encode(content)
     path_info['contents_enc64'] = True
@@ -301,7 +301,7 @@ else:
   if type == 'file':
     path_info['contents'] = xmlrpclib.Binary(content)
 
-if options.satellite_version in ['5.4', '5.5']:
+if options.satellite_version in ['5.4', '5.5', '5.6']:
   if options.configpath_context:
     path_info['selinux_ctx'] = options.configpath_context
 

@@ -23,7 +23,7 @@
       <tbody valign="top">
         <row>
           <entry>
-            Fedora 18 download
+            Fedora 20 download
           </entry>
            <entry>
             76 minutes
@@ -34,29 +34,29 @@
   </table>
   <para>
     On the host system, make a location where the downloaded ISO can be stored: 
-    <screen>
-&srvprompt; <userinput>mkdir /var/isos</userinput>
-    </screen>
+<screen>
+&hostp; <userinput>mkdir /var/lib/libvirt/isos</userinput>
+</screen>
     <itemizedlist>
       <listitem>
         <para>
-          Download the Fedora 18 DVD, see <ulink
-          url="http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso">Download
-          Fedora 18</ulink> and store it in <filename
-          class="directory">/var/isos</filename>.
-          <screen>
-&sw1p; <userinput>cd /var/isos</userinput>
-&sw1p; <userinput>wget http://download.fedoraproject.org/pub/fedora/linux/releases/18/Fedora/x86_64/iso/Fedora-18-x86_64-DVD.iso</userinput>
-          </screen>
+          Download the Fedora 20 DVD, see <ulink
+          url="http://download.fedoraproject.org/pub/fedora/linux/releases/20/Fedora/x86_64/iso/Fedora-20-x86_64-DVD.iso">Download
+          Fedora 20</ulink> and store it in <filename
+          class="directory">/var/lib/libvirt/isos</filename>.
+<screen>
+&sw1p; <userinput>cd /var/lib/libvirt/isos</userinput>
+&sw1p; <userinput>wget http://download.fedoraproject.org/pub/fedora/linux/releases/20/Fedora/x86_64/iso/Fedora-20-x86_64-DVD.iso</userinput>
+</screen>
         </para>
       </listitem>
     </itemizedlist>
     After the download, our <filename
-    class="directory">/var/isos</filename> is: 
-    <screen>
-&srvprompt; <userinput>ls -l /var/isos | grep Fedora-18</userinput>
--rw-------. 1 qemu qemu 4573888512 Jan 15 20:30 Fedora-18-x86_64-DVD.iso
-    </screen>
+    class="directory">/var/lib/libvirt/isos</filename> is: 
+<screen>
+&hostp; <userinput>ls -l /var/lib/libvirt/isos | grep Fedora-20</userinput>
+-rw-------. 1 qemu qemu 4603248640 Jan 23 14:33 Fedora-20-x86_64-DVD.iso
+</screen>
   </para>
 </section>
 
