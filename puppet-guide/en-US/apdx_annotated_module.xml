@@ -7,6 +7,9 @@
   <title>Appendix annotated Puppet module</title>
 
   <para>
+    In this appendix we show the annotaded LDAP module in
+    order to make clear how we use the Puppet language to
+    construct a Puppet module.
   </para>
 
   <xi:include href="apdx_annotated_module/ldap.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

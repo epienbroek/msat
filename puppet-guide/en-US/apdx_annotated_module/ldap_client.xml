@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_annotated_module-ldap-client">
+  <title>The ldap::client class</title>
+
+  <para>
+    The ldap::client construction class implements all the
+    details needed for an LDAP client. This means:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Packages (RPM's) to be installed needed to
+          connect to the LDAP server.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Configuration files specifying the information
+          how to use and connect to the LDAP server.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Pulling in helper classes needed for the LDAP
+          client.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    The set of parameters must be verified in the params
+    class as deep as possible. All illegal values should
+    be detected here, as far as possible. This makes the
+    job of system integrators easier; the module fails as
+    soon as possible and no lengthy troubleshooting
+    afterwards is necessary.
+  </para>
+
+  <para>
+    The anatomy of a client construction class is:
+<screen>
+# == Class: &lt;module&gt;::client
+#
+# This construction class installs and configures the &lt;explanation&gt;
+#
+# === Dependencies
+#
+# stdlib
+# &lt;module&gt;::install
+#
+# === Parameters
+#
+# All parameters used as an configuration interface are
+# placed in the &lt;module&gt;::params class.
+#
+# === Variables
+#
+# === Examples
+#
+# In YAML file:
+# &lt;module&gt;::params::&lt;base64 param1&gt;: |
+#  .
+#  .
+#  k7IJPVN+jDH9heNcZQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqG
+#  SIb3DQEBBQUAA4IBAQCXOuSeEkKDZ178T5DVxqmuotbmFW5I+lQhA7Y5dgpy4MwA
+#  .
+#  .
+# &lt;module&gt;::params::&lt;param2&gt;: "string value"
+# &lt;module&gt;::params::&lt;param3&gt;:
+#  - "string array element 1"
+#
+# In puppet code:
+# include &lt;module&gt;::client
+#
+# Or in site.pp:
+# hiera_include('classes')
+# and (for this case) in YAML:
+# classes:
+#  - &lt;module&gt;::client
+#
+# === Authors
+#
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+#
+# === Copyright
+#
+# Copyright 2014 Allard Berends
+#
+# === Bugs
+#
+class &lt;module&gt;::client inherits &lt;module&gt;::params {
+  include stdlib
+  require &lt;module&gt;::&lt;helper class&gt;
+
+  &lt; code to configure config files &gt;
+
+} # end &lt;module&gt;::client
+</screen>
+  </para>
+
+  <para>
+    Let us first examine an excerpt of a construction class,
+    in this particular case called
+    <emphasis>ldap::client</emphasis>.
+<screen>
+# == Class: ldap::client
+#
+# This construction class installs and configures the LDAP
+# client function.
+#
+# Supported OSses and versions:
+# * CentOS
+#   * 5
+#   * 6
+# * RHEL
+#   * 5
+#   * 6
+#
+# === Dependencies
+#
+# stdlib
+# ldap::install
+#
+# === Parameters
+#
+# All parameters used as an configuration interface are
+# placed in the ldap::params class.
+#
+# === Variables
+#
+# === Examples
+#
+# In YAML file:
+# ldap::params::cacert_value: |
+#  .
+#  .
+#  k7IJPVN+jDH9heNcZQIDAQABoxYwFDASBgNVHRMBAf8ECDAGAQH/AgEAMA0GCSqG
+#  SIb3DQEBBQUAA4IBAQCXOuSeEkKDZ178T5DVxqmuotbmFW5I+lQhA7Y5dgpy4MwA
+#  .
+#  .
+# ldap::params::ldap_domain: "dmsat1.org"
+# ldap::params::servers:
+#  - "ds.dmsat1.org"
+#
+# In puppet code:
+# include ldap::client
+#
+# Or in site.pp:
+# hiera_include('classes')
+# and (for this case) in YAML:
+# classes:
+#  - ldap::client
+#
+# === Authors
+#
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+#
+# === Copyright
+#
+# Copyright 2014 Allard Berends
+#
+# === Bugs
+#
+# We set nsswitch.conf in this module explicitly. Instead,
+# it must be configurable. It is up to the node how to
+# configure nsswitch.conf, not to the ldap client. The ldap
+# client should only demand that for a specific set of name
+# databases (e.g. passwd, shadow, and group), ldap is used.
+# Now, we dictate the whole file, which is wrong.
+class ldap::client inherits ldap::params {
+  include stdlib
+  require ldap::install
+
+  file {'/etc/openldap/ldap.conf': <co id="apdx_annotated_module-ldap-client-co_ldap_conf" linkends="apdx_annotated_module-ldap-client-ldap_conf" />
+    ensure    => file,
+    owner     => 'root',
+    group     => 'root',
+    mode      => '0644',
+    content   => template('ldap/openldap.erb'), <co id="apdx_annotated_module-ldap-client-co_openldap_erb" linkends="apdx_annotated_module-ldap-client-openldap_erb" />
+  }
+
+  file {'/etc/nsswitch.conf': <co id="apdx_annotated_module-ldap-client-co_nsswitch_conf" linkends="apdx_annotated_module-ldap-client-nsswitch_conf" />
+    ensure    => file,
+    owner     => 'root',
+    group     => 'root',
+    mode      => '0644',
+    source    => "puppet:///modules/ldap/nsswitch.${::operatingsystemmajrelease}" <co id="apdx_annotated_module-ldap-client-co_operatingsystemmajrelease" linkends="apdx_annotated_module-ldap-client-operatingsystemmajrelease" />
+  }
+
+} # end ldap::client
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-client-co_ldap_conf" id="apdx_annotated_module-ldap-client-ldap_conf">
+      <para>
+        Example of a Puppet <emphasis>file</emphasis>
+        resource. The file is implemented by using a Ruby
+        template.
+      </para>
+    </callout>
+    <callout arearefs="apdx_annotated_module-ldap-client-co_openldap_erb" id="apdx_annotated_module-ldap-client-openldap_erb">
+      <para>
+        The Ruby template is obtained from the <filename
+        class="directory">ldap/templates</filename>
+        subdirectory, relative to one of the directories
+        where Puppet searches for its modules, see <xref
+        linkend="puppet_configuration-puppet_conf" />. In
+        this particular case the prefix directory is
+        <filename
+        class="directory">/etc/puppet/modules</filename>.
+        The Ruby template is discussed below.
+      </para>
+    </callout>
+    <callout arearefs="apdx_annotated_module-ldap-client-co_nsswitch_conf" id="apdx_annotated_module-ldap-client-nsswitch_conf">
+      <para>
+        Example of a Puppet <emphasis>file</emphasis>
+        resource. The file is implemented by using a static
+        file, coming from the <filename
+        class="directory">ldap/files</filename>
+        subdirectory, relative to one of the directories
+        where Puppet searches for its modules, see <xref
+        linkend="puppet_configuration-puppet_conf" />. In
+        this particular case the prefix directory is
+        <filename
+        class="directory">/etc/puppet/modules</filename>.
+        The static file is discussed below.
+      </para>
+    </callout>
+    <callout arearefs="apdx_annotated_module-ldap-client-co_operatingsystemmajrelease" id="apdx_annotated_module-ldap-client-operatingsystemmajrelease">
+      <para>
+        To specify the static config file, we use the
+        Puppet/Facter fact
+        <emphasis>${::operatingsystemmajrelease}</emphasis>.
+        The "::" means that it comes from the global
+        namespace in Puppet. All facts are placed in
+        Puppet's global namespace. The "::" ensures that the
+        variable name is not mixed up with a local variable
+        <emphasis>$operatingsystemmajrelease</emphasis>.  Of
+        course, it is very unwise to define such a variable
+        name!
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+    As promised we show the
+    <filename>openldap.erb</filename> Ruby template and the
+    <filename>nsswitch.6</filename> static config file here.
+  </para>
+
+  <para>
+    The parts between <code>&lt;%</code> and
+    <code>%&gt;</code>, possibly with '=' or '-' signs, are
+    Ruby code.
+<screen>
+&t1p; <userinput>cat /etc/puppet/modules/ldap/templates/openldap.erb</userinput>
+# AB: note, this file is only used by openldap clients, not
+# by the mozldap-tools clients. The first set of tools is
+# preferred on RHEL 6 and the latter set of tools is
+# preferred on RHEL 5. We checked the source code of mozldap
+# and mozldap-tools to verify if ldap.conf is referred. It
+# is not!
+
+#
+# LDAP Defaults
+#
+
+# See ldap.conf(5) for details
+# This file should be world readable but not world writable.
+
+#BASE dc=example, dc=com
+&lt;%
+a = @ldap_domain.split('.') <co id="apdx_annotated_module-ldap-client-co_ruby" linkends="apdx_annotated_module-ldap-client-ruby" />
+a.each_with_index { |x, i|
+  a[i] = "dc=#{x}"
+} # end of each
+-%&gt;
+BASE &lt;%= a.join(',') %&gt;
+#URI ldap://ldap.example.com ldap://ldap-master.example.com:666
+&lt;%
+list = @servers.map{|x| "ldap://#{x}/"}.join(' ')
+-%&gt;
+URI &lt;%= list %&gt;
+
+#SIZELIMIT 12
+#TIMELIMIT 15
+#DEREF never
+
+&lt;% if @cacert_dir != '/etc/openldap/certs' -%&gt;
+#TLS_CACERTDIR   /etc/openldap/certs
+TLS_CACERTDIR &lt;%= @cacert_dir %&gt;
+&lt;% else                                    -%&gt;
+TLS_CACERTDIR   /etc/openldap/certs
+&lt;% end                                     -%&gt;
+
+&lt;%
+if @encrypted == 'yes'
+if @servers.length &gt; 1
+# AB: client connections want encyrption, but since we
+# have more than one LDAP server, we are configuring the
+# client on an LDAP server itself, or on an LVS server.
+# Since, the certificate will never correspond with the
+# actual hostname in a LVS setup, we allow obtaining of
+# a certificate, but we do not really check it.
+tls_reqcert_level = 'allow'
+else
+tls_reqcert_level = 'demand'
+end -%&gt;
+TLS_REQCERT &lt;%= tls_reqcert_level %&gt;
+&lt;% end -%&gt;
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-client-co_ruby" id="apdx_annotated_module-ldap-client-ruby">
+      <para>
+        Example of dereferencing a Puppet variable. Inside
+        the Puppet code, it is known as
+        <emphasis>$ldap_domain</emphasis>. Inside a Ruby
+        template, it is known as
+        <emphasis>@ldap_domain</emphasis> and in a YAML
+        file, the key is set with
+        <emphasis>ldap::params::ldap_domain</emphasis>.
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+    The <filename>/etc/nsswitch.conf</filename> file below,
+    is an adapted version from the default. Some entries now
+    use LDAP to lookup names.
+<screen>
+&t1p; <userinput>cat /etc/puppet/modules/ldap/files/nsswitch.6</userinput>
+#
+# /etc/nsswitch.conf
+#
+# An example Name Service Switch config file. This file should be
+# sorted with the most-used services at the beginning.
+#
+# The entry '[NOTFOUND=return]' means that the search for an
+# entry should stop if the search in the previous entry turned
+# up nothing. Note that if the search failed due to some other reason
+# (like no NIS server responding) then the search continues with the
+# next entry.
+#
+# Legal entries are:
+#
+#       nisplus or nis+         Use NIS+ (NIS version 3)
+#       nis or yp               Use NIS (NIS version 2), also called YP
+#       dns                     Use DNS (Domain Name Service)
+#       files                   Use the local files
+#       db                      Use the local database (.db) files
+#       compat                  Use NIS on compat mode
+#       hesiod                  Use Hesiod for user lookups
+#       [NOTFOUND=return]       Stop searching if not found so far
+#
+
+# To use db, put the "db" in front of "files" for entries you want to be
+# looked up first in the databases
+#
+# Example:
+#passwd:    db files nisplus nis
+#shadow:    db files nisplus nis
+#group:     db files nisplus nis
+
+#passwd:     files
+passwd:     files ldap
+#shadow:     files
+shadow:     files ldap
+#group:      files
+group:      files ldap
+
+#hosts:     db files nis dns #ldap nis dns
+hosts:      files dns
+
+# Example - obey only what nisplus tells us...
+#services:   nisplus [NOTFOUND=return] files
+#networks:   nisplus [NOTFOUND=return] files
+#protocols:  nisplus [NOTFOUND=return] files
+#rpc:        nisplus [NOTFOUND=return] files
+#ethers:     nisplus [NOTFOUND=return] files
+#netmasks:   nisplus [NOTFOUND=return] files
+
+bootparams: nisplus [NOTFOUND=return] files
+
+ethers:     files
+netmasks:   files
+networks:   files
+#protocols:  files
+protocols:  files ldap
+rpc:        files
+#services:   files
+services:   files
+
+#netgroup:   nisplus
+netgroup:   files ldap
+
+#publickey:  nisplus
+publickey:  files
+
+#automount:  files nisplus
+automount:  files ldap
+#aliases:    files nisplus
+aliases:    files
+</screen>
+  </para>
+</section>

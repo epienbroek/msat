@@ -1,0 +1,508 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_annotated_module-ldap-params">
+  <title>The params class</title>
+
+  <para>
+    The params class describes all the module parameters and
+    derived variables. Both can be used in other classes of
+    the module. It is important to describe them fully so
+    that others can use this module as a construction block
+    for other modules or as an implementation on a target
+    node.
+  </para>
+
+  <para>
+    The set of parameters must be verified in the params
+    class as deep as possible. All illegal values should be
+    detected here, as far as possible. This makes the job of
+    system integrators easier; the module fails as soon as
+    possible and no lengthy troubleshooting afterwards is
+    necessary.
+  </para>
+
+  <para>
+    The anatomy of a params class is:
+<screen>
+# == Class: &lt;module&gt;::params
+#
+# This interface class ... &lt;explanation&gt;
+#
+# === Dependencies
+#
+# &lt;describe here on what the module depends&gt;
+#
+# === Parameters
+#
+# *&lt;name&gt;*
+#   Default: &lt;default value&gt; or None.
+#   Type:    &lt;'client' or 'server' or both&gt;
+#
+#   &lt;description of the parameter&gt;
+# *&lt;name&gt;*
+# .
+# .
+#
+# === Variables
+#
+# *&lt;name&gt;*
+#
+#   &lt;description of the parameter&gt;
+# *&lt;name&gt;*
+# .
+# .
+# 
+# === Examples
+#
+# &lt;if applicable give specific parameter examples&gt;
+#  
+# === Authors
+# 
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+# &lt;other authors with (initials)&gt;
+# 
+# === History
+#
+# &lt;describe changes&gt;
+#
+# === Copyright
+# 
+# Copyright 2014 Allard Berends
+#
+# === Bugs
+#
+# &lt;describe caveats or shortcomings&gt;
+#
+class &lt;module&gt;::params (
+  $&lt;param1&gt; = &lt;default value&gt;,
+  $&lt;param2&gt; = &lt;default value&gt;,
+  $&lt;param3&gt;,
+  .
+  .
+) {
+  # AB: code here must have not side effects. Only setting
+  # of variables is allowed!
+
+  &lt;code to validate all parameters&gt;
+
+  &lt;code to derive or calculate variables from parameters&gt;
+
+} # end &lt;module&gt;::params
+</screen>
+  </para>
+
+  <para>
+    Let us first examine an excerpt of an interface class,
+    in this particular case called
+    <emphasis>ldap::params</emphasis>. Note, many parts of
+    the code are skipped. For a complete working example,
+    refer to <xref
+    linkend="puppet-guide-ref_material-puppet-baseinfra" />.
+<screen>
+# == Class: ldap::params
+#
+# This interface class provides the configuration interface
+# of the ldap module. All other classes in the ldap module
+# inherit these class parameters.
+#
+# The default values of the parameters can be overridden in
+# YAML files. All the parameters are validated in this
+# class.
+#
+# === Dependencies
+#
+# In case of provisioning the LDAP server, the functioning
+# of the ldap module depends on configuration of the
+# Spacewalk/Satellite server software channels. See the
+# rhn_channel parameter.
+#
+# === Parameters
+#
+# *cacert_dir* <co id="apdx_annotated_module-ldap-co_cacert_dir" linkends="apdx_annotated_module-ldap-cacert_dir" />
+#   Default: '/etc/openldap/cacerts'
+#   Type:    'client'
+#
+#   Directory where the LDAP client tools check the CA
+#   certificates.
+# *cacert_value* <co id="apdx_annotated_module-ldap-co_cacert_value" linkends="apdx_annotated_module-ldap-cacert_value" />
+#   Default: '' (empty string)
+#   Type:    'client'
+#
+#   The base64 encoded value of the X.509v3 certificate of
+#   the CA (Certificate Authority) in this depzone. This
+#   parameter must be provided from a YAML file. It has no
+#   default value.
+# *iptables_lines* <co id="apdx_annotated_module-ldap-co_iptables_lines" linkends="apdx_annotated_module-ldap-iptables_lines" />
+#   Default: [
+#     {
+#       'protocol' =&gt; 'tcp',
+#       'dport'    =&gt; 389,
+#       'comment'  =&gt; 'LDAP',
+#     },
+#     {
+#       'protocol' =&gt; 'tcp',
+#       'dport'    =&gt; 636,
+#       'comment'  =&gt; 'LDAPS',
+#     },
+#     {
+#       'protocol' =&gt; 'tcp',
+#       'dport'    =&gt; 9830,
+#       'comment'  =&gt; 'RHDS admin',
+#     },
+#   ]
+#   Type:    'client'
+#
+#  The TCP ports to be opened in the host's firewall to
+#  support LDAP, LDAP over SSL (LDAPS), strictly spoken TLS,
+#  and the admin console.
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-co_cacert_dir" id="apdx_annotated_module-ldap-cacert_dir">
+      <para>
+        Example of a class parameter of type string, with a
+        default value of <filename
+        class="directory">/etc/openldap/cacerts</filename>.
+        The type in the comment means that this parameter
+        belongs to the ldap::client class, as opposed to the
+        ldap::server class. Since the parameter has a
+        default value, it does not need to be set in a YAML
+        file. A developer of a Puppet module must always
+        indicate what the idea is of a module parameter and
+        how a system integrator should view it. So, in this
+        case, a system integrator should leave this value
+        alone, unless he has a very good reason to change
+        its value. In this particular example, this
+        directory is the location where the CA (Certificate
+        Authority) certificates are kept.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_cacert_value" id="apdx_annotated_module-ldap-cacert_value">
+      <para>
+        Example of a class parameter of type string, with an
+        empty string as the default value. Note that this
+        means that the parameter has an actual value. If we
+        wanted it to be a <emphasis role="strong">required
+        YAML parameter</emphasis>, then the comment states:
+        "Default: None". An empty string means that it
+        depends on how the other module parameters are set.
+        In this particular case, a CA certificate is only
+        needed if the ldap clients must use SSL encrypted
+        connections.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_iptables_lines" id="apdx_annotated_module-ldap-iptables_lines">
+      <para>
+        Example of a class parameter of type array with a
+        default value. It is of type 'server', since it is
+        used in the ldap::server class. The system
+        integrator should only change this parameter if
+        there is a very good reason to do so.
+      </para>
+    </callout>
+
+  </calloutlist>
+
+  <para>
+<screen>
+# *ldap_domain* <co id="apdx_annotated_module-ldap-co_ldap_domain" linkends="apdx_annotated_module-ldap-ldap_domain" />
+#   Default: None
+#   Type:    'client' and 'server'
+#
+#   The LDAP domain used by the clients and server. In the
+#   sever, the backend database uses the LDAP domain as a
+#   suffix. For example: dc=example,dc=com
+# *servers* <co id="apdx_annotated_module-ldap-co_servers" linkends="apdx_annotated_module-ldap-servers" />
+#   Default: None
+#   Type:    'client' and 'server'
+#
+#   Array of hashes with information about ldap servers. For
+#   most client systems, this is an array with one element.
+#   If this array contains 2 or more elements, then these
+#   elements are used to setup multiple LDAP servers in the
+#   client configuration files on LDAP server nodes.  Yes,
+#   if we configure an LDAP server, we always install the
+#   ldap::client code, since an LDAP server must be an LDAP
+#   client too! If MMR (MultiMaster Replication) is used,
+#   this parameter is used indirectly in the server code,
+#   via the mmr template file.
+# *type* <co id="apdx_annotated_module-ldap-co_type" linkends="apdx_annotated_module-ldap-type" />
+#   Default: 'client'
+#   Type:    'client' and 'server'
+#
+#   The LDAP type of the target system. Only for the LDAP
+#   servers, it needs to be set to 'server' in a YAML file.
+# *want_ldap* <co id="apdx_annotated_module-ldap-co_want_ldap" linkends="apdx_annotated_module-ldap-want_ldap" />
+#   Default: 'yes'
+#   Type:    'client'
+#
+#   Configuration option to switch off the LDAP client
+#   function. This parameter is handy, if one wants to test
+#   a target node withoud the LDAP client installed.
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-co_ldap_domain" id="apdx_annotated_module-ldap-ldap_domain">
+      <para>
+        Example of a class parameter of type string that
+        must be provided in a YAML file. By declaring in the
+        code as <code>$ldapdomain</code> without an equal
+        sign (=), we tell Puppet during the compilation of
+        the module, that it must look up this parameter in a
+        YAML file.  Failing to provide it, results in an
+        immediate compilation error. This is exactly what we
+        want, since it is an error not to provide the LDAP
+        domain. The type is set to 'client' and 'server',
+        indicating that both the ldap::client and
+        ldap::server class need this parameter. Apparently,
+        it must have the same value for both the clients as
+        the server.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_servers" id="apdx_annotated_module-ldap-servers">
+      <para>
+        Example of a class parameter of type array that is
+        used by both the ldap::client and ldap::server code.
+        It must be filled in in the YAML files. For the LDAP
+        server itself, it may be necesarry to overwrite this
+        parameter at a higher level, say in the depzone
+        platform instance layer, see <xref
+        linkend="puppet_configuration-layers" />. In a
+        multimaster replication setup with a LVS load
+        balancer front, the LVS nodes and LDAP nodes may
+        need a specific client setup to make LDAP over SSL
+        work.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_type" id="apdx_annotated_module-ldap-type">
+      <para>
+        Example of a class parameter of type string with a
+        default value that is correct for all the
+        ldap::client target nodes, except for the LDAP
+        server nodes. For the LDAP server nodes, at the node
+        layer, see <xref
+        linkend="puppet_configuration-layers" />, the type
+        must be set to 'server'.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_want_ldap" id="apdx_annotated_module-ldap-want_ldap">
+      <para>
+        Example of a class parameter of type string that can
+        only have two values: 'yes' or 'no'. This class
+        parameter is special in the sense that it gives the
+        developer the option to switch off the LDAP client
+        code. This may be handy for experimenting with the
+        code.
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+<screen>
+#
+# === Variables
+#
+# *cacert_file* <co id="apdx_annotated_module-ldap-co_cacert_file" linkends="apdx_annotated_module-ldap-cacert_file" />
+#   File my-ca.crt in $cacert_dir.
+#   File containing the X.509v3 certificate of the LDAP
+#   server in this depzone.
+# 
+# === Examples
+#  
+# === Authors
+# 
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+# 
+# === History
+#
+# === Copyright
+# 
+# Copyright 2014 Allard Berends
+#
+# === Bugs
+#
+# We use the parameters server_admin and server_admin_pwd
+# for both the ConfigDirectoryAdminID, ServerAdminID and
+# ConfigDirectoryAdminPwd, ServerAdminPwd. So, it is either
+# misnamed or we should have different parameter sets for
+# both accounts.
+#
+# The server port, 389, parameter is not parameterized,
+# although we give the suggestion by allowing the filter and
+# nat rules to be changed. The same reasoning goes for the
+# SSL port 636 and the admin port 9830.
+#
+# The naming of this module is wrong. It suggests that we
+# are general, but we are not. We implement the 389
+# Directory Server project, which is the upstream project of
+# the RHDS (Red Hat Directory Server), and the RHDS.
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-co_cacert_file" id="apdx_annotated_module-ldap-cacert_file">
+    <para>
+      Example of a class variable. Its calculation is based,
+      in this case, on a class parameter.  Variables used in
+      multiple module classes or in module templates should
+      be declared in the params class.
+    </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+    In the part below, the real code starts. Note that
+    between parentheses the class parameters are declared.
+    If a parameter is not filled in, i.e. it has no default
+    value (so no '=' sign), and via the Hiera key lookup
+    mechanism, no YAML key is found with the exact same
+    name, e.g.
+    <emphasis>ldap::params::ldap_domain</emphasis>, the
+    Puppet compiler fails. This behavior is used to detect
+    quickly that a configuration error has been made. The
+    error is that no parameter is given in the YAML file!
+<screen>
+class ldap::params (
+  $cacert_dir          = "/etc/openldap/cacerts",
+  $cacert_value        = '',
+  $iptables_lines      = [
+    {
+      'protocol' =&gt; 'tcp',
+      'dport'    =&gt; 389,
+      'comment'  =&gt; 'LDAP',
+    },
+    {
+      'protocol' =&gt; 'tcp',
+      'dport'    =&gt; 636,
+      'comment'  =&gt; 'LDAPS',
+    },
+    {
+      'protocol' =&gt; 'tcp',
+      'dport'    =&gt; 9830,
+      'comment'  =&gt; 'RHDS admin',
+    },
+  ],
+  $ldap_domain,
+  $servers,
+  $type                = 'client',
+  $want_ldap           = 'yes',
+) {
+  # AB: code here must have not side effects. Only setting
+  # of variables is allowed!
+
+  include stdlib
+
+  # AB: validate class parameters.
+  case $::puppetversion {
+    /^3\.[6789].*/: {
+      fail("Puppet version ${::puppetversion} not yet implemented.")
+    } # puppet &gt;= 3.6 and &lt; 4.0
+
+    /^3\.[012345].*/: {
+      validate_string($ldap_domain) <co id="apdx_annotated_module-ldap-co_validate_string" linkends="apdx_annotated_module-ldap-validate_string" />
+      if size($ldap_domain) == 0 { <co id="apdx_annotated_module-ldap-co_validate_size" linkends="apdx_annotated_module-ldap-validate_size" />
+        fail("${title}::\$ldap_domain not set") <co id="apdx_annotated_module-ldap-co_fail" linkends="apdx_annotated_module-ldap-fail" />
+      }
+      validate_array($servers)
+      if size($servers) == 0 {
+        fail("${title}::\$servers not set")
+      }
+      if size($servers[0]) == 0 {
+        fail("${title}::\$servers first element not set")
+      }
+      validate_string($type)
+      unless "$type" in ['client', 'server'] {
+        fail("${title}::\$type not set")
+      }
+      validate_string($want_ldap)
+      unless "$want_ldap" in ['yes', 'no'] {
+        fail("${title}::\$want_ldap must be yes or no")
+      }
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-co_validate_string" id="apdx_annotated_module-ldap-validate_string">
+      <para>
+        With the <function>validate_string</function>
+        function of the <emphasis>stdlib</emphasis> module,
+        one can check if the class parameter is indeed a
+        string.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_validate_size" id="apdx_annotated_module-ldap-validate_size">
+      <para>
+        With the <function>size</function> function, one can
+        calculate the size of a string or array. In this
+        case the length of the string is calculated.  It
+        must not be an empty string, hence we enforce a
+        value &gt; 0.
+      </para>
+    </callout>
+
+    <callout arearefs="apdx_annotated_module-ldap-co_fail" id="apdx_annotated_module-ldap-fail">
+      <para>
+        With the <function>fail</function> function, the
+        Puppet execution stops with the failure message.
+        Since we know, in this case, that the input
+        parameter is wrong, we fail immediately.
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+<screen>
+      # AB: server specific parameter check.
+      if $type == 'server' {
+        validate_array($iptables_lines)
+        if size($iptables_lines) == 0 {
+          fail("${title}::\$iptables_lines not set")
+        }
+      } # type server
+    } # puppet &gt;= 3.0 and &lt; 3.6
+
+    default: {
+      fail("Puppet version ${::puppetversion} not supported.")
+    } # unsupported puppet versions
+  } # case
+
+  # AB: calculated variables
+  $cacert_file = "$cacert_dir/my-ca.crt"
+
+  case $::operatingsystemmajrelease { <co id="apdx_annotated_module-ldap-co_case" linkends="apdx_annotated_module-ldap-case" />
+    # AB: if this list is adapted, the blacklist in support6
+    # must be adapted too!
+    '6': {
+      $client_packages = ['openldap-clients', 'nss-pam-ldapd', 'nscd']
+    }
+
+    default: {
+      fail("Module ${module_name} is not supported on RHEL ${::operatingsystemmajrelease}")
+    }
+  }
+} # end ldap::params
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="apdx_annotated_module-ldap-co_case" id="apdx_annotated_module-ldap-case">
+    <para>
+      With the <emphasis>case</emphasis> statement, one can
+      build nice checks base on a fact, like the OS major
+      release. Depending on its value, one can execute a
+      specific branch of code in the case statement.
+    </para>
+    </callout>
+  </calloutlist>
+</section>
