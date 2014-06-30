@@ -1,0 +1,335 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_configuration-layers">
+  <title>Puppet/Hiera parameter layers setup</title>
+
+  <para>
+    Before we show how the
+    <filename>/etc/hiera.yaml</filename> file is configured
+    we explain the layers we use to configure parameters. To
+    determine in what layer parameters go, it is important
+    to understand the following table.
+  </para>
+
+  <table id="puppet_configuration-layers-table">
+    <title>Puppet/Hiera parameter layers</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>layer</entry>
+          <entry>comment</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>node</entry>
+          <entry>
+            In this layer, the node specific configuration
+            parameters are set. The
+            <emphasis>instance</emphasis>,
+            <emphasis>platform</emphasis> and
+            <emphasis>subzone</emphasis> parameters must
+            only be set in this layer. If set, the
+            <emphasis>platform</emphasis> parameter
+            determines to which platform a node belongs, or
+            even to which platform instance
+            (<emphasis>instance</emphasis> needs to be set).
+            The <emphasis>subzone</emphasis> can be set to
+            indicate that a specialized set of parameters is
+            needed for a sub zone of the Deployment zone
+            (depzone). Note that the combination depzone,
+            FQDN is unique, but FQDN itself not! The reason
+            is that some people want to name nodes equally
+            in different Deployment zones. For example, in
+            the Quality Assurance environment (say depzone
+            qamsat1, quality assurance meta Satellite 1),
+            the ldap node is named ldap.service.net and in
+            the Production environment (say depzone pmsat1,
+            production meta Satellite 1) it is also named
+            ldap.service.net.
+          </entry>
+        </row>
+        <row>
+          <entry>depzone platform instance</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific for the Deployment zone, the platform
+            type, and the specific platform instance.
+          </entry>
+        </row>
+        <row>
+          <entry>depzone platform</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific for the Deployment zone and the platform
+            type.
+          </entry>
+        </row>
+        <row>
+          <entry>depzone subzone</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific for a subzone in a Deployment zone. Why
+            do we need this layer? Say we have a Production
+            deployment zone, pmsat1, in which we can
+            provision all nodes via a Spacewalk server and
+            Puppet. If we have a generic LDAP service in
+            pmsat1 that contains a number of sensitive
+            entries that we don't want to be available in a
+            DMZ in pmsat1, then we can create a specific
+            LDAP service for the DMZ. The set of LDAP
+            parameters that apply to all nodes in the DMZ
+            can now be placed in the dmzpmsat1 sub zone of
+            the Deployment zone pmsat1. All nodes in the
+            subzone, just have to set, on the node layer,
+            <code>subzone: dmzpmsat1</code>.
+          </entry>
+        </row>
+        <row>
+          <entry>depzone</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific for a Deployment zone. Since Puppet
+            Facter cannot determine by itself in which
+            Deployment zone a node is installed, we set the
+            Deployment zone, (<emphasis>depzone</emphasis>),
+            explicitly during bare metal (or machine in case
+            of a virtual machine) deployment of a node. It
+            will show up as a Facter fact from the
+            <filename>/etc/profile.d/depzone.sh</filename>
+            bash source file. The environment variable is:
+            <parameter>FACTER_depzone="&lt;depzone&gt;"</parameter>.
+            How, during bare metal deployment, the <emphasis
+            role="strong">depzone</emphasis> fact comes to
+            life, is described in <xref
+            linkend="software-test-kp" />.
+          </entry>
+        </row>
+        <row>
+          <entry>platform instance</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific to the platform instance, irrespective
+            of the Deployment zone. In other words, the same
+            platform instance in different depzones receives
+            the same set of parameters from this layer. Of
+            course, the parameters can be overridden in a
+            higher layer, e.g. depzone platform instance.
+          </entry>
+        </row>
+        <row>
+          <entry>platform</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            specific to the platform type, irrespective of
+            the Deployment zone. In other words, the same
+            platform type in different depzones receives the
+            same set of parameters from this layer. Of
+            course, the parameters can be overridden in a
+            higher level, e.g. depzone platform.
+          </entry>
+        </row>
+        <row>
+          <entry>base</entry>
+          <entry>
+            In this layer, parameters are configured that are
+            not specific at all, but that are configured on
+            all target nodes in all depzones.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    The layers described above in the table, are searched
+    from top to bottom by the Hiera part of Puppet.
+    Essentially the <function>hiera(&lt;key&gt;)</function>
+    lookup function is used. To tell puppet to use the layer
+    model, we need to place it in
+    <filename>/etc/hiera.yaml</filename>. We show the key
+    lookup configuration here:
+<screen>
+&t1p; <userinput>facter depzone</userinput>
+dmsat1 <co id="puppet_configuration-layers-co_depzone" linkends="puppet_configuration-layers-depzone" />
+
+&t1p; <userinput>cat /etc/hiera.yaml</userinput>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/%{depzone}/hosts/%{fqdn} <co id="puppet_configuration-layers-co_fqdn" linkends="puppet_configuration-layers-fqdn" />
+  - depzones/%{depzone}/platforms/%{platform}/%{instance} <co id="puppet_configuration-layers-co_platform" linkends="puppet_configuration-layers-platform" /><co id="puppet_configuration-layers-co_instance" linkends="puppet_configuration-layers-instance" />
+  - depzones/%{depzone}/platforms/%{platform}
+  - depzones/%{depzone}/subzones/%{subzone} <co id="puppet_configuration-layers-co_subzone" linkends="puppet_configuration-layers-subzone" />
+  - depzones/%{depzone}
+  - platforms/%{platform}/%{instance}
+  - platforms/%{platform}
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="puppet_configuration-layers-co_depzone" id="puppet_configuration-layers-depzone">
+      <para>
+        Facter fills in the string "%{depzone}" with the
+        custom created fact. As can be seen, it expands to
+        "dmsat1".
+      </para>
+    </callout>
+    <callout arearefs="puppet_configuration-layers-co_fqdn" id="puppet_configuration-layers-fqdn">
+      <para>
+        Facter fills in the string "%{fqdn}" with the
+        built-in fact FQDN. It is the result of the
+        <command>hostname</command> command. For example:
+        ds1.dmsat1.org. The Puppet/Hiera lookup mechanism
+        expands the path
+        <filename>depzones/%{depzone}/hosts/%{fqdn}</filename>
+        with the Facter facts and appends the string ".yaml"
+        to it. The result is
+        <filename>depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</filename>.
+        Since, it is a relative path, it is prepended with
+        the configured datadir base, so with
+        <filename>/var/lib/hiera</filename>.
+      </para>
+
+      <para>
+        The node YAML file, which is
+        <filename>/var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</filename>,
+        is different from the other YAML files, since we can
+        set extra parameters in here that we use to expand
+        the other layers. In other words, the node YAML
+        file, may contain <emphasis>instance</emphasis>,
+        <emphasis>platform</emphasis> and
+        <emphasis>subzone</emphasis> keys. These keys are
+        used to resolve the lower layer parameters. For
+        example:
+<screen>
+&t1p; <userinput>grep -e ^instance -e ^platform -e ^subzone /var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</userinput>
+instance: 'test1'
+platform: 'test'
+subzone:  'dmz'
+</screen>
+      </para>
+    </callout>
+    <callout arearefs="puppet_configuration-layers-co_platform" id="puppet_configuration-layers-platform">
+      <para>
+        The string "%{platform}" is expanded by Puppet with
+        the value of the lookup key platform, which is set
+        in the node YAML file. Since its value is "test",
+        the path expands to
+        <filename>depzones/dmsat1/platforms/test/%{instance}</filename>.
+      </para>
+    </callout>
+    <callout arearefs="puppet_configuration-layers-co_instance" id="puppet_configuration-layers-instance">
+      <para>
+        The string "%{instance}" is expanded by Puppet with
+        the value of the lookup key instance, which is set
+        in the node YAML file. Since its value is "test1",
+        the path expands to
+        <filename>depzones/dmsat1/platforms/test/test1.yaml</filename>.
+      </para>
+    </callout>
+    <callout arearefs="puppet_configuration-layers-co_subzone" id="puppet_configuration-layers-subzone">
+      <para>
+        The string "%{subzone}" is expanded by Puppet with
+        the value of the lookup key subzone, which is set
+        in the node YAML file. Since its value is "dmz",
+        the path expands to
+        <filename>depzones/dmsat1/subzones/dmz.yaml</filename>.
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+    So, the actual view of the <systemitem
+    class="server">ds1.dmsat1.org</systemitem> machine in
+    the <emphasis>dmsat1</emphasis> depzone of the
+    <filename>/etc/hiera.yaml</filename> file is:
+<programlisting>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/dmsat1/hosts/ds1.dmsat1.org
+  - depzones/dmsat1/platforms/test/test1
+  - depzones/dmsat1/platforms/test
+  - depzones/dmsat1/subzones/dmz
+  - depzones/dmsat1
+  - platforms/test/test1
+  - platforms/test
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</programlisting>
+  </para>
+
+  <para>
+    What happens if we do not specify
+    <emphasis>platform</emphasis> in the node YAML file,
+    <filename>/var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</filename>?
+    We have tested it with a class called
+    <emphasis>test</emphasis> and concluded that all layers
+    with the %{platform} key in it, are skipped. So, if the
+    node YAML is:
+<screen>
+&t1p; <userinput>grep -e ^instance -e ^platform -e ^subzone /var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</userinput>
+instance: 'test1'
+subzone:  'dmz'
+</screen>
+    The view of <systemitem
+    class="server">ds1.dmsat1.org</systemitem> on
+    <filename>/etc/hiera.yaml</filename> is:
+<programlisting>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/dmsat1/hosts/ds1.dmsat1.org
+  - depzones/dmsat1/subzones/dmz
+  - depzones/dmsat1
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</programlisting>
+  </para>
+
+  <warning>
+    <title>Set platform if a platform instance is needed</title>
+
+    <para>
+      Fromt the test above, one can conclude that if
+      <emphasis>platform</emphasis> is not set, all the
+      parameters in the platform instance YAML file are lost
+      too! So, if one needs the parameters of a specific
+      platform instance, not only the
+      <emphasis>instance</emphasis> parameter must be set,
+      but also the <emphasis>platform</emphasis> parameter.
+      Both must be set in the node YAML file!
+    </para>
+  </warning>
+
+</section>
+

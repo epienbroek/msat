@@ -1,0 +1,345 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_construction-assert">
+  <title>Puppet assert class parameters</title>
+
+  <para>
+    In Puppet modules we construct classes to perform a
+    certain task, for example, configuring a Linux node as
+    an LDAP client. In the class we use
+    <emphasis>class parameters</emphasis> to specify certain
+    values, like the FQDN of the LDAP server. The puppet
+    class must fail to compile if we forget to specify the
+    class parameters. How do we make this work? In this
+    section we define the pattern to assert the class
+    parameters.
+  </para>
+
+  <para>
+    We explain how it works by an example. The class
+    parameters are looked up by Puppet in the hiera
+    hierarchy. So, we first give the hiera set of files,
+    from which Puppet can obtain the class parameters:
+<screen>
+&t1p; <userinput>cat /etc/hiera.yaml</userinput>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/%{depzone}/hosts/%{fqdn}
+  - depzones/%{depzone}
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</screen>
+  </para>
+
+  <para>
+    Note that, since we are on the system <systemitem
+    class="domainname">ds1.dmsat1.org</systemitem>, the
+    <emphasis>%{fqdn}</emphasis> expands to
+    <emphasis>ds1.dmsat1.org</emphasis>. The
+    <emphasis>%{depzone}</emphasis> key exapands to
+    <emphasis>dmsat1</emphasis> since we have created a
+    custrom depzone fact with:
+<screen>
+&t1p; <userinput>cat /etc/profile.d/depzone.sh</userinput>
+export FACTER_depzone="dmsat1"
+</screen>
+    We can show both facts on the command line with:
+<screen>
+&t1p; <userinput>facter depzone</userinput>
+dmsat1
+
+&t1p; <userinput>facter fqdn</userinput>
+ds1.dmsat1.org
+</screen>
+  </para>
+
+  <para>
+    Because the system knows the above facts, the
+    <filename>/etc/hiera.yaml</filename> is read as:
+<screen>
+&t1p; <userinput>cat /etc/hiera.yaml</userinput>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/dmsat1/hosts/ds1.dmsat1.org
+  - depzones/dmsat1
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</screen>
+  </para>
+
+  <para>
+    For testing purposes, we leave the first two YAML files
+    empty, but we put in <filename>base.yaml</filename>:
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+  - "b"
+validate_params::my_string: "a"
+</screen>
+  </para>
+
+  <para>
+    Now, the Puppet class in which we test the assertion of
+    the Puppet class parameters is:
+<programlisting>
+class validate_params (
+  $my_array, <co id="puppet_construction-assert-co_my_array" linkends="puppet_construction-assert-my_array" />
+  $my_string, <co id="puppet_construction-assert-co_my_string" linkends="puppet_construction-assert-my_string" />
+) {
+  if "${puppetversion}" =~ /^3\.[6789].*/ {
+    fail("Puppet version ${puppetversion} not yet implemented.")
+  } # if puppetversion >= 3.6
+  elsif "${puppetversion}" =~ /^3\.[012345].*/ {
+    validate_array($my_array)
+    if size($my_array) == 0 {
+      fail("${title}::\$my_array not set")
+    }
+    validate_string($my_array[0])
+    if size($my_array[0]) == 0 {
+      fail("${title}::\$my_array first element not set")
+    }
+    validate_string($my_string)
+    if size($my_string) == 0 {
+      fail("${title}::\$my_string not set")
+    }
+  }
+  else {
+    notify {"other version, ${puppetversion}":}
+  } # other puppet versions
+} # end validate_params
+
+include validate_params
+</programlisting>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="puppet_construction-assert-co_my_array" id="puppet_construction-assert-my_array">
+      <para>
+        <code>$my_array</code> must be set in the hiera
+        hierarchy. It must meat the following conditions:
+        <itemizedlist>
+          <listitem>
+            <para>
+              The variable <code>$my_array</code> must be of
+              type <emphasis>array</emphasis>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The array <code>$my_array</code> must have at
+              least one element.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The elements of <code>$my_array</code> must be
+              of type <emphasis>string</emphasis>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The array <code>$my_array</code> must have at
+              least a value in the first element.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_construction-assert-co_my_string" id="puppet_construction-assert-my_string">
+      <para>
+        <code>$my_string</code> must be set in the hiera
+        hierarchy. It must meat the following conditions:
+        <itemizedlist>
+          <listitem>
+            <para>
+              The variable <code>$my_string</code> must be of type
+              <emphasis>string</emphasis>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The string <code>$my_string</code> must contain at
+              least one character.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </callout>
+  </calloutlist>
+
+  <para>
+    To verify if the pattern works as designed, we conduct a
+    number of tests. The tests are:
+    <itemizedlist>
+      <listitem>
+        <para>
+          No array:
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: Must pass my_array to Class[Validate_params] in /root/validate_params.pp on node ds1.dmsat1.org
+Error: Must pass my_array to Class[Validate_params] in /root/validate_params.pp on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <code>$my_array</code> is set to empty string:
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array: ""
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: "" is not an Array.  It looks to be a String at /root/validate_params.pp:9 on node ds1.dmsat1.org
+Error: "" is not an Array.  It looks to be a String at /root/validate_params.pp:9 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Empty array:
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array: []
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: validate_params::$my_array not set at /root/validate_params.pp:11 on node ds1.dmsat1.org
+Error: validate_params::$my_array not set at /root/validate_params.pp:11 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          First array element empty:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - ""
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: validate_params::$my_array first element not set at /root/validate_params.pp:14 on node ds1.dmsat1.org
+Error: validate_params::$my_array first element not set at /root/validate_params.pp:14 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          First array element of wrong type:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - false
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: false is not a string.  It looks to be a FalseClass at /root/validate_params.pp:13 on node ds1.dmsat1.org
+Error: false is not a string.  It looks to be a FalseClass at /root/validate_params.pp:13 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          First array element has a value:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Notice: Compiled catalog for ds1.dmsat1.org in environment production in 0.23 seconds
+Notice: Finished catalog run in 0.04 seconds
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          String is not set:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+validate_params::my_string:
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: Must pass my_string to Class[Validate_params] in /root/validate_params.pp on node ds1.dmsat1.org
+Error: Must pass my_string to Class[Validate_params] in /root/validate_params.pp on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          String is boolean false:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+validate_params::my_string: false
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: false is not a string.  It looks to be a FalseClass at /root/validate_params.pp:17 on node ds1.dmsat1.org
+Error: false is not a string.  It looks to be a FalseClass at /root/validate_params.pp:17 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          String is empty value:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+validate_params::my_string: ""
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Error: validate_params::$my_string not set at /root/validate_params.pp:18 on node ds1.dmsat1.org
+Error: validate_params::$my_string not set at /root/validate_params.pp:18 on node ds1.dmsat1.org
+</screen>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          String has value:
+<screen>
+&t1p; <userinput>cat my_array /var/lib/hiera/base.yaml</userinput>
+validate_params::my_array:
+  - "a"
+validate_params::my_string: "a"
+
+&t1p; <userinput>puppet apply validate_params.pp</userinput>
+Notice: Compiled catalog for ds1.dmsat1.org in environment production in 0.23 seconds
+Notice: Finished catalog run in 0.04 seconds
+</screen>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+</section>

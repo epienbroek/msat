@@ -1,0 +1,649 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_configuration-hiera">
+  <title>Testing the Hiera setup</title>
+
+  <para>
+    The Hiera testing with a Puppet test class is executed
+    on a completely empty machine. So, only the class
+    parameters from the Puppet test class are placed in the
+    YAML files. The configuration of <xref
+    linkend="puppet_configuration-puppet_conf" /> is used
+    and the Hiera setup of <xref
+    linkend="puppet_configuration-layers" />. Furthermore,
+    the only Puppet class available in <filename
+    class="directory">/etc/puppet/modules</filename> is
+    test.
+  </para>
+
+  <para>
+    By changing the contents of the YAML files, we can see
+    from which layer, as described in <xref
+    linkend="puppet_configuration-layers" />, a parameter is
+    set.
+    The set of test parameters with which we test is
+    described in the table below.
+  </para>
+
+  <para>
+  </para>
+  <table id="puppet_configuration-hiera-table">
+    <title>Description of the test parameters</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>parameter</entry>
+          <entry>description</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>test::params::par1 (node)</entry>
+          <entry>
+            Deployed only on the specific host (based upon
+            its FQDN) in a specific depzone. Note that both
+            the <emphasis>fqdn</emphasis> and
+            <emphasis>depzone</emphasis> parameters are
+            automatic, since they are Facter facts.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par2 (depzone platform
+          instance)</entry>
+          <entry>
+            Deployed on all target nodes belonging to a
+            specific instance of a specific platform type,
+            in a specific depzone. In the node YAML file,
+            the <emphasis>platform</emphasis> parameter and
+            the <emphasis>instance</emphasis> parameter must
+            be set. Note that the
+            <emphasis>depzone</emphasis> parameter is
+            automatic.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par3 (depzone platform)</entry>
+          <entry>
+            Deployed on all target nodes belonging to a
+            specific platform type, in a specific depzone.
+            In the node YAML file, the
+            <emphasis>platform</emphasis> parameter must be
+            set. Note that the <emphasis>depzone</emphasis>
+            parameter is automatic.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par4 (depzone subzone)</entry>
+          <entry>
+            Deployed on all target nodes of a specific
+            subzone in the specific depzone. The
+            <emphasis>subzone</emphasis> parameter must be
+            set in the node YAML file.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par5 (depzone)</entry>
+          <entry>
+            Deployed on all target nodes of a specific
+            depzone. No specific parameters need to be set
+            in the node YAML file, the
+            <emphasis>depzone</emphasis> fact is automatic.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par6 (platform instance)</entry>
+          <entry>
+            Deployed on all target nodes belonging to a
+            specific instance of a specific platform type,
+            in all depzones. In the node YAML file, the
+            <emphasis>platform</emphasis> parameter and the
+            <emphasis>instance</emphasis> parameter must be
+            set.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par7 (platform)</entry>
+          <entry>
+            Deployed on all target nodes belonging to a
+            specific platform type, in all depzones. In the
+            node YAML file, the
+            <emphasis>platform</emphasis> parameter must be
+            set.
+          </entry>
+        </row>
+        <row>
+          <entry>test::params::par8 (base)</entry>
+          <entry>
+            Deployed on all target nodes, in all depzones.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section id="puppet_configuration-hiera-dirs">
+    <title>Structure of the YAML files</title>
+
+    <para>
+      We need to fill the YAML files with the parameters
+      described in <xref
+      linkend="puppet_configuration-hiera-table" />. The
+      structure of the <filename
+      class="directory">/var/lib/hiera</filename> directory
+      tree is (layer name inside parentheses):
+<screen>
+&t1p; <userinput>tree /var/lib/hiera --noreport --charset=ASCII</userinput>
+/var/lib/hiera
+|-- base.yaml                       (8 base)
+|-- depzones
+|   |-- dmsat1
+|   |   |-- hosts
+|   |   |   `-- ds1.dmsat1.org.yaml (1 node)
+|   |   |-- platforms
+|   |   |   |-- test
+|   |   |   |   `-- test1.yaml      (2 depzone platform instance)
+|   |   |   `-- test.yaml           (3 depzone platform)
+|   |   `-- subzones
+|   |       `-- dmz.yaml            (4 depzone subzone)
+|   `-- dmsat1.yaml                 (5 depzone)
+`-- platforms
+    |-- test
+    |   `-- test1.yaml              (6 platform instance)
+    `-- test.yaml                   (7 platform)
+</screen>
+    </para>
+
+    <para>
+      The contents of the YAML files, ordered according the
+      the layers, see <xref
+      linkend="puppet_configuration-layers-table" />, is
+      shown below.
+    </para>
+
+    <para>
+      The parameters on the node layer, overwrite all other
+      parameters. Hence, the ones we want from lower layers,
+      are commented out. Note that the node YAML file has 3
+      extra parameters: <emphasis>instance</emphasis>,
+      <emphasis>platform</emphasis> and
+      <emphasis>subzone</emphasis>.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</userinput>
+---
+
+instance: 'test1'
+platform: 'test'
+subzone:  'dmz'
+
+test::params::par1: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par2: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par3: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par4: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par5: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par6: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par7: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par8: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameters par3 - par8 are overwritten by the
+      "depzone platform instance" layer. Hence, they are
+      commented out. Note that par1 is overwritten by the
+      node YAML file.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/platforms/test/test1.yaml</userinput>
+---
+
+test::params::par1: 'depzones/dmsat1/platforms/test/test1.yaml'
+test::params::par2: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par3: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par4: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par5: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par6: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par7: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par8: 'depzones/dmsat1/platforms/test/test1.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameters par4 - par8 are overwritten by the
+      "depzone platform" layer. Hence, they are
+      commented out. Note that par1 - par2 are overwritten
+      by the higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/platforms/test.yaml</userinput>
+---
+
+test::params::par1: 'depzones/dmsat1/platforms/test.yaml'
+test::params::par2: 'depzones/dmsat1/platforms/test.yaml'
+test::params::par3: 'depzones/dmsat1/platforms/test.yaml'
+#test::params::par4: 'depzones/dmsat1/platforms/test.yaml'
+#test::params::par5: 'depzones/dmsat1/platforms/test.yaml'
+#test::params::par6: 'depzones/dmsat1/platforms/test.yaml'
+#test::params::par7: 'depzones/dmsat1/platforms/test.yaml'
+#test::params::par8: 'depzones/dmsat1/platforms/test.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameters par5 - par8 are overwritten by the
+      "depzone subzone" layer. Hence, they are
+      commented out. Note that par1 - par3 are overwritten
+      by the higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/subzones/dmz.yaml</userinput>
+---
+
+test::params::par1: 'depzones/dmsat1/subzones/dmz.yaml'
+test::params::par2: 'depzones/dmsat1/subzones/dmz.yaml'
+test::params::par3: 'depzones/dmsat1/subzones/dmz.yaml'
+test::params::par4: 'depzones/dmsat1/subzones/dmz.yaml'
+#test::params::par5: 'depzones/dmsat1/subzones/dmz.yaml'
+#test::params::par6: 'depzones/dmsat1/subzones/dmz.yaml'
+#test::params::par7: 'depzones/dmsat1/subzones/dmz.yaml'
+#test::params::par8: 'depzones/dmsat1/subzones/dmz.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameters par6 - par8 are overwritten by the
+      "depzone" layer. Hence, they are commented out. Note
+      that par1 - par4 are overwritten by the higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1.yaml</userinput>
+---
+
+test::params::par1: 'depzones/dmsat1.yaml'
+test::params::par2: 'depzones/dmsat1.yaml'
+test::params::par3: 'depzones/dmsat1.yaml'
+test::params::par4: 'depzones/dmsat1.yaml'
+test::params::par5: 'depzones/dmsat1.yaml'
+#test::params::par6: 'depzones/dmsat1.yaml'
+#test::params::par7: 'depzones/dmsat1.yaml'
+#test::params::par8: 'depzones/dmsat1.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameters par7 - par8 are overwritten by the
+      "platform instance" layer. Hence, they are commented
+      out. Note that par1 - par5 are overwritten by the
+      higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/platforms/test/test1.yaml</userinput>
+---
+
+test::params::par1: 'platforms/test/test1.yaml'
+test::params::par2: 'platforms/test/test1.yaml'
+test::params::par3: 'platforms/test/test1.yaml'
+test::params::par4: 'platforms/test/test1.yaml'
+test::params::par5: 'platforms/test/test1.yaml'
+test::params::par6: 'platforms/test/test1.yaml'
+#test::params::par7: 'platforms/test/test1.yaml'
+#test::params::par8: 'platforms/test/test1.yaml'
+</screen>
+    </para>
+
+    <para>
+      The parameter par8 is overwritten by the "platform"
+      layer. Hence, it is commented out. Note that par1 -
+      par6 are overwritten by the higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/platforms/test.yaml</userinput>
+---
+
+test::params::par1: 'platforms/test.yaml'
+test::params::par2: 'platforms/test.yaml'
+test::params::par3: 'platforms/test.yaml'
+test::params::par4: 'platforms/test.yaml'
+test::params::par5: 'platforms/test.yaml'
+test::params::par6: 'platforms/test.yaml'
+test::params::par7: 'platforms/test.yaml'
+#test::params::par8: 'platforms/test.yaml'
+</screen>
+    </para>
+
+    <para>
+      The catch-all layer, base, sets the base set of
+      parameters. All parameters can be overwritten by
+      higher layers.
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/base.yaml</userinput>
+---
+
+test::params::par1: 'base.yaml'
+test::params::par2: 'base.yaml'
+test::params::par3: 'base.yaml'
+test::params::par4: 'base.yaml'
+test::params::par5: 'base.yaml'
+test::params::par6: 'base.yaml'
+test::params::par7: 'base.yaml'
+test::params::par8: 'base.yaml'
+</screen>
+    </para>
+
+  </section>
+
+  <section id="puppet_configuration-hiera-code">
+    <title>The Puppet test code</title>
+
+    <para>
+      First, we need to construct a test class in Puppet via
+      which we can demonstrate/test how the hiera lookup
+      structure with the layers works. The code is shown
+      here:
+<screen>
+&t1p; <userinput>cat /etc/puppet/modules/test/manifests/params.pp</userinput>
+# == Class: test::params
+#
+# This interface class provides the configuration interface
+# of the test module. All other classes in the test module
+# inherit these class parameters.
+#
+# The default values of the parameters can be overridden in
+# YAML files. All parameters are validated in this class.
+#
+# === Dependencies
+#
+# === Parameters
+#
+# :hierarchy:
+#   - depzones/%{depzone}/hosts/%{fqdn}
+#   - depzones/%{depzone}/platforms/%{platform}/%{instance}
+#   - depzones/%{depzone}/platforms/%{platform}
+#   - depzones/%{depzone}/subzones/%{subzone}
+#   - depzones/%{depzone}
+#   - platforms/%{platform}/%{instance}
+#   - platforms/%{platform}
+#   - base
+#
+# With:
+#
+# depzone  == dmsat1
+# fqdn     == ds1.dmsat1.org
+# platform == test
+# instance == test1
+# subzone  == dmz
+#
+# the file search order is:
+#
+# 1 depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+# 2 depzones/dmsat1/platforms/test/test1.yaml
+# 3 depzones/dmsat1/platforms/test.yaml
+# 4 depzones/dmsat1/subzones/dmz.yaml
+# 5 depzones/dmsat1.yaml
+# 6 platforms/test/test1.yaml
+# 7 platforms/test.yaml
+# 8 base.yaml
+#
+# *par1*
+#   To be found in level 1, ds1.dmsat1.org.yaml.
+# *par2*
+#   To be found in level 2, test1.yaml (under dmsat1).
+# *par3*
+#   To be found in level 3, test.yaml (under dmsat1).
+# *par4*
+#   To be found in level 4, dmz.yaml.
+# *par5*
+#   To be found in level 5, dmsat1.yaml.
+# *par6*
+#   To be found in level 6, test1.yaml.
+# *par7*
+#   To be found in level 7, test.yaml.
+# *par8*
+#   To be found in level 8, base.yaml.
+#
+# === Variables
+# 
+# === Examples
+#  
+# === Authors
+# 
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+# 
+# === History
+#
+# === Copyright
+# 
+# Copyright 2014 Allard Berends
+#
+# === Bugs
+#
+class test::params (
+  $par1,
+  $par2,
+  $par3,
+  $par4,
+  $par5,
+  $par6,
+  $par7,
+  $par8,
+) {
+  # AB: code here must have not side effects. Only setting
+  # of variables is allowed!
+
+  # AB: validate class parameters.
+  case $::puppetversion {
+    /^3\.[6789].*/: {
+      fail("Puppet version ${::puppetversion} not yet implemented.")
+    } # puppet &gt;= 3.6 and &lt; 4.0
+
+    /^3\.[012345].*/: {
+      validate_string($par1)
+      if size($par1) == 0 {
+        fail("${title}::\$par1 not set")
+      }
+      validate_string($par2)
+      if size($par2) == 0 {
+        fail("${title}::\$par2 not set")
+      }
+      validate_string($par3)
+      if size($par3) == 0 {
+        fail("${title}::\$par3 not set")
+      }
+      validate_string($par4)
+      if size($par4) == 0 {
+        fail("${title}::\$par4 not set")
+      }
+      validate_string($par5)
+      if size($par5) == 0 {
+        fail("${title}::\$par5 not set")
+      }
+      validate_string($par6)
+      if size($par6) == 0 {
+        fail("${title}::\$par6 not set")
+      }
+      validate_string($par7)
+      if size($par7) == 0 {
+        fail("${title}::\$par7 not set")
+      }
+      validate_string($par8)
+      if size($par8) == 0 {
+        fail("${title}::\$par8 not set")
+      }
+    } # puppet &gt;= 3.0 and &lt; 3.6
+
+    default: {
+      fail("Puppet version ${::puppetversion} not supported.")
+    } # unsupported puppet versions
+  } # case
+} # end test::params
+
+&t1p; <userinput>cat /etc/puppet/modules/test/manifests/init.pp</userinput>
+# == Class: test
+#
+# This construction class tests the puppet structure by
+# notifying in which YAML level from /etc/hiera.yaml a
+# parameter is set.
+#       
+# === Parameters
+#
+# All parameters used as an configuration interface are
+# placed in the test::params class.
+#
+# === Variables
+#
+# === Authors
+# 
+# Allard Berends &lt;allard.berends@example.com&gt; (AB)
+# 
+# === Copyright
+# 
+# Copyright 2014 Allard Berends
+#
+class test inherits test::params {
+  notify{"Value of \$par1 comes from $par1":}
+  notify{"Value of \$par2 comes from $par2":}
+  notify{"Value of \$par3 comes from $par3":}
+  notify{"Value of \$par4 comes from $par4":}
+  notify{"Value of \$par5 comes from $par5":}
+  notify{"Value of \$par6 comes from $par6":}
+  notify{"Value of \$par7 comes from $par7":}
+  notify{"Value of \$par8 comes from $par8":}
+} # end test
+
+&t1p; <userinput>cat /root/site.pp</userinput>
+$instance = hiera('instance', '')
+$platform = hiera('platform', '')
+$subzone  = hiera('subzone', '')
+
+include test
+</screen>
+    </para>
+  </section>
+
+  <section id="puppet_configuration-hiera-tests">
+    <title>Executing the tests</title>
+
+    <para>
+      We want to test the following scenario's:
+      <itemizedlist>
+        <listitem>
+          <para>
+            Every layer provides one parameter. The higher
+            layers overwrite parameters of the lower layers.
+            This is the setup as we have depicted above in
+            the YAML files.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            On the node YAML file we overwrite all other
+            layers, by uncommenting the par2 - par8
+            parameters.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            On the platform instance layers (the all
+            depzones platform instance layer and the dmsat1
+            specific platform instance layer) we overwrite
+            the platform layers parameters. So, eventually
+            all the platform parameters are set on the
+            depzone platform instance layer. So, par7, par6,
+            par3 and par2, all come from
+            <filename>.../depzones/dmsat1/platforms/test/test1.yaml</filename>.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      Test run 1 (no changes done):
+<screen>
+&t1p; <userinput>puppet apply site.pp | grep 'Notice: Value' | sort</userinput>
+Notice: Value of $par1 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par2 comes from depzones/dmsat1/platforms/test/test1.yaml
+Notice: Value of $par3 comes from depzones/dmsat1/platforms/test.yaml
+Notice: Value of $par4 comes from depzones/dmsat1/subzones/dmz.yaml
+Notice: Value of $par5 comes from depzones/dmsat1.yaml
+Notice: Value of $par6 comes from platforms/test/test1.yaml
+Notice: Value of $par7 comes from platforms/test.yaml
+Notice: Value of $par8 comes from base.yaml
+</screen>
+    </para>
+
+    <para>
+      Test run 2 (all in node YAML):
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</userinput>
+---
+
+instance: 'test1'
+platform: 'test'
+subzone:  'dmz'
+
+test::params::par1: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par2: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par3: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par4: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par5: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par6: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par7: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+test::params::par8: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+
+&t1p; <userinput>puppet apply site.pp | grep 'Notice: Value' | sort</userinput>
+Notice: Value of $par1 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par2 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par3 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par4 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par5 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par6 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par7 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par8 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+</screen>
+    </para>
+
+    <para>
+      Test run 3 (all platform parameters come from depzone
+      platform instance layer):
+<screen>
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/hosts/ds1.dmsat1.org.yaml</userinput>
+---
+
+instance: 'test1'
+platform: 'test'
+subzone:  'dmz'
+
+test::params::par1: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par2: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par3: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par4: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par5: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par6: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par7: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+#test::params::par8: 'depzones/dmsat1/hosts/ds1.dmsat1.org.yaml'
+
+&t1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/platforms/test/test1.yaml</userinput>
+---
+
+test::params::par1: 'depzones/dmsat1/platforms/test/test1.yaml'
+test::params::par2: 'depzones/dmsat1/platforms/test/test1.yaml'
+test::params::par3: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par4: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par5: 'depzones/dmsat1/platforms/test/test1.yaml'
+test::params::par6: 'depzones/dmsat1/platforms/test/test1.yaml'
+test::params::par7: 'depzones/dmsat1/platforms/test/test1.yaml'
+#test::params::par8: 'depzones/dmsat1/platforms/test/test1.yaml'
+
+&t1p; <userinput>puppet apply site.pp | grep 'Notice: Value' | sort</userinput>
+Notice: Value of $par1 comes from depzones/dmsat1/hosts/ds1.dmsat1.org.yaml
+Notice: Value of $par2 comes from depzones/dmsat1/platforms/test/test1.yaml
+Notice: Value of $par3 comes from depzones/dmsat1/platforms/test/test1.yaml
+Notice: Value of $par4 comes from depzones/dmsat1/subzones/dmz.yaml
+Notice: Value of $par5 comes from depzones/dmsat1.yaml
+Notice: Value of $par6 comes from depzones/dmsat1/platforms/test/test1.yaml
+Notice: Value of $par7 comes from depzones/dmsat1/platforms/test/test1.yaml
+Notice: Value of $par8 comes from base.yaml
+</screen>
+    </para>
+  </section>
+
+</section>
+

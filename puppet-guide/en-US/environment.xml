@@ -4,11 +4,34 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="environment">
-  <title>Environment</title>
+  <title>Environments</title>
 
   <para>
-    Empty.
+    In this chapter, we mean by environment a piece of ICT
+    infrastructure with elements that belong together. For
+    example, we have a development environment, in which we
+    have a network, some computer machines, an LDAP service,
+    a DNS service, a Provisioning service (Spacewalk), etc.
+    In other words, it is an infrastructure domain in which
+    we provide different services and machines. Since we
+    call it development environment, we give the suggestion
+    that we develop in this environment.
   </para>
+
+  <warning>
+    <title>The notion of environment in this chapter must
+    not be confused witht the Puppet parameter $enviornment.</title>
+
+    <para>
+      In the Puppet configuration one can set the parameter
+      <emphasis>$environment</emphasis>, to define the set
+      of configuration parameters used according to the
+      Puppet <emphasis>Directory environments</emphasis>
+      mechanism. Since the environment notion in this
+      chapter also yields a puppet Parameter, we name it
+      <emphasis>$depzone</emphasis>, for Deployment zone.
+    </para>
+  </warning>
 
   <para>
     Tasks we need to conduct:
@@ -28,7 +51,7 @@
 
   <xi:include href="environment/development.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="environment/acceptance.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="environment/qaenv.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment/production.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>
 

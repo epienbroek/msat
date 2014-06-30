@@ -10,8 +10,10 @@
   <xi:include href="environment.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_construction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_annotated_module.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="apdx_puppet_lang.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="references.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_tools.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="ref_material.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="Revision_History.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <index />
 </book>

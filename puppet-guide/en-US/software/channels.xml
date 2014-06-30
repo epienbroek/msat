@@ -20,7 +20,7 @@
       <tbody valign="top">
         <row>
           <entry>Analysis of CentOS 6.5 channel</entry>
-          <entry>120 minutes</entry>
+          <entry>20 minutes</entry>
         </row>
         <row>
           <entry>Construction of puppet channel</entry>
@@ -34,35 +34,30 @@
           <entry>Construction of puppet configuration channel</entry>
           <entry>60 minutes</entry>
         </row>
+        <row>
+          <entry>Construction of directory server channel</entry>
+          <entry>60 minutes</entry>
+        </row>
       </tbody>
     </tgroup>
   </table>
 
   <para>
-    In this section we discuss what needs to be done on the
-    host system. For the Directory Server KVM, we need: 
+    In this section we discuss ...
     <itemizedlist>
       <listitem>
         <para>
-          A virtual network in which we let the Directory
-          Server operate. We use the same network as the one
+          ...
         </para>
       </listitem>
       <listitem>
         <para>
-          Disk storage. The amount of disk storage is mostly
-          determined by the amount of data and users one
-          wants to store in the Directory Server. Since, for
-          us, it is just a machine to test the function, we
-          hardly need any disk space. So, a total of 5GB for
-          all should suffice.
+          ...
         </para>
       </listitem>
       <listitem>
         <para>
-          Memory for the virutal CPU. Again, since we just
-          test the function and not the performance, we need
-          512MB maximum.
+          ...
         </para>
       </listitem>
     </itemizedlist>
@@ -72,6 +67,71 @@
     <title>Analysis of CentOS 6.5 channel</title>
 
     <para>
+      The first question we need to answer, is: do we have
+      conflicts in the software channels? The OS and Puppet
+      software channels are:
+      <table id="software-channels-centos65-channellist">
+        <title>Software channels</title>
+        <tgroup align="left" cols="2" colsep="1" rowsep="1">
+          <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <thead valign="top">
+            <row>
+              <entry>channel</entry>
+              <entry>URL</entry>
+            </row>
+          </thead>
+          <tbody valign="top">
+            <row>
+              <entry>CentOS 6.5</entry>
+              <entry><ulink
+              url="http://mirror.centos.org/centos/6.5/os/x86_64/Packages/">mirror.centos.org/centos/6.5/os/x86_64/Packages/</ulink></entry>
+            </row>
+            <row>
+              <entry>Puppet 6.5</entry>
+              <entry><ulink
+              url="http://yum.puppetlabs.com/el/6.5/products/x86_64/">yum.puppetlabs.com/el/6.5/products/x86_64</ulink></entry>
+            </row>
+            <row>
+              <entry>Puppet deps 6.5</entry>
+              <entry><ulink
+              url="http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/">yum.puppetlabs.com/el/6.5/dependencies/x86_64</ulink></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </para>
+
+    <para>
+      We download the lists of RPM's with:
+<screen>
+&uprompt; <userinput>wget -O - http://mirror.centos.org/centos/6.5/os/x86_64/Packages/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > centos65.txt</userinput>
+
+&uprompt; <userinput>wget -O - http://yum.puppetlabs.com/el/6.5/products/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > puppet65.txt</userinput>
+
+&uprompt; <userinput>wget -O - http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > puppetdeps65.txt</userinput>
+</screen>
+    </para>
+
+    <para>
+      Next, we need to compare the lists of RPM's to figure
+      out if we have conficts. For this purpose, we use the
+      <application>line_sets.py</application> tool. See also
+      <xref linkend="apdx_tools-line_sets" />
+<screen>
+&uprompt; <userinput>line_sets.py -a centos65.txt -b puppet65.txt -o '&amp;'</userinput>
+.. no output == no intersection ..
+
+&uprompt; <userinput>line_sets.py -a centos65.txt -b puppetdeps65.txt -o '&amp;'</userinput>
+.. no output == no intersection ..
+</screen>
+    </para>
+
+    <para>
+      From the above analysis, we can conclude that it is
+      safe to place the contents of the Puppet and Puppet
+      dependencies in software channels. We don't risk a
+      conflict.
     </para>
 
   </section>
@@ -95,8 +155,11 @@
     <para>
       In the <emphasis role="bold">Puppet
       channel</emphasis>, we place the RPM's, needed for the
-      Puppet product itself. The minimal set, we need for
-      our purposes, is:
+      Puppet product itself. The minimal
+      set<footnote><para>We figured out the minimal set by
+      creating a test system on which we run some puppet,
+      facter and hier commands</para></footnote>, we need
+      for our purposes, is:
       <itemizedlist>
         <listitem>
           <para>
@@ -159,7 +222,7 @@
 
     <para>
       We obtain these packages from <ulink
-      url="http://yum.puppetlabs.com/el/6.5/products/">Index
+      url="http://yum.puppetlabs.com/el/6.5/products/x86_64/">Index
       of /el/6.5/products</ulink>. Since they need to be
       placed on the Spacewalker server, we have to execute,
       on the Spacewalk server:
@@ -214,7 +277,12 @@ puppet 3.4.3 1.el6 noarch
       In the <emphasis role="bold">Puppet Dependencies
       channel</emphasis>, we place the RPM's, needed to
       support the Puppet product itself. The minimal set, we
-      need for our purposes, is:
+      need for our purposes<footnote><para>We figured out
+      the minimal set of dependencies by running puppet,
+      facter and hiera commands on a test system. We added
+      the dependencies as given by the <command>yum install
+      puppet facter hiera</command>
+      command.</para></footnote>, is:
       <itemizedlist>
         <listitem>
           <para>
@@ -285,7 +353,7 @@ puppet 3.4.3 1.el6 noarch
 
     <para>
       We obtain these packages from <ulink
-      url="http://yum.puppetlabs.com/el/6.5/dependencies/">Index
+      url="http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/">Index
       of /el/6.5/dependencies</ulink>. Since they need to be
       placed on the Spacewalker server, we have to execute,
       on the Spacewalk server:
@@ -335,10 +403,230 @@ ruby-shadow 2.2.0 2.el6 x86_64
 
   </section>
 
+  <section id="software-channels-ds">
+    <title>Construction of directory server channel</title>
+
+    <para>
+      Since these packages from EPEL are signed with
+      the <emphasis
+      role="bold">RPM-GPG-KEY-EPEL-6</emphasis> key, we
+      need to place this GPG key on the Spacewalk server.
+      This is done with:
+<screen>
+&sw1p; <userinput>cd /tmp</userinput>
+&sw1p; <userinput>wget http://epel.mirror.net.in/epel/RPM-GPG-KEY-EPEL-6</userinput>
+&sw1p; <userinput>msat_mk_cr.py -d 'RPM-GPG-KEY-EPEL-6' -t GPG -c /tmp/RPM-GPG-KEY-EPEL-6</userinput>
+</screen>
+    </para>
+
+    <para>
+      In the <emphasis role="bold">Directory Server
+      channel</emphasis>, we place the RPM's, needed to
+      support the 389 Directory server product. The minimal
+      set, we need for our purposes<footnote><para>We
+      figured out the minimal set of dependencies by
+      installing 389-ds from EPEL (Extra Packages for
+      Enterprise Linux).</para></footnote>, is:
+      <itemizedlist>
+        <listitem>
+          <para>
+            <package>389-ds</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-admin</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-admin-console</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-admin-console-doc</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-adminutil</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-console</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-ds-console</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-ds-console-doc</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>389-dsgw</package>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      We use the specific versions:
+      <table id="software-channels-ds-rpms">
+        <title>Directory Server channel RPM's</title>
+        <tgroup align="left" cols="3" colsep="1" rowsep="1">
+          <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+          <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+          <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
+          <thead valign="top">
+            <row>
+              <entry>Package</entry>
+              <entry>Summary</entry>
+              <entry>Provider</entry>
+            </row>
+          </thead>
+          <tbody valign="top">
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+            <row>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+              <entry>ruby</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </para>
+
+    <para>
+      We obtain these packages from <ulink
+      url="http://epel.mirror.net.in/epel/6/x86_64/">Index
+      of /epel/6/x86_64/</ulink>. Since they need to be
+      placed on the Spacewalker server, we have to execute,
+      on the Spacewalk server:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-epel-6u5-1_0</userinput>
+&sw1p; <userinput>cd /var/satellite/example-epel-6u5-1_0</userinput>
+&sw1p; <userinput>wget -O - http://epel.mirror.net.in/epel/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\.rpm\)".*$/\1/p' | grep ^389 | grep -v i686 | while read line; do wget http://epel.mirror.net.in/epel/6/x86_64/$line; done</userinput>
+.. output skipped ..
+
+&sw1p; <userinput>ls -1</userinput>
+389-admin-1.1.35-1.el6.x86_64.rpm
+389-admin-console-1.1.8-1.el6.noarch.rpm
+389-admin-console-doc-1.1.8-1.el6.noarch.rpm
+389-adminutil-1.1.19-1.el6.x86_64.rpm
+389-adminutil-devel-1.1.19-1.el6.x86_64.rpm
+389-console-1.1.7-1.el6.noarch.rpm
+389-ds-1.2.2-1.el6.noarch.rpm
+389-ds-console-1.2.6-1.el6.noarch.rpm
+389-ds-console-doc-1.2.6-1.el6.noarch.rpm
+389-dsgw-1.1.11-1.el6.x86_64.rpm
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-epel-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-epel-6u5-1_0 -n example-epel-6u5-1_0 -s example-epel-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-epel-6u5-1_0</userinput>
+example-epel-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-epel-6u5-1_0 -u example -p redhat -d example-epel-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-epel-6u5-1_0</userinput>
+389-admin 1.1.35 1.el6 x86_64
+389-admin-console 1.1.8 1.el6 noarch
+389-admin-console-doc 1.1.8 1.el6 noarch
+389-adminutil 1.1.19 1.el6 x86_64
+389-adminutil-devel 1.1.19 1.el6 x86_64
+389-console 1.1.7 1.el6 noarch
+389-ds 1.2.2 1.el6 noarch
+389-ds-console 1.2.6 1.el6 noarch
+389-ds-console-doc 1.2.6 1.el6 noarch
+389-dsgw 1.1.11 1.el6 x86_64
+</screen>
+    </para>
+
+    <para>
+      Unfortunately, we are not done yet. Some RPM's are
+      still missing. By repeatedly trying with
+      <command>yum install 389-ds</command> and placing
+      missing packages in
+      <emphasis>example-epel-6u5-1_0</emphasis>, we arrive
+      at the following channel content:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-epel-6u5-1_0</userinput>
+</screen>
+    </para>
+
+  </section>
+
   <section id="software-channels-conf">
     <title>Construction of puppet configuration channel</title>
 
     <para>
+      ...
     </para>
 
   </section>

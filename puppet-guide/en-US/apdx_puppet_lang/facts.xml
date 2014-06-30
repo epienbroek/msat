@@ -38,10 +38,87 @@
   </para>
 
   <section id="apdx_puppet_lang-facts-facter">
-    <title>Facter</title>
+    <title>Facter facts</title>
 
     <para>
-      Empty.
+      Facter is a part of Puppet that gathers all sorts of
+      facts about a system. All the facts Facter can gather
+      are pieces of information that are already on the
+      system. For example, one has installed an Operating
+      System (OS) on the system, so facter can know about
+      the OS as long the OS is supported by the Facter
+      library. Similarly, information like MAC addresses
+      (the addresses of ethernet cards), are obtained by
+      Facter via an OS interface. The complete list of facts
+      as Facter sees them, can be obtained with:
+<screen>
+&t1p; <userinput>facter | grep -e fqdn -e ipaddress -e macaddress -e operatingsystem -e virtual</userinput>
+fqdn = ds1.dmsat1.org
+ipaddress => 192.168.5.14
+ipaddress_em1 => 192.168.5.14
+ipaddress_lo => 127.0.0.1
+is_virtual => true
+macaddress => 52:54:00:A8:05:0E
+macaddress_em1 => 52:54:00:A8:05:0E
+operatingsystem => CentOS
+operatingsystemmajrelease => 6
+operatingsystemrelease => 6.5
+virtual => kvm
+</screen>
+    </para>
+
+    <para>
+      So, what can we do with these facts? All facts, known
+      by Facter, are in the local namespace of Puppet.
+      Meaning, in Puppet code, one can use the pattern:
+      ${&lt;factname&gt;} to get the value of a fact. For
+      example:
+<screen>
+&t1p; <userinput>cat some_facts.pp</userinput>
+notify {"fqdn: ${fqdn}":}
+notify {"ipaddress: ${ipaddress}":}
+notify {"macaddress: ${macaddress}":}
+notify {"operatingsystem: ${operatingsystem}":}
+notify {"virtual: ${virtual}":}
+
+&t1p; <userinput>puppet apply some_facts.pp</userinput>
+Notice: Compiled catalog for ds1.dmsat1.org in environment production in 0.17 seconds
+Notice: operatingsystem: CentOS
+Notice: /Stage[main]/Main/Notify[operatingsystem: CentOS]/message: defined 'message' as 'operatingsystem: CentOS'
+Notice: fqdn: ds1.dmsat1.org
+Notice: /Stage[main]/Main/Notify[fqdn: ds1.dmsat1.org]/message: defined 'message' as 'fqdn: ds1.dmsat1.org'
+Notice: virtual: kvm
+Notice: /Stage[main]/Main/Notify[virtual: kvm]/message: defined 'message' as 'virtual: kvm'
+Notice: macaddress: 52:54:00:A8:05:0E
+Notice: /Stage[main]/Main/Notify[macaddress: 52:54:00:A8:05:0E]/message: defined 'message' as 'macaddress: 52:54:00:A8:05:0E'
+Notice: ipaddress: 192.168.5.14
+Notice: /Stage[main]/Main/Notify[ipaddress: 192.168.5.14]/message: defined 'message' as 'ipaddress: 192.168.5.14'
+Notice: Finished catalog run in 0.03 seconds
+</screen>
+    </para>
+
+  </section>
+  
+  <section id="apdx_puppet_lang-facts-env">
+    <title>Environment facts</title>
+
+    <para>
+      Sometimes, the facts provided by Facter are not
+      enough. Sometimes one wants to add facts to a system
+      that cannot by found out from the system itself. An
+      example is, the location in a datacentre where a
+      system is placed, or the environment in which a system
+      operates. Facter has a mechanism to find out facts by
+      analyzing the shell environment. How one can add these
+      environment fact is shown here:
+<screen>
+&t1p; <userinput>cat /etc/profile.d/depzone.sh</userinput>
+export FACTER_depzone="dmsat1"
+
+&t1p; <userinput>. /etc/profile.d/depzone.sh</userinput>
+&t1p; <userinput>facter depzone</userinput>
+dmsat1
+</screen>
     </para>
 
   </section>

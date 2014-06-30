@@ -6,20 +6,19 @@
 <chapter id="puppet_configuration">
   <title>Puppet configuration</title>
   <para>
-    This chapter discusses how to setup software channels
+    This chapter discusses how Puppet is configured and how
+    we organize the class parameter lookups via the Hiera
+    tool with YAML files.
   </para>
 
   <para>
-    Tasks we need to conduct:
-    <itemizedlist>
-      <listitem>
-        <para>
-          Empty.
-        </para>
-      </listitem>
-    </itemizedlist>
+    We end this chapter by demonstrating with a Puppet test
+    class and a set of test YAML files, how the Hiera lookup
+    mechanism exactly works in our setup.
   </para>
 
-  <xi:include href="puppet_configuration/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_configuration/puppet_conf.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_configuration/layers.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_configuration/hiera.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>
 

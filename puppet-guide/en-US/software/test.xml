@@ -4,7 +4,7 @@
 %BOOK_ENTITIES;
 ]>
 <section id="software-test">
-  <title>Test software channels</title>
+  <title>Test node deployment with software channels</title>
 
   <table id="software-ds_install-time">
     <title>Time needed</title>
@@ -20,7 +20,7 @@
       <tbody valign="top">
         <row>
           <entry>Build kickstart profile</entry>
-          <entry>60 minutes</entry>
+          <entry>10 minutes</entry>
         </row>
         <row>
           <entry>Test bare machine deployment</entry>
@@ -35,46 +35,69 @@
   </table>
 
   <para>
-    For the kickstart profile to install bare machines, we
-    need the following items: 
+    In order to construct the kickstart profile to install
+    bare machines, we need the following items: 
     <itemizedlist>
       <listitem>
         <para>
-          An activation key with the RPM to setup a basic
-          puppet configuration. Furthermore, this activation
-          keys makes it possible for the target system to
-          interact with the Spacewalk server.
+          An activation key to register the target system to
+          the software channels we constructed in <xref
+          linkend="software-channels" />.
         </para>
       </listitem>
       <listitem>
         <para>
           A Cobbler snippet to remove all the original
-          CentOS yum repositories. We want to manage the
-          software on a Linux node via the Spacewalk server.
+          CentOS yum repositories in <filename
+          class="directory">/etc/yum.repos.d/</filename>. We
+          want to manage the software on a Linux node via
+          the Spacewalk server.
         </para>
       </listitem>
       <listitem>
         <para>
           A Cobbler snippet to set the installation
-          environment of the target node. Furthermore, if
-          needed, the correct kernel version can be updated
-          from here with a <command>yum update</command>.
+          depzone (Deployment zone) of the target node.
+          Furthermore, if needed, the correct kernel version
+          can be updated from here with a <command>yum
+          update</command>.
         </para>
       </listitem>
       <listitem>
         <para>
           Kickstart post install script to include the
-          Cobbler snippet.
+          Cobbler snippets.
         </para>
       </listitem>
       <listitem>
         <para>
-          Configure the kickstart software to install:
-          @Core, perl, rhn-setup, and wget.
+          Configure the kickstart software to install the
+          group <package>@Core</package>, and the packages
+          <package>perl</package>,
+          <package>rhn-setup</package>, and
+          <package>wget</package>.
         </para>
       </listitem>
     </itemizedlist>
   </para>
+
+  <note>
+    <title>Cobbler snippets versus Kickstart
+    Snippets</title>
+    <para>
+      On the web interface of Spacewalk, Cobbler snippets
+      are called Kickstart Snippets. The reason that we
+      call them Cobbler snippets instead of Kickstart
+      Snippets is that they are located under <filename
+      class="directory">/var/lib/cobbler/snippets</filename>.
+      In this directory a symbolic link exists to <filename
+      class="directory">/var/lib/rhn/kickstarts/snippets</filename>,
+      under which the newly created snippets are placed.
+      Since the type of snippets used, come from the Cobbler
+      project, it makes sense for us to call them Cobbler
+      snippets, after their original name.
+    </para>
+  </note>
 
   <section id="software-test-kp">
     <title>Build kickstart profile</title>
@@ -83,13 +106,19 @@
       A kickstart profile is a hierarchical structure. The
       kickstart profile in the Spacewalk server is at the
       top level. It uses an activation key and a Cobbler
-      snippet. So, in order to create the kickstart profile,
+      snippets. So, in order to create the kickstart profile,
       we need to create the activation key and the Cobbler
-      snippet first.
+      snippets first.
     </para>
 
     <para>
-      The activation key is created with:
+      Since no dependencies between the activation keys and
+      the Cobbler snippets exist, the order of creation of
+      the activation key and Cobbler snippets does not
+      matter. Here we start with the activation key.
+    </para>
+    <para>
+      The activation key creation script is:
 <screen>
 &sw1p; <userinput>cat ak-bare-kvm-6u5-x_y_z.sh</userinput>
 #!/bin/bash
@@ -145,14 +174,18 @@ msat_mk_ak.py \
   --activationkey-childchannels 'example-puppet-6u5-1_0,example-puppet-deps-6u5-1_0,example-puppet-conf-6u5-1_0,con-tools-centos-x86_64-server-6' \
   --activationkey-packages '' \
   --activationkey-configchannels ''
+</screen>
+      To put the activation key on the Spacewalk server, run
+      the script:
+<screen>
 &sw1p; <userinput>./ak-bare-kvm-6u5-x_y_z.sh</userinput>
 .. no output upon success ..
 </screen>
     </para>
 
     <para>
-      The Cobbler snippet to control the yum repo's is
-      created with:
+      The Cobbler snippet creation script to control the yum
+      repo's is:
 <screen>
 &sw1p; <userinput>cat cs-repo-6-x_y_z.sh</userinput>
 #!/bin/bash
@@ -208,13 +241,17 @@ msat_mk_cs.py \
 
 # AB: only Spacewalk channels as repo.
 /bin/rm -f /etc/yum.repos.d/CentOS-*.repo'
+</screen>
+      The put the Cobbler snippet on the Spacewalk server,
+      run it:
+<screen>
 &sw1p; <userinput>./cs-repo-6-x_y_z.sh</userinput>
 </screen>
     </para>
 
     <para>
-      The Cobbler snippet for the bare Linux node is created
-      with:
+      The Cobbler snippet creation script for the bare Linux
+      node is:
 <screen>
 &sw1p; <userinput>cat cs-bare-6-x_y_z.sh</userinput>
 #!/bin/bash
@@ -268,23 +305,27 @@ msat_mk_cs.py \
   --snippet-content '# Snippet: bare-6-x_y_z
 # Specific snippet for node type.
 
-# AB: obtain environment
-environment=\$(/bin/cat /proc/cmdline | /bin/sed '"'"'s/.*environment=\([^ ]\{1,\}\).*\$/\1/'"'"')
-/bin/cat &lt;&lt; EOF &gt; /etc/profile.d/environment.sh
-export FACTER_environment="\$environment"
+# AB: obtain depzone
+depzone=\$(/bin/cat /proc/cmdline | /bin/sed '"'"'s/.*depzone=\([^ ]\{1,\}\).*\$/\1/'"'"')
+/bin/cat &lt;&lt; EOF &gt; /etc/profile.d/depzone.sh
+export FACTER_depzone="\$depzone"
 EOF
 
 # AB: if we want to update the kernel, do it here. Use the
 # exact kernel version.
 #yum -y update kernel-2.6.32-431.el6.x86_64 kernel-firmware-2.6.32-431.el6.noarch'
+</screen>
+      To put in on the Spacewalk server, run it with:
+<screen>
 &sw1p; <userinput>./cs-bare-6-x_y_z.sh</userinput>
 </screen>
     </para>
 
     <para>
       Since we have the activation key and the Cobbler
-      snippet on which the kickstart profile depends, we can
-      create the kickstart profile now:
+      snippets, on which the kickstart profile depends, in
+      the Spacewalk server, we can create the kickstart
+      profile now by creating the script:
 <screen>
 &sw1p; <userinput>cat kp-bare-kvm-6u5-x_y_z.sh</userinput>
 #!/bin/bash
@@ -346,16 +387,16 @@ msat_mk_kp.py \
   --kickstart-childchannels '' \
   --kickstart-configmgt false \
   --kickstart-remotecmds false \
-  --kickstart-partitioning 'part /boot --fstype=ext4 --size=256 --ondisk=vda,part pv.01 --size=1024 --grow --ondisk=vda,part swap --size=512 --maxsize=1024 --ondisk=vda,volgroup myvg pv.01,logvol / --vgname=myvg --name=rootvol --size=1024 --grow,logvol /var/log --vgname=myvg --name=logvol --size=1024' \
+  --kickstart-partitioning 'part /boot --fstype=ext4 --size=256 --ondisk=vda,part pv.01 --size=1024 --grow --ondisk=vda,part swap --size=512 --ondisk=vda,volgroup myvg pv.01,logvol / --vgname=myvg --name=rootvol --size=1024 --grow,logvol /var/log --vgname=myvg --name=logvol --size=1024' \
   --kickstart-keys 'RHN-ORG-TRUSTED-SSL-CERT,Example-GPG-KEY,RPM-GPG-KEY-puppetlabs,RPM-GPG-KEY-CentOS-6,RPM-GPG-KEY-spacewalk-2012,RPM-GPG-KEY-EPEL-6' \
   --kickstart-install true \
   --kickstart-text true \
   --kickstart-url "--url /ks/dist/org/$ORGNUM/ks-centos-x86_64-server-6u5" \
   --kickstart-lang "en_US" \
   --kickstart-keyboard "us" \
-  --kickstart-device "scsi" \
+  --kickstart-device "virtio" \
   --kickstart-zerombr "yes" \
-  --kickstart-clearpart "--drives=vda --initlabel" \
+  --kickstart-clearpart "--all --drives=vda --initlabel" \
   --kickstart-bootloader '--location mbr --driveorder=vda' \
   --kickstart-timezone "--utc Europe/Amsterdam" \
   --kickstart-auth "--enablemd5 --enableshadow" \
@@ -370,7 +411,21 @@ msat_mk_kp.py \
   --kickstart-postscript '$SNIPPET('"'"'spacewalk/'"$ORGNUM"'/repo-6-x_y_z'"'"')
 $SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
 </screen>
+      We run the script with the command:
+<screen>
+&sw1p; <userinput>./kp-bare-kvm-6u5-x_y_z.sh</userinput>
+</screen>
     </para>
+
+    <warning>
+      <title>Disable @Base in Spacewalk web interface</title>
+      <para>
+        Via the msat scripts, we are unable to select the
+        option to not install the <package>@Base</package>
+        set of RPM's. Hence, we need to do so manually:
+        <menuchoice><guimenu>Kickstart</guimenu><guisubmenu>Profiles</guisubmenu><guimenuitem>bare-kvm-6u5-x_y_z</guimenuitem><guimenuitem>Software</guimenuitem><guimenuitem>Don't install @Base package group</guimenuitem></menuchoice>
+      </para>
+    </warning>
 
     <para>
       We still need to add a sample system to Cobbler. This
@@ -411,13 +466,13 @@ $SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
 # DEPENDENCIES
 #   The profile should not yet exist in cobbler. If it does,
 #   remove it with:
-#   sudo cobbler system remove --name=tbeheer1_dl3x0_ds1
+#   sudo cobbler system remove --name=dmsat1_kvm_ds1
 #   Adding an existing profile results in a clear warning
 #   from cobbler. No harm is done.
 # FAILURE
 # AUTHORS
 #   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
-#   Allard Berends (AB), 2014-06-09 11:31
+#   Allard Berends (AB), 2014-06-09 21:31
 # HISTORY
 # LICENSE
 #   Copyright (C) 2014 Allard Berends
@@ -442,7 +497,7 @@ $SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
 #
 
 COBBLER="sudo cobbler"
-# AB: extra Satellite organizations have != 1
+# AB: extra Spacewalk organizations have != 1
 ORGNUM="$(msat_ls_org.py)"
 
 ########## PARAMETERS TO EDIT ##########
@@ -451,7 +506,7 @@ OWNERS="example"
 PROFILE="bare-kvm-6u5-x_y_z"
 ORG="SpacewalkDefaultOrganization"
 MACH="kvm"
-COMMENT="empty"
+COMMENT="DS 1 test node"
 GATEWAY="192.168.5.1"
 NAMESERVERS="192.168.5.11"
 NAMESERVERS_SEARCH="dmsat1.org"
@@ -461,10 +516,10 @@ PROD_SUBNET="255.255.255.0"
 PROD_DNS_NAME="${HOSTNAME}"
 #CLUSTER_IP=
 #CLUSTER_SUBNET=
-#OCN1_IP=
-#OCN1_SUBNET=
-#OCN2_IP=
-#OCN2_SUBNET=
+#EXT1_IP=
+#EXT1_SUBNET=
+#EXT2_IP=
+#EXT2_SUBNET=
 #BACKUP_IP=
 #BACKUP_SUBNET=
 #BHR_IP=
@@ -498,7 +553,7 @@ $COBBLER system add \
   --name=${ORG}_${MACH}_${NAME} \
   --owners=${OWNERS} \
   --profile=${PROFILE}:${ORGNUM}:${ORG} \
-  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} nostorage environment=dmsat1 ipv6.disable=1 biosdevname=1" \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} nostorage depzone=dmsat1 ipv6.disable=1 biosdevname=1" \
   --kopts-post="ipv6.disable=1 biosdevname=1" \
   --netboot-enabled=0 \
   --comment=${COMMENT} \
@@ -551,25 +606,39 @@ $COBBLER system edit \
 
 # CIC ethernet interfaces not available
 
-# OCN-1 ethernet interface not available
+# EXT-1 ethernet interface not available
 
-# OCN-2 ethernet interface not available
+# EXT-2 ethernet interface not available
 
 # Backup ethernet interface not available
 
 # Beheer ethernet interface not available
-
 </screen>
-      Also, make sure that the system is in the DNS resource
-      files. Otherwise, the installation via the Spacewalk
-      server fails.
+      Add the system to Cobbler with:
+<screen>
+&sw1p; <userinput>./cobbler-ds1.sh</userinput>
+</screen>
     </para>
 
     <para>
+      In order to start the installation of the test system,
+      we need a boot ISO. It is created with:
 <screen>
 &sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-bare-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds1" --tempdir=/tmp</userinput>
 &sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso</userinput>
-...
+-rw-r--r--. 1 root root 37M Jun 13 17:00 /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso
+</screen>
+    </para>
+
+    <para>
+      Also, make sure that the system is in the DNS resource
+      files. Otherwise, the installation via the Spacewalk
+      server fails.
+<screen>
+&sw1p; <userinput>cd /var/named/chroot/var/named</userinput>
+&sw1p; <userinput>grep ds1 *</userinput>
+192.168.5.in-addr.arpa:14  IN  PTR ds1.dmsat1.org.
+dmsat1.org.zone:ds1        IN      A       192.168.5.14
 </screen>
     </para>
 
@@ -579,7 +648,7 @@ $COBBLER system edit \
     <title>Bare machine deployment test</title>
 
     <para>
-      The boot IS,
+      The boot ISO,
       <filename>/var/www/cobbler/pub/example/centos6u5-bare-kvm.iso</filename>,
       needs to be copied to the machine on which we run the
       KVM guest:
@@ -593,7 +662,7 @@ centos6u5-bare-kvm.iso                        100%   36MB  36.3MB/s   00:00
     <para>
       We prepare storage for the test machine:
 <screen>
-&sw1p; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) vg_vm</userinput>
   Logical volume "ds1" created
 </screen>
     </para>
@@ -610,7 +679,7 @@ centos6u5-bare-kvm.iso                        100%   36MB  36.3MB/s   00:00
   <userinput>--name=ds1 \</userinput>
   <userinput>--ram=512 \</userinput>
   <userinput>--arch=x86_64 \</userinput>
-  <userinput>--description="LVS LDAP 1" \</userinput>
+  <userinput>--description="DS 1 test node" \</userinput>
   <userinput>--cdrom /var/lib/libvirt/isos/centos6u5-bare-kvm.iso \</userinput>
   <userinput>--os-type=linux \</userinput>
   <userinput>--os-variant=rhel6 \</userinput>
@@ -619,10 +688,12 @@ centos6u5-bare-kvm.iso                        100%   36MB  36.3MB/s   00:00
   <userinput>--graphics vnc \</userinput>
   <userinput>--hvm \</userinput>
   <userinput>--autostart</userinput>
-.. output skipped, about 10 minutes ..
+.. output skipped, about 4 minutes, installation and reboot ..
 </screen>
+      Make sure to select the system called <systemitem
+      class="systemname">SpacewalkDefaultOrganization_kvm_ds1</systemitem>
+      in the selection window.
     </para>
-
 
   </section>
   
@@ -631,9 +702,10 @@ centos6u5-bare-kvm.iso                        100%   36MB  36.3MB/s   00:00
 
     <para>
       The installation of the <systemitem
-      class="systemname">ds1</systemitem> machine is done.
-      Now, we want to verify if we can run Puppet on it. The
-      first step is to install the Puppet software:
+      class="systemname">ds1</systemitem> machine has been
+      completed. Now, we want to verify if we can run
+      Puppet on it. The first step is to install the Puppet
+      software:
 <screen>
 &t1p; <userinput>yum install puppet</userinput>
 .
@@ -647,18 +719,18 @@ Installing for dependencies:
  augeas-libs      x86_64 1.0.0-5.el6          centos-x86_64-server-6      308 k
  compat-readline5 x86_64 5.2-17.1.el6         centos-x86_64-server-6      130 k
  dmidecode        x86_64 1:2.11-2.el6         centos-x86_64-server-6       71 k
- facter           x86_64 1:1.7.5-1.el6        example-puppet-6u5-1_0       87 k
- hiera            noarch 1.3.2-1.el6          example-puppet-6u5-1_0       23 k
+ facter           x86_64 1:1.7.5-1.el6        <emphasis>example-puppet-6u5-1_0</emphasis>       87 k
+ hiera            noarch 1.3.2-1.el6          <emphasis>example-puppet-6u5-1_0</emphasis>       23 k
  libselinux-ruby  x86_64 2.0.94-5.3.el6_4.1   centos-x86_64-server-6       99 k
  pciutils         x86_64 3.1.10-2.el6         centos-x86_64-server-6       85 k
  ruby             x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      534 k
- ruby-augeas      x86_64 0.4.1-3.el6          example-puppet-deps-6u5-1_0  21 k
+ ruby-augeas      x86_64 0.4.1-3.el6          <emphasis>example-puppet-deps-6u5-1_0</emphasis>  21 k
  ruby-irb         x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      313 k
  ruby-libs        x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      1.6 M
  ruby-rdoc        x86_64 1.8.7.352-12.el6_4   centos-x86_64-server-6      376 k
- ruby-rgen        noarch 0.6.5-2.el6          example-puppet-deps-6u5-1_0 237 k
- ruby-shadow      x86_64 1:2.2.0-2.el6        example-puppet-deps-6u5-1_0  13 k
- rubygem-json     x86_64 1.5.5-1.el6          example-puppet-deps-6u5-1_0 763 k
+ ruby-rgen        noarch 0.6.5-2.el6          <emphasis>example-puppet-deps-6u5-1_0</emphasis> 237 k
+ ruby-shadow      x86_64 1:2.2.0-2.el6        <emphasis>example-puppet-deps-6u5-1_0</emphasis>  13 k
+ rubygem-json     x86_64 1.5.5-1.el6          <emphasis>example-puppet-deps-6u5-1_0</emphasis> 763 k
  rubygems         noarch 1.3.7-5.el6          centos-x86_64-server-6      207 k
  virt-what        x86_64 1.11-1.2.el6         centos-x86_64-server-6       24 k
 .
@@ -667,11 +739,21 @@ Installing for dependencies:
 </screen>
     </para>
 
+    <note>
+      <title>Puppet channels contents</title>
+      <para>
+        From the emphasized items, from the above
+        <command>yum install</command> command, one can
+        clearly see the set of RPM's need to run Puppet.
+      </para>
+    </note>
+
+
     <para>
       Next, we want to conduct some simple Puppet tests, to
       see if Puppet functions:
 <screen>
-&t1p; <userinput>facter environment</userinput>
+&t1p; <userinput>facter depzone</userinput>
 dmsat1
 
 &t1p; <userinput>hiera -d somekey</userinput>
@@ -685,21 +767,39 @@ nil
 
 &t1p; <userinput>puppet apply --configprint hiera_config</userinput>
 /etc/puppet/hiera.yaml
+
 &t1p; <userinput>ls /etc/puppet/hiera.yaml</userinput>
 ls: cannot access /etc/puppet/hiera.yaml: No such file or directory
 
 &t1p; cat &gt; /var/lib/hiera/defaults.yaml &lt;&lt; EOF
-mything::one: one for bare01
-mything::two: two for bare01
+mything_one: one for bare
+mything_two: two for bare
 EOF
-&t1p; <userinput>hiera -d mything::one</userinput>
+
+&t1p; <userinput>hiera -d mything_one</userinput>
 DEBUG: Mon Jun 09 17:34:56 +0200 2014: Hiera YAML backend starting
 DEBUG: Mon Jun 09 17:34:56 +0200 2014: Looking up mything::one in YAML backend
 DEBUG: Mon Jun 09 17:34:56 +0200 2014: Looking for data source defaults
 DEBUG: Mon Jun 09 17:34:56 +0200 2014: Found mything::one in defaults
-one for bare01
-&t1p; <userinput>hiera mything::two</userinput>
-two for bare01
+one for bare
+
+&t1p; <userinput>hiera mything_two</userinput>
+two for bare
+
+&t1p; <userinput>cat /root/test.pp</userinput>
+notify {"Running in depzone ${depzone}":}
+notify {"Key mything_one is ${mything_one}":}
+
+&t1p; <userinput>puppet apply test.pp</userinput>
+Notice: Compiled catalog for ds1.dmsat1.org in environment production in 0.18 seconds
+Notice: Key mything_one is 
+Notice: /Stage[main]/Main/Notify[Key mything_one is ]/message: defined 'message' as 'Key mything_one is '
+Notice: Running in depzone dmsat1
+Notice: /Stage[main]/Main/Notify[Running in depzone dmsat1]/message: defined 'message' as 'Running in depzone dmsat1'
+Notice: Finished catalog run in 0.07 seconds
+[root@ds1 ~]# cat /root/test.pp 
+notify {"Running in depzone ${depzone}":}
+notify {"Key mything_one is ${mything_one}":}
 </screen>
     </para>
 

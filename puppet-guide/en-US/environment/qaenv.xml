@@ -3,10 +3,10 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
 %BOOK_ENTITIES;
 ]>
-<section id="environment-acceptance">
-  <title>Acceptance environment</title>
+<section id="environment-qaenv">
+  <title>Quality Assurance environment</title>
 
-  <table id="environment-acceptance-time">
+  <table id="environment-qaenv-time">
     <title>Time needed</title>
     <tgroup align="left" cols="2" colsep="1" rowsep="1">
       <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
@@ -39,7 +39,7 @@
     </itemizedlist>
   </para>
 
-  <section id="environment-acceptance-something">
+  <section id="environment-qaenv-something">
     <title>Something</title>
 
     <para>

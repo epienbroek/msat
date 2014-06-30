@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_tools-line_sets">
+  <title>Line based sets</title>
+
+  <para>
+    Once in a while, one needs to compare two sets. Most of
+    the time, in scripting, the sets are files, in which
+    each element of a set is represented by a line in the
+    file. Using the standard tools, like
+    <command>sort</command>, <command>sed</command>,
+    <command>grep</command>, <command>diff</command>, etc,
+    it is still cumbersome to find the answers one needs.
+  </para>
+
+  <para>
+    To tackle this problem, the
+    <command>line_sets.py</command> tool has been developed.
+    How can we use it? In the examples below we show how the
+    different operations work.
+<screen>
+&uprompt; <userinput>cat a</userinput>
+bok
+does
+duif
+gijs
+hok
+jet
+kees
+lam
+schapen
+teun
+vuur
+weide
+wim
+zus
+
+&uprompt; <userinput>cat b</userinput>
+aap
+bok
+does
+gijs
+hok
+lam
+mies
+noot
+schapen
+teun
+vuur
+weide
+wim
+zus
+
+&uprompt; <userinput>line_sets.py -h</userinput>  
+.. to get help ..
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '=='</userinput>  
+False
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '&lt;='</userinput>  
+False
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '&lt;'</userinput>  
+False
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '&gt;='</userinput>  
+False
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '&gt;'</userinput>  
+False
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '|' | sort</userinput>
+aap
+bok
+does
+duif
+gijs
+hok
+jet
+kees
+lam
+mies
+noot
+schapen
+teun
+vuur
+weide
+wim
+zus
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '&amp;' | sort</userinput>
+bok
+does
+gijs
+hok
+lam
+schapen
+teun
+vuur
+weide
+wim
+zus
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '-' | sort</userinput>
+duif
+jet
+kees
+
+&uprompt; <userinput>line_sets.py -b a -a b -o '-' | sort</userinput>
+aap
+mies
+noot
+
+&uprompt; <userinput>line_sets.py -a a -b b -o '^' | sort</userinput>
+aap
+duif
+jet
+kees
+mies
+noot
+</screen>
+    To perform a side-by-side comparison, use the
+    <option>-s</option> option. If the line-based elements
+    are too wide to fit on a 80 column ternminal, use the
+    <option>-w</option> option.
+<screen>
+&uprompt; <userinput>line_sets.py -a a -b b -s</userinput>
+                                        aap                                    
+bok                                     bok                                    
+does                                    does                                   
+duif                                    
+gijs                                    gijs                                   
+hok                                     hok                                    
+jet                                     
+kees                                    
+lam                                     lam                                    
+                                        mies                                   
+                                        noot                                   
+schapen                                 schapen                                
+teun                                    teun                                   
+vuur                                    vuur                                   
+weide                                   weide                                  
+wim                                     wim                                    
+zus                                     zus
+</screen>
+  </para>
+
+</section>

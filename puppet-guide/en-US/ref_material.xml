@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<appendix id="puppet-guide-ref_material">
+  <title>Reference material</title>
+  <para>
+    In this appendix we show links to reference material
+    used throughout the documentation.
+  </para>
+
+  <para>
+    <variablelist>
+      <varlistentry id="puppet-guide-ref_material-puppet-baseinfra">
+        <term>git repo - puppet-baseinfra</term>
+        <listitem>
+          <para>
+            Git repository containing basic Linux
+            infrastructure Puppet modules.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/puppet-baseinfra"><citetitle>aberends/puppet-baseinfra</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-puppet-structure">
+        <term>git repo - puppet-structure</term>
+        <listitem>
+          <para>
+            Git repository containing setup for Puppet
+            structure.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/puppet-structure"><citetitle>aberends/puppet-structure</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+    </variablelist>
+  </para>
+</appendix>
+

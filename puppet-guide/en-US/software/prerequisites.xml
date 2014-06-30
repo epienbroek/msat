@@ -49,5 +49,14 @@
     </itemizedlist>
   </para>
 
+  <para>
+    Since the bare metal deployment is done with help of the
+    Spacewalk server, and since the RPM's for Puppet and the
+    RPM's with the custom Puppet provisioning code all come
+    from software channels on the Spacewalk server, it is
+    essential, in our setup, to have a functioning Spacewalk
+    server.
+  </para>
+
 </section>
 
