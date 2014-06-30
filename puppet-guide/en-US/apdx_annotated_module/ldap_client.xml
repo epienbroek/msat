@@ -300,17 +300,17 @@ TLS_CACERTDIR   /etc/openldap/certs
 
 &lt;%
 if @encrypted == 'yes'
-if @servers.length &gt; 1
-# AB: client connections want encyrption, but since we
-# have more than one LDAP server, we are configuring the
-# client on an LDAP server itself, or on an LVS server.
-# Since, the certificate will never correspond with the
-# actual hostname in a LVS setup, we allow obtaining of
-# a certificate, but we do not really check it.
-tls_reqcert_level = 'allow'
-else
-tls_reqcert_level = 'demand'
-end -%&gt;
+  if @servers.length &gt; 1
+    # AB: client connections want encyrption, but since we
+    # have more than one LDAP server, we are configuring the
+    # client on an LDAP server itself, or on an LVS server.
+    # Since, the certificate will never correspond with the
+    # actual hostname in a LVS setup, we allow obtaining of
+    # a certificate, but we do not really check it.
+    tls_reqcert_level = 'allow'
+  else
+    tls_reqcert_level = 'demand'
+  end -%&gt;
 TLS_REQCERT &lt;%= tls_reqcert_level %&gt;
 &lt;% end -%&gt;
 </screen>
