@@ -1,0 +1,492 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap2">
+  <title>LDAP 2 instance</title>
+
+  <para>
+    In the development environment we have depicted a
+    network drawing, <xref
+    linkend="environment-development-network" />, in which 2
+    LDAP platforms are present.  We focus on the
+    <emphasis>ldap2</emphasis> platform here.
+  </para>
+
+  <para>
+    In order to get the <emphasis>ldap2</emphasis> service
+    operational, we need to conduct the following tasks:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Do bare metal deployment of the target node of
+          the <emphasis>ldap2</emphasis> instance.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Create the CA keypair (for SSL encryption of the
+          LDAP connections) or obtain it from a password
+          vault. Place it in
+          <filename>depzones/dmsat1/platforms/ldap/ldap2.yaml</filename>,
+          under <filename
+          class="directory">/var/lib/hiera</filename>. The
+          LDAP nodes of the <emphasis>ldap2</emphasis>
+          instance must have access to it.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Make the X.509 CA certificate from the CA keypair
+          available in the
+          <filename>depzones/dmsat1/subzones/dmz.yaml</filename>
+          file, under the <filename
+          class="directory">/var/lib/hiera</filename>
+          directory. All nodes in the
+          <emphasis>dmz</emphasis> subzone of
+          <emphasis>dmsat1</emphasis> deployment zone, must
+          have access to it.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Construct the <package>puppet-dmsat1</package> RPM
+          package with all the YAML files needed for the
+          Linux base infrastructure services in the
+          <emphasis>dmsat1</emphasis> Deployment zone and
+          make it available via the Spacewalk server in the
+          <emphasis>example-puppet-structure-6u5-1_0</emphasis>
+          software channel.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Provision the <emphasis>ldap2</emphasis> node via
+          Puppet.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <!-- Bare metal deployment -->
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create a new Cobbler scripts for placing
+    the <emphasis>ldap2</emphasis> platform instance
+    node to Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ds3/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.6.18/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DS 3 test node/g' \</userinput>
+<userinput>  -e 's/svcs.dmsat1.org/dmz.dmsat1.org/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:06:12/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-ds3.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    For the LDAP platform instance
+    <emphasis>ldap2</emphasis>, we create a boot ISO. It is
+    created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds3" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso</userinput>
+TODO
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-ldap2-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-ds3.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=ds3 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="DS 3 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-ldap2-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/ds3,device=disk,bus=virtio \
+  --network=network=dmz,mac=52:54:00:a8:06:12 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Make sure the scripts is executable and then start
+    it as root on the host:
+<screen>
+&hostp; <userinput>chmod u+x install-*</userinput>
+&hostp; <userinput>./install-ds3.sh</userinput>
+</screen>
+  </para>
+
+  <!-- CA keypair -->
+  <!-- X.509 CA certificate -->
+  <para>
+    The creation of the CA keypair and X.509 CA certificate
+    is done in exactly the same way as is described in <xref
+    linkend="platforms-ldap-ldap1" />.
+  </para>
+
+  <!-- puppet-dmsat1 rpm -->
+  <para>
+    The contribution of the <emphasis>ldap2</emphasis>
+    instance to the <package>puppet-dmsat1</package> RPM is
+    a set of parameters, distributed over different YAML
+    files. Each time the set of parameters is changed, we
+    need to build a new version of the
+    <package>puppet-dmsat1</package> RPM. This is also true
+    if other platforms, or subzones, are added to the
+    <emphasis>dmsat1</emphasis> Deployment zone.
+  </para>
+
+  <para>
+    The contribution of <emphasis>ldap2</emphasis> to the
+    influenced YAML fileset of <emphasis>dmsat1</emphasis>
+    is depicted below.
+<screen>
+&t1p; <userinput>cd /root/puppet-dmsat1/puppet-dmsat1/var/lib/hiera/depzones</userinput>
+&t1p; <userinput>tree --noreport --charset=ASCII</userinput>
+.
+|-- dmsat1
+|   |-- hosts
+|   |   `-- ds3.dmz.dmsat1.org.yaml (node)
+|   |-- platforms
+|   |   `-- ldap
+|   |       `-- ldap2.yaml          (depzone platform instance)
+|   `-- subzones
+|       `-- dmz.yaml                (depzone subzone)
+</screen>
+  </para>
+
+  <para>
+    The code of the <package>puppet-dmsat1</package> RPM can
+    be found in <xref
+    linkend="puppet-guide-ref_material-puppet-dmsat1" />.
+    The RPM is built with:
+<screen>
+&t1p; <userinput>cd ~/puppet-dmsat1</userinput>
+&t1p; <userinput>./build.sh</userinput>
+.. outpus skipped ..
+&t1p; <userinput>rpm --resign /root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm:
+&t1p; <userinput>scp /root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm root@192.168.5.11:/tmp</userinput>
+root@192.168.5.11's password: <userinput>redhat</userinput>
+puppet-dmsat1-0.1.1-1.noarch.rpm              100% 8743     8.5KB/s   00:00
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>cd /tmp</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-structure-6u5-1_0 -u example -p redhat puppet-dmsat1-0.1.1-1.noarch.rpm</userinput>
+.. no output is success ..
+</screen>
+  </para>
+
+  <!-- Puppet node provisioning -->
+  <table id="platforms-ldap-ldap2-items">
+    <title>LDAP platform delivery items</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>Item</entry>
+          <entry>Description</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>node</entry>
+          <entry>
+          </entry>
+        </row>
+        <row>
+          <entry>depzone platform instance</entry>
+          <entry>
+          </entry>
+        </row>
+        <row>
+          <entry>depzone platform</entry>
+          <entry>
+          </entry>
+        </row>
+        <row>
+          <entry>depzone subzone</entry>
+          <entry>
+          </entry>
+        </row>
+        <row>
+          <entry>depzone</entry>
+          <entry>
+            The following list of parameters need to be
+            provides:
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::capem</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::ldap_vip</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::ldap_vname</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::rhn_channel</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::root_dn_pwd</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::server_admin_pwd</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::servers</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>ldap::params::type</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::backup</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::nmask</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::primary</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::servers</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::vip</emphasis>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis>lvs::ldap::params::vmac</emphasis>
+                </para>
+              </listitem>
+            </itemizedlist>
+          </entry>
+        </row>
+        <row>
+          <entry>platform instance</entry>
+          <entry>Not applicable.</entry>
+        </row>
+        <row>
+          <entry>platform</entry>
+          <entry>Not applicable.</entry>
+        </row>
+        <row>
+          <entry>base</entry>
+          <entry>Not applicable.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+
+  <para>
+    The parameter that we need, according to <xref
+    linkend="puppet_configuration-layers-table" />, are:
+  </para>
+
+  <table id="platforms-ldap-ldap2-parameters">
+    <title>LDAP Puppet/Hiera parameter layers</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>Parameter</entry>
+          <entry>Description</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">node layer</emphasis></entry>
+        </row>
+        <row>
+          <entry>instance</entry>
+          <entry>ldap2</entry>
+        </row>
+        <row>
+          <entry>platform</entry>
+          <entry>ldap</entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">depzone platform instance layer</emphasis></entry>
+        </row>
+        <row>
+          <entry>platform</entry>
+          <entry>ldap</entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">depzone platform layer</emphasis></entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">depzone subzone layer</emphasis></entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">depzone layer</emphasis></entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">platform instance layer</emphasis></entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">platform layer</emphasis></entry>
+        </row>
+        <row>
+          <entry namest="c1" nameend="c2"><emphasis
+          role="strong">base layer</emphasis></entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    The <emphasis>ldap2</emphasis> LDAP instance provides
+    the LDAP service for all the nodes in the deployment
+    zone. An exception to this rule occurs if we have a
+    security rule that forbids LDAP access in a particular
+    subzone. For example, in the <emphasis>dmsat1</emphasis>
+    deployment zone, we have a subzone called
+    <emphasis>dmz</emphasis>. This zone has its own LDAP
+    service.
+  </para>
+
+  <para>
+    Since the <emphasis>ldap2</emphasis> LDAP instance
+    provides the LDAP service for all nodes in a deployment
+    zone, for example <emphasis>dmsat1</emphasis>, all nodes
+    need to know how to contact the LDAP service. The
+    contact point is the virtual hostname of the LDAP
+    service, e.g.
+    <systemitem>ds0.svcs.dmsat1.org</systemitem> in
+    <emphasis>dmsat1</emphasis>. So, this parameter and also
+    the CA (Certificate Authority) certificate, with which
+    the LDAP server certificates are signed, need to be
+    known by all nodes. To make the parameter set complete,
+    all nodes also need to know the base search path within
+    the DIT (Directory Information Tree).
+  </para>
+
+  <para>
+    The parameters are placed in the deployment zone layer,
+    <emphasis>depzone</emphasis>, see <xref
+    linkend="puppet_configuration-layers-table" />. In the
+    table below, the parameters are described. Why the
+    parameters are named like they are, is explained in
+    <xref linkend="puppet_configuration-hiera" /> and <xref
+    linkend="apdx_annotated_module-ldap-params" />.
+  </para>
+
+  <table id="platforms-ldap-ldap2-depzone">
+    <title>ldap2 deployment zone parameters</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>Parameter</entry>
+          <entry>Description</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>ldap::params::cacert_value</entry>
+          <entry>
+            The base64 encoded X.509 CA certificate of the
+            LDAP service.
+          </entry>
+        </row>
+        <row>
+          <entry>ldap::params::ldap_domain</entry>
+          <entry>
+            The LDAP domain is used as the root of the data
+            of the DIT (Directory Information Tree) in the
+            LDAP database. For example, if it is
+            <emphasis>dmsat1.org</emphasis>, it is
+            transformed to
+            <emphasis>dc=dmsat1,dc=org</emphasis> in the
+            configuration files.
+          </entry>
+        </row>
+        <row>
+          <entry>ldap::params::servers</entry>
+          <entry>
+            List of servers to connect to. Since we use load
+            balancers, the list contains exactly one
+            element.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    An example set of parameters can be found in <xref
+    linkend="puppet-guide-ref_material-puppet-baseinfra" />,
+    in the documentation path, <filename
+    class="directory">/usr/share/doc/puppet-baseinfra</filename>.
+    Start with reading the <filename>README.ldap</filename>
+    file.
+  </para>
+
+</section>

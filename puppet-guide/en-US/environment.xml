@@ -7,20 +7,27 @@
   <title>Environments</title>
 
   <para>
-    In this chapter, we mean by environment a piece of ICT
-    infrastructure with elements that belong together. For
-    example, we have a development environment, in which we
-    have a network, some computer machines, an LDAP service,
-    a DNS service, a Provisioning service (Spacewalk), etc.
-    In other words, it is an infrastructure domain in which
-    we provide different services and machines. Since we
-    call it development environment, we give the suggestion
-    that we develop in this environment.
+    In this chapter we discuss different environment types
+    that we envision. During the discussions we position the
+    environments and characterise their properties.
+  </para>
+
+  <para>
+    By environment we mean: collaborating ICT infrastructure
+    elements on which services run.  In an environment, we
+    have a network (data transport mechanism), some compute
+    nodes (e.g. KVM machines), and data storage (e.g. disks
+    on the KVM hosts). In the environment, we run an LDAP
+    service, a DNS service, a Provisioning service
+    (Spacewalk), etc. In other words, it is an
+    infrastructure domain in which we provide different
+    services.
   </para>
 
   <warning>
     <title>The notion of environment in this chapter must
-    not be confused witht the Puppet parameter $enviornment.</title>
+    not be confused with the Puppet parameter
+    $environment.</title>
 
     <para>
       In the Puppet configuration one can set the parameter
@@ -33,25 +40,8 @@
     </para>
   </warning>
 
-  <para>
-    Tasks we need to conduct:
-    <itemizedlist>
-      <listitem>
-        <para>
-          Empty.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          Empty.
-        </para>
-      </listitem>
-    </itemizedlist>
-  </para>
-
   <xi:include href="environment/development.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment/test.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment/qaenv.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment/production.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>
-

@@ -1,0 +1,226 @@
+graph cluster_dev_network {
+  fillcolor   = "white";
+  label       = "Deployment zone (dmsat1)";
+  labelloc    = "top";
+  //overlap     = "false";
+  outputorder = "edgesfirst";
+  packmode    = "node";
+  style       = "filled";
+
+  subgraph cluster_svcs {
+    fillcolor = "white";
+    label     = "Services (svcs) zone";
+    labelloc  = "bottom";
+    style     = "filled";
+
+    // Nodes.
+    svcs [
+      // the svcs.dmsat1.org zone network switch.
+      fillcolor = "lightgray",
+      label     = "svcs.dmsat1.org\nsvcs\n192.168.5.0/24";
+      shape     = "box",
+      style     = "filled",
+    ];
+
+    ant1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    subgraph cluster_ntp1 {
+      fillcolor = "white";
+      label     = "ntp1 instance";
+      labelloc  = "bottom";
+      style     = "filled";
+
+      ntp1 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      ntp2 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+    }
+
+    subgraph cluster_ldap1 {
+      fillcolor = "white";
+      label     = "ldap1 instance";
+      labelloc  = "bottom";
+      style     = "filled";
+
+      ds1 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      ds2 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      lvs1 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      lvs2 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+    }
+
+    subgraph cluster_lts1 {
+      fillcolor = "white";
+      label     = "lts1 instance";
+      labelloc  = "bottom";
+      style     = "filled";
+
+      lts1 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      lts2 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+    } // cluster_lts1
+
+    sw1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    // Edges.
+    svcs -- ant1;
+    svcs -- ntp1;
+    svcs -- ntp2;
+    svcs -- ds1;
+    svcs -- ds2;
+    svcs -- lvs1;
+    svcs -- lvs2;
+    svcs -- lts1;
+    svcs -- lts2;
+    svcs -- sw1;
+  } // cluster_svcs
+
+  subgraph cluster_rmt {
+    fillcolor = "white";
+    label     = "Remote (rmt) zone";
+    labelloc  = "bottom";
+    style     = "filled";
+
+    // Nodes.
+    rmt [
+      // the rmt.dmsat1.org zone network switch.
+      fillcolor = "lightgray",
+      label     = "rmt.dmsat1.org\nrmt\n192.168.7.0/24";
+      shape     = "box",
+      style     = "filled",
+    ];
+
+    proxy1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    tgt1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    // Edges.
+    rmt -- proxy1;
+    rmt -- tgt1;
+  } // cluster_rmt
+
+  subgraph cluster_dmz {
+    fillcolor = "white";
+    label     = "Demilitarized (dmz) zone";
+    labelloc  = "bottom";
+    style     = "filled";
+
+    // Nodes.
+    dmz [
+      // the dmz.dmsat1.org zone network switch.
+      fillcolor = "lightgray",
+      label     = "dmz.dmsat1.org\ndmz\n192.168.6.0/24";
+      shape     = "box",
+      style     = "filled",
+    ];
+
+    ds3 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    dex1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    // Edges.
+    dmz -- ds3;
+    dmz -- dex1;
+  } // cluster_dmz
+
+  subgraph cluster_core {
+    fillcolor = "white";
+    label     = "Central network (core) zone";
+    labelloc  = "bottom";
+    style     = "filled";
+
+    // Nodes.
+    core [
+      // the core.dmsat1.org zone network switch.
+      fillcolor = "lightgray",
+      label     = "core.dmsat1.org\ncore\n192.168.4.0/24";
+      shape     = "box",
+      style     = "filled",
+    ];
+
+    dev1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    rpm1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    yum1 [
+      fillcolor = "lightblue",
+      shape     = "box",
+      style     = "filled,rounded",
+    ];
+
+    // Edges.
+    core -- dev1;
+    core -- rpm1;
+    core -- yum1;
+  } // cluster_core
+
+  // Edges.
+  core -- svcs;
+  core -- rmt;
+  core -- dmz;
+} // dev_network

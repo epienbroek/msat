@@ -27,6 +27,22 @@
         </listitem>
       </varlistentry>
 
+      <varlistentry id="puppet-guide-ref_material-puppet-dmsat1">
+        <term>git repo - puppet-dmsat1</term>
+        <listitem>
+          <para>
+            Git repository containing Puppet module
+            parameters of the puppet-baseinfra modules in
+            the <emphasis>dmsat1</emphasis> Deployment zone.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/puppet-dmsat1"><citetitle>aberends/puppet-dmsat1</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry id="puppet-guide-ref_material-puppet-structure">
         <term>git repo - puppet-structure</term>
         <listitem>
@@ -38,6 +54,22 @@
           <para>
             <ulink
             url="https://github.com/aberends/puppet-structure"><citetitle>aberends/puppet-structure</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-libvirt">
+        <term>libvirt: The virtualization API</term>
+        <listitem>
+          <para>
+            libvirt is a toolkit to interact with the
+            virtualization capabilities of recent versions
+            of Linux (and other OSes).
+          </para>
+
+          <para>
+            <ulink
+            url="http://libvirt.org/"><citetitle>libvirt: The virtualization API</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>

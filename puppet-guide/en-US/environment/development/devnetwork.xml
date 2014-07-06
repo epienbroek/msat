@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="environment-development-devnetwork">
+  <title>Development network</title>
+
+  <para>
+    In this section we discuss the development network and
+    its zones. We show the
+    <application>libvirt</application> commands to create
+    the development networks. For background information,
+    see <xref linkend="puppet-guide-ref_material-libvirt"
+    />. The network drawing is given in <xref
+    linkend="environment-development-network" />. In the
+    table below, we explain the subdivision of the network
+    in different zones.
+  </para>
+
+  <table id="environment-development-devnetwork-zones">
+    <title>Development network zones</title>
+    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+      <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+      <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <thead valign="top">
+        <row>
+          <entry>Zone</entry>
+          <entry>Description</entry>
+        </row>
+      </thead>
+      <tbody valign="top">
+        <row>
+          <entry>core</entry>
+          <entry>
+            The <emphasis>core</emphasis> network provides
+            the place where we do the work. For example, the
+            <systemitem class="systemname">dev1</systemitem>
+            development node is located here. This node is a
+            bare system on which we test our
+            <application>Puppet</application> code.
+            Furthermore, from a network perspective, this
+            zone also interconnects the other zones.
+          </entry>
+        </row>
+        <row>
+          <entry>svcs</entry>
+          <entry>
+            The <emphasis>svcs</emphasis> network provides
+            the network location for our basic Linux infra
+            services, like DNS, LDAP, NTP, etc. So, whenever
+            a new service for the development environment
+            (dmsat1 deployment zone) is introduced, it is
+            placed in svcs.
+          </entry>
+        </row>
+        <row>
+          <entry>rmt</entry>
+          <entry>
+            The <emphasis>rmt</emphasis> network is a
+            Satellite zone where we do similar work as in
+            the core zone. The difference is that it is a
+            separate area. For example, it could be a
+            different geographical location or a subsidiary.
+          </entry>
+        </row>
+        <row>
+          <entry>dmz</entry>
+          <entry>
+            The <emphasis>dmz</emphasis> network is a
+            network that connects us to the Internet, or
+            other networks that we don't control. So, a
+            different security level is applicable here.
+          </entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <para>
+    In this text, we show how to create the different zones
+    on the host machine.
+  </para>
+
+  <para>
+<screen>
+&hostp; <userinput>cat core.xml</userinput>
+&lt;network&gt;
+  &lt;name&gt;core&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;mac address='52:54:00:A8:04:01'/&gt;
+  &lt;ip address='192.168.4.1' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+
+&hostp; <userinput>virsh net-define core.xml</userinput>
+Network core defined from core.xml
+&hostp; <userinput>virsh net-autostart core</userinput>
+&hostp; <userinput>virsh net-start core</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&hostp; <userinput>cat svcs.xml</userinput>
+&lt;network&gt;
+  &lt;name&gt;svcs&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr2' stp='on' delay='0'/&gt;
+  &lt;mac address='52:54:00:A8:05:01'/&gt;
+  &lt;ip address='192.168.5.1' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+
+&hostp; <userinput>virsh net-define svcs.xml</userinput>
+Network svcs defined from svcs.xml
+&hostp; <userinput>virsh net-autostart svcs</userinput>
+&hostp; <userinput>virsh net-start svcs</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&hostp; <userinput>cat dmz.xml</userinput>
+&lt;network&gt;
+  &lt;name&gt;dmz&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr3' stp='on' delay='0'/&gt;
+  &lt;mac address='52:54:00:A8:06:01'/&gt;
+  &lt;ip address='192.168.6.1' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+
+&hostp; <userinput>virsh net-define dmz.xml</userinput>
+Network dmz defined from dmz.xml
+&hostp; <userinput>virsh net-autostart dmz</userinput>
+&hostp; <userinput>virsh net-start dmz</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&hostp; <userinput>cat rmt.xml</userinput>
+&lt;network&gt;
+  &lt;name&gt;rmt&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr4' stp='on' delay='0'/&gt;
+  &lt;mac address='52:54:00:A8:07:01'/&gt;
+  &lt;ip address='192.168.7.1' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+
+&hostp; <userinput>virsh net-define rmt.xml</userinput>
+Network rmt defined from rmt.xml
+&hostp; <userinput>virsh net-autostart rmt</userinput>
+&hostp; <userinput>virsh net-start rmt</userinput>
+</screen>
+  </para>
+
+</section>

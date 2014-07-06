@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap">
+  <title>LDAP platform</title>
+
+  <para>
+    Instead of explaining what an LDAP platform is, we show
+    2 different LDAP platform instances in the following
+    sections. We use the <emphasis>dmsat1</emphasis>
+    Deployment zone as an example. For security reasons, an
+    extra LDAP instance is available for the subzone
+    <emphasis>dmz</emphasis>. This setup means that all
+    nodes in <emphasis>dmsat1</emphasis> will use the
+    generic LDAP service of the <emphasis>ldap1</emphasis>
+    instance. For the nodes in <emphasis>dmz</emphasis>, the
+    generic LDAP settings are overwritten by the subzone
+    parameters.
+  </para>
+
+  <xi:include href="ldap/ldap1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="ldap/ldap2.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</section>

@@ -1,139 +1,353 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
 %BOOK_ENTITIES;
 ]>
 <section id="environment-development">
   <title>Development environment</title>
 
-  <table id="environment-development-time">
-    <title>Time needed</title>
-    <tgroup align="left" cols="2" colsep="1" rowsep="1">
+  <para>
+    In the development environment we have a basic set of
+    services and nodes. In the drawing below, one can see
+    the layout of the network and the nodes it contains.
+    <figure id="environment-development-network">
+      <title>Development network</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" contentdepth="100%"
+          fileref="images/dnet.svg" format="SVG"
+          scalefit="1" valign="middle" width="100%" />
+        </imageobject>
+        <imageobject role="html">
+          <imagedata align="center" contentdepth="200%"
+          fileref="images/dnet.png" format="PNG"
+          scalefit="1" valign="middle" width="100%" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </para>
+
+  <para>
+    In the table, <xref
+    linkend="environment-development-nodes" />, the third
+    column refers to specific YAML parameters. What do we
+    mean by them? This answer is given in <xref
+    linkend="puppet_configuration-layers-table" />. By
+    studying <xref linkend="puppet_configuration" />, the
+    usage of these parameter must become clear.
+  </para>
+
+  <table id="environment-development-nodes">
+    <title>Base infra nodes</title>
+    <tgroup align="left" cols="3" colsep="1" rowsep="1">
       <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
       <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+      <colspec colname="c3" colnum="3" colwidth="1*"></colspec>
       <thead valign="top">
         <row>
-          <entry>action</entry>
-          <entry>time</entry>
+          <entry>Node</entry>
+          <entry>Description</entry>
+          <entry>Parameters</entry>
         </row>
       </thead>
       <tbody valign="top">
         <row>
-          <entry>Analysis of CentOS 6.5 channel</entry>
-          <entry>120 minutes</entry>
+          <entry>d21sw1</entry>
+          <entry>
+            The Spacewalk provisioning server. It is used
+            for bare metal deployment of the other nodes.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>ds1</entry>
+          <entry>
+            Directory server 1 node, providing the LDAP
+            service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other Directory server node via
+            MultiMaster Replication (MMR).
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ldap1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ldap</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>ds2</entry>
+          <entry>
+            Directory server 2 node, providing the LDAP
+            service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other Directory server node via
+            MultiMaster Replication (MMR).
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ldap1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ldap</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>lvs1</entry>
+          <entry>
+            Linux Virtual Server (LVS) 1 node, providing
+            network load balancing for the the LDAP service
+            for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other LVS node via a custom heartbeat
+            mechanism.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ldap1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ldap</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>lvs2</entry>
+          <entry>
+            Linux Virtual Server (LVS) 2 node, providing
+            network load balancing for the the LDAP service
+            for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other LVS node via a custom heartbeat
+            mechanism.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ldap1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ldap</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>ant1</entry>
+          <entry>
+            Simulation of a stratum 1 NTP server, using the
+            NTP software.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>ntp1</entry>
+          <entry>
+            Network Time Protocol (NTP) 1 node, providing
+            the NTP service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other NTP node via a custom heartbeat
+            mechanism. It uses the <systemitem
+            class="systemname">ant1</systemitem> stratum 1
+            server as upstream clock.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ntp1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ntp</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>ntp2</entry>
+          <entry>
+            Network Time Protocol (NTP) 2 node, providing
+            the NTP service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other NTP node via a custom heartbeat
+            mechanism. It uses the <systemitem
+            class="systemname">ant1</systemitem> stratum 1
+            server as upstream clock.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ntp1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ntp</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>lts1</entry>
+          <entry>
+            The Linux Terminal Server (LTS) 1 node. It is by
+            system administrators to do interactive
+            administration in the
+            <emphasis>dmsat1</emphasis> Deployment zone.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>lts1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>lts</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>lts2</entry>
+          <entry>
+            The Linux Terminal Server (LTS) 2 node. It is by
+            system administrators to do interactive
+            administration in the
+            <emphasis>dmsat1</emphasis> Deployment zone.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>lts1</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>lts</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>proxy1</entry>
+          <entry>
+            The Spacewalk provisioning proxy. It is used for
+            bare metal deployment of the other nodes in the
+            <emphasis>rmt</emphasis> zone of the
+            <emphasis>dmsat1</emphasis> Deployment zone.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>tgt1</entry>
+          <entry>
+            Target 1 node, to be installed via the Spacewalk
+            <systemitem
+            class="systemname">proxy1</systemitem> node.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>ds3</entry>
+          <entry>
+            Directory server 3 node, providing the LDAP
+            service for the <emphasis>dmz</emphasis> subzone
+            in the Deployment zone
+            <emphasis>dmsat1</emphasis>. It is a standalone
+            LDAP service without sensitive data, but only
+            data actually used in the
+            <emphasis>dmz</emphasis> subzone.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>instance</term>
+                <listitem><para>ldap2</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>platform</term>
+                <listitem><para>ldap</para></listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>subzone</term>
+                <listitem><para>dmz</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>dex1</entry>
+          <entry>
+            Data EXchange (DEX) server 1. It provides the
+            means to store and retrieve data via sftp and
+            ftp.
+          </entry>
+          <entry>
+            Node YAML parameters:
+            <variablelist>
+              <varlistentry>
+                <term>subzone</term>
+                <listitem><para>dmz</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </entry>
+        </row>
+        <row>
+          <entry>dev1</entry>
+          <entry>
+            Development machine 1. It is used to build and
+            test Puppet code.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>rpm1</entry>
+          <entry>
+            RPM development machine 1. It is used to build
+            RPM packages.
+          </entry>
+          <entry>None.</entry>
+        </row>
+        <row>
+          <entry>yum1</entry>
+          <entry>
+            YUM development machine 1. It is used to build
+            figure out YUM.
+          </entry>
+          <entry>None.</entry>
         </row>
       </tbody>
     </tgroup>
   </table>
 
-  <para>
-    In this section we discuss how we setup a basic Linux
-    node that we use to develop our puppet code and
-    configuration on. After we have created the bare Linux
-    node, as is shown in <xref
-    linkend="software-test-bare"/>, we want to install a
-    number of RPM packages and setup some configuration. We
-    need the following items:
-    <itemizedlist>
-      <listitem>
-        <para>
-          <package>vim-enhanced</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <package>rsync</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <package>puppet</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <package>tree</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <package>man</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <package>mlocate</package>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          Public SSH key of our host in the
-          <filename>~/.ssh/authorized_keys</filename> of the
-          bare Linux node.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          The <application>vim</application> configuration
-          of our host in <filename
-          class="directory">~/.vim/</filename>.
-        </para>
-      </listitem>
-    </itemizedlist>
-  </para>
-
-  <para>
-    The RPM packages can be installed with:
-<screen>
-&t1p; <userinput>yum install vim-enhanced rsync puppet tree man mlocate</userinput>  
-.. output skipped ..
-</screen>
-  </para>
-
-  <para>
-    The public SSH key of our host is copied with:
-<screen>
-&hostp; <userinput>ssh-copy-id root@192.168.5.14</userinput>
-/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
-/usr/bin/ssh-copy-id: INFO: 2 key(s) remain to be installed -- if you are prompted now it is to install the new keys
-Warning: Permanently added '192.168.5.14' (RSA) to the list of known hosts.
-root@192.168.5.14's password: <userinput>redhat</userinput>
-
-Number of key(s) added: 2
-
-Now try logging into the machine, with:   "ssh 'root@192.168.5.14'"
-and check to make sure that only the key(s) you wanted were added.
-</screen>
-  </para>
-
-  <para>
-    All the custom vim settings on our host are copied to
-    the Puppet development machine with:
-<screen>
-&hostp; <userinput>rsync -au ~/.vim root@192.168.5.14:</userinput>
-</screen>
-  </para>
-
-  <para>
-    Since this is our Puppet development node, we want to
-    enrich it with some aliases to speed up our workflow:
-<screen>
-&t1p; <userinput>cat ~/.bashrc</userinput>
-# .bashrc
-
-# User specific aliases and functions
-
-# Source global definitions
-if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
-fi
-
-# Path aliases.
-alias hier='cd /var/lib/hiera'
-alias ipt='cd /etc/puppet/modules/iptables/manifests'
-alias ldap='cd /etc/puppet/modules/ldap/manifests'
-alias mod='cd /etc/puppet/modules'
-</screen>
-  </para>
-
+  <xi:include href="development/devnetwork.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="development/devnode.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </section>

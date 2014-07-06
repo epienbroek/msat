@@ -5,6 +5,7 @@
 
 <!ENTITY rprompt "<prompt>#</prompt>">
 <!ENTITY uprompt "<prompt>$</prompt>">
+<!ENTITY uhp "<prompt>host$</prompt>">
 <!ENTITY hostp "<prompt>host#</prompt>">
 <!ENTITY sw1 "dw1sw1">
 <!ENTITY sw1p "<prompt>d21sw1#</prompt>">

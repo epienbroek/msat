@@ -111,14 +111,18 @@
       snippets first.
     </para>
 
-    <para>
-      Since no dependencies between the activation keys and
-      the Cobbler snippets exist, the order of creation of
-      the activation key and Cobbler snippets does not
-      matter. Here we start with the activation key.
-    </para>
-    <para>
-      The activation key creation script is:
+    <section id="software-test-kp-ak">
+      <title>Add activation key</title>
+
+      <para>
+        Since no dependencies between the activation keys and
+        the Cobbler snippets exist, the order of creation of
+        the activation key and Cobbler snippets does not
+        matter. Here we start with the activation key.
+      </para>
+
+      <para>
+        The activation key creation script is:
 <screen>
 &sw1p; <userinput>cat ak-bare-kvm-6u5-x_y_z.sh</userinput>
 #!/bin/bash
@@ -175,17 +179,21 @@ msat_mk_ak.py \
   --activationkey-packages '' \
   --activationkey-configchannels ''
 </screen>
-      To put the activation key on the Spacewalk server, run
-      the script:
+        To put the activation key on the Spacewalk server, run
+        the script:
 <screen>
 &sw1p; <userinput>./ak-bare-kvm-6u5-x_y_z.sh</userinput>
 .. no output upon success ..
 </screen>
-    </para>
+      </para>
+    </section>
 
-    <para>
-      The Cobbler snippet creation script to control the yum
-      repo's is:
+    <section id="software-test-kp-cs">
+      <title>Add Cobbler snippet</title>
+
+      <para>
+        The Cobbler snippet creation script to control the yum
+        repo's is:
 <screen>
 &sw1p; <userinput>cat cs-repo-6-x_y_z.sh</userinput>
 #!/bin/bash
@@ -242,16 +250,16 @@ msat_mk_cs.py \
 # AB: only Spacewalk channels as repo.
 /bin/rm -f /etc/yum.repos.d/CentOS-*.repo'
 </screen>
-      The put the Cobbler snippet on the Spacewalk server,
-      run it:
+        The put the Cobbler snippet on the Spacewalk server,
+        run it:
 <screen>
 &sw1p; <userinput>./cs-repo-6-x_y_z.sh</userinput>
 </screen>
-    </para>
+      </para>
 
-    <para>
-      The Cobbler snippet creation script for the bare Linux
-      node is:
+      <para>
+        The Cobbler snippet creation script for the bare Linux
+        node is:
 <screen>
 &sw1p; <userinput>cat cs-bare-6-x_y_z.sh</userinput>
 #!/bin/bash
@@ -315,17 +323,21 @@ EOF
 # exact kernel version.
 #yum -y update kernel-2.6.32-431.el6.x86_64 kernel-firmware-2.6.32-431.el6.noarch'
 </screen>
-      To put in on the Spacewalk server, run it with:
+        To put in on the Spacewalk server, run it with:
 <screen>
 &sw1p; <userinput>./cs-bare-6-x_y_z.sh</userinput>
 </screen>
-    </para>
+      </para>
+    </section>
 
-    <para>
-      Since we have the activation key and the Cobbler
-      snippets, on which the kickstart profile depends, in
-      the Spacewalk server, we can create the kickstart
-      profile now by creating the script:
+    <section id="software-test-kp-kp">
+      <title>Add kickstart profile</title>
+
+      <para>
+        Since we have the activation key and the Cobbler
+        snippets, on which the kickstart profile depends, in
+        the Spacewalk server, we can create the kickstart
+        profile now by creating the script:
 <screen>
 &sw1p; <userinput>cat kp-bare-kvm-6u5-x_y_z.sh</userinput>
 #!/bin/bash
@@ -411,25 +423,29 @@ msat_mk_kp.py \
   --kickstart-postscript '$SNIPPET('"'"'spacewalk/'"$ORGNUM"'/repo-6-x_y_z'"'"')
 $SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
 </screen>
-      We run the script with the command:
+        We run the script with the command:
 <screen>
 &sw1p; <userinput>./kp-bare-kvm-6u5-x_y_z.sh</userinput>
 </screen>
-    </para>
-
-    <warning>
-      <title>Disable @Base in Spacewalk web interface</title>
-      <para>
-        Via the msat scripts, we are unable to select the
-        option to not install the <package>@Base</package>
-        set of RPM's. Hence, we need to do so manually:
-        <menuchoice><guimenu>Kickstart</guimenu><guisubmenu>Profiles</guisubmenu><guimenuitem>bare-kvm-6u5-x_y_z</guimenuitem><guimenuitem>Software</guimenuitem><guimenuitem>Don't install @Base package group</guimenuitem></menuchoice>
       </para>
-    </warning>
 
-    <para>
-      We still need to add a sample system to Cobbler. This
-      is done with:
+      <warning>
+        <title>Disable @Base in Spacewalk web interface</title>
+        <para>
+          Via the msat scripts, we are unable to select the
+          option to not install the <package>@Base</package>
+          set of RPM's. Hence, we need to do so manually:
+          <menuchoice><guimenu>Kickstart</guimenu><guisubmenu>Profiles</guisubmenu><guimenuitem>bare-kvm-6u5-x_y_z</guimenuitem><guimenuitem>Software</guimenuitem><guimenuitem>Don't install @Base package group</guimenuitem></menuchoice>
+        </para>
+      </warning>
+    </section>
+
+    <section id="software-test-kp-cobbler">
+      <title>Add system to Cobbler</title>
+
+      <para>
+        We still need to add a sample system to Cobbler. This
+        is done with:
 <screen>
 &sw1p; <userinput>cat cobbler-ds1.sh</userinput>
 #!/bin/bash
@@ -614,33 +630,38 @@ $COBBLER system edit \
 
 # Beheer ethernet interface not available
 </screen>
-      Add the system to Cobbler with:
+        Add the system to Cobbler with:
 <screen>
 &sw1p; <userinput>./cobbler-ds1.sh</userinput>
 </screen>
-    </para>
+      </para>
+    </section>
 
-    <para>
-      In order to start the installation of the test system,
-      we need a boot ISO. It is created with:
+    <section id="software-test-kp-iso">
+      <title>Create boot ISO</title>
+
+      <para>
+        In order to start the installation of the test system,
+        we need a boot ISO. It is created with:
 <screen>
 &sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-bare-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds1" --tempdir=/tmp</userinput>
 &sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso</userinput>
 -rw-r--r--. 1 root root 37M Jun 13 17:00 /var/www/cobbler/pub/example/centos6u5-bare-kvm.iso
 </screen>
-    </para>
+      </para>
 
-    <para>
-      Also, make sure that the system is in the DNS resource
-      files. Otherwise, the installation via the Spacewalk
-      server fails.
+      <para>
+        Also, make sure that the system is in the DNS resource
+        files. Otherwise, the installation via the Spacewalk
+        server fails.
 <screen>
 &sw1p; <userinput>cd /var/named/chroot/var/named</userinput>
 &sw1p; <userinput>grep ds1 *</userinput>
 192.168.5.in-addr.arpa:14  IN  PTR ds1.dmsat1.org.
 dmsat1.org.zone:ds1        IN      A       192.168.5.14
 </screen>
-    </para>
+      </para>
+    </section>
 
   </section>
   
