@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap1-keypair">
+  <title>CA keypair creation</title>
+
+  <!-- CA keypair -->
+  <para>
+    In order for the LDAP connections to be encrypted, we
+    need to create a CA (Certificate Authority) keypair. It
+    is used in the LDAP module to generate server
+    certificates for the LDAP nodes. The server certificates
+    are signed with the private key of the CA keypair. Here,
+    we show the steps needed to create such a CA keypair.
+  </para>
+
+  <para>
+    We create a directory in which we keep the security
+    databases. In there, we create the different files we
+    need. The <command>certutil -N</command> command creates
+    the actual databases.
+<screen>
+&t1p; <userinput>mkdir /tmp/cert</userinput>
+&t1p; <userinput>cd /tmp/cert</userinput>
+&t1p; <userinput>echo -e "redhat123\nredhat123" > /tmp/pwdfile</userinput>
+&t1p; <userinput>certutil -N -d . -f /tmp/pwdfile</userinput>
+&t1p; <userinput>ls</userinput>
+cert8.db  key3.db  secmod.db
+</screen>
+  </para>
+
+  <para>
+    The actual creation of the keypair is done here. To
+    speed up the process, we create a random seed file,
+    called <filename>noise.txt</filename>. The
+    <command>certutil -S</command> command is interactive.
+    Some question need to be answered.
+<screen>
+&t1p; <userinput>echo "abadslkfjasdfwq398rq23laskmdv.as,fdlkasjdf2139847qw398aslfkdjasv.v,zlfckjasldf2o" &gt; noise.txt</userinput>
+&t1p; <userinput>certutil -S -n "LDAP CA cert" -s "cn=LDAP CA cert,dc=dmsat1,dc=org" -c "cn=LDAP CA cert,dc=dmsat1,dc=org" -2 -x -t "CT,," -m 1000 -v 120 -d . -k rsa -g 2048 -f /tmp/pwdfile -z noise.txt</userinput>
+
+Generating key.  This may take a few moments...
+
+Is this a CA certificate [y/N]?
+<userinput>y</userinput>
+Enter the path length constraint, enter to skip [&lt;0 for unlimited path]: > 
+Is this a critical extension [y/N]?
+<userinput>y</userinput>
+</screen>
+  </para>
+
+  <para>
+    We check the result by using the list command
+    <command>certutil -L</command>.
+<screen>
+&t1p; <userinput>certutil -d . -L</userinput>
+
+Certificate Nickname                                         Trust Attributes
+                                                             SSL,S/MIME,JAR/XPI
+
+LDAP CA cert                                                 CTu,u,u
+</screen>
+  </para>
+
+  <para>
+    The CA keypair does not have any use to us if we keep it
+    on this development node. Hence, we export to PEM
+    (Privacy Enhanced Mail) format, which is in base64
+    encoding. This file we can easily transport and store.
+<screen>
+&t1p; <userinput>pk12util -d . -o ca.p12 -n "LDAP CA cert" -w /tmp/pwdfile -k /tmp/pwdfile</userinput>
+pk12util: PKCS12 EXPORT SUCCESSFUL
+&t1p; <userinput>openssl pkcs12 -in ca.p12 -out ca.pem -passin file:/tmp/pwdfile -passout file:/tmp/pwdfile</userinput>
+MAC verified OK
+</screen>
+  </para>
+
+  <para>
+    To verify the content of the CA keypair, we dump it to
+    the terminal screen:
+<screen>
+&t1p; <userinput>cd /tmp/cert</userinput>
+&t1p; <userinput>cat ca.pem</userinput>
+Bag Attributes
+    friendlyName: LDAP CA cert
+    localKeyID: E4 73 5A 58 86 12 7B 20 76 AC 58 57 F1 97 99 85 51 BF 08 82 
+Key Attributes: &lt;No Attributes&gt;
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+MIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIeTLi89J1mhQCAggA
+MBQGCCqGSIb3DQMHBAid+8tZcnBn9ASCBMhGQyy6/x44Yrt1lfTOlXwWuxjYD0CC
+7T+C53kitSEDZymw2ajhEC5Crr4AufGezfCgKa23N2tFY6rlydF2m6qabJyxDmqe
+DKx6oScYemx5Lz80kC43DZ34YHH2OWfwBaRVDHdcm+UnXzVBPm+B2AgrfOAWGWqV
+FrPbSP5ONNTjFL/A+cNoE4GayZF07vrbpQ8wvufov26rcqK56G8pTPTpplFRrnTB
+sZxaILw/LWUlFOcve6kBdhw9gkhiQwuJiFVVrXduJi1S+kQmHucSiyzhgwAMF/9G
+3I2QOJYlKb+TJ98cpx2ruq9eyfKdcf1x/wnck+zq4GLNMiS+9x8Xp4uCDMonnPmD
+hgvMQtwgMPCtvzdzGoZwEkzO6b58Rh55DVJxPXq+1kkdOwA5ypqvDRd9TfXwbTmo
+MAuDz2bKKiXu3fsB5nKdeFJxQYtTaYc9QBR/gmMWijbeKIDvF7SCWvP0lDdwgmFJ
+c7rKNZmuWQt00/WouIeH14+UFyrrtjf/R0FEUWmyD9M8jLPOQNgk+HJXJTthuZgh
+9lKF6DP7g2ovhqkf4asLmUq4oLPiqcBRGupqaJtV0YBuUP2jtn74+2hzrq6Pa8z5
+aiT2P/62MvsgkWjIEYR0DPuVR4uqjJzOLclo2wjE5o6YhRFvZxAG5HDp7HdPkDSO
+VFQUBw9g2+XNFFfKth6E18Y3nPd3cH2LMO7F2JuZOYi9k08QPTtu3Jy3cDxgXCJz
+2v7OPKtKF92KGoZWLnTPE4p8vCTxudipU3WlzrNKpVm7diwX3x3ThcQmc1J+tX/r
+hxKUwHtAVrgvO2sytcJg2HQT/Bk3fX8b630LxmvBxGv8NxR76IV5Ijyb0scn8qCP
+eukkMJjx+wQC/IV7o4hSywVOj23qIMY+OJduD81Y6LZFKk7u673vMB6AiTGJjqOo
+7Bh20qbCBTwVoGaQwEehKJlsDCqScGETsSilZGR9cpnvUub8ccYaV0LPavNxl9SL
+bExe3kA2tSEnthMqvSwHTyMLo1WfrmsKJX3AMaSeNrCGvRQUzwsghE5o1nLYzHE6
+7zNKL1uKfXzl5pGNQki0tPnTJTlnmNSXUq0gpx1JD38awpuTiXOj28lEOD+kg5vc
+fIRo0tg/7DKLEz1XCip7XS0pV3YYBSA1LdJEDEGoB727LtQxRymv4w59/ZyY1g0Q
+On/0OztDz4nZrki82+ifyLEYZvL7SYuVNT3LSAQSXVnhSnPq3LC14m14+w8lUBO8
+TmNv1hudD5ZW3XcQiRfROrp55JYsBSUWgCudsePVnydbjvrbsOeL3I44QjpK6l41
+7IaGccOzV8cib0JzJcSwjgTexThDERdRJgu9n1HtbxiaCEEihfcGgNkDB0BogGNa
+SZ0n1xUy6WXy7FwjxOanpL3+1BHtHbN36SS8R36YGxq7VL/uBLhS1d3/7Xvfg+zM
+ITjuvJGP24nosc4AUGlQ4hO9MRdzxJWSIiV3oDjgkbSP70sGX2siQUs2f1h9TMB2
+41yAlay8EbuGB+AxiZhz3ZeTfwy0/f8V+YvDpHs3qhKKT5dIkmeGjefOwY2bha+X
+p04Tzig2Ph23nIY33JVB7Em4nkgCJlcNuucstDwWDijTpvcy0zDaFhTU/id92MWb
+ZC8=
+-----END ENCRYPTED PRIVATE KEY-----
+Bag Attributes
+    friendlyName: LDAP CA cert
+    localKeyID: E4 73 5A 58 86 12 7B 20 76 AC 58 57 F1 97 99 85 51 BF 08 82 
+subject=/DC=org/DC=dmsat1/CN=LDAP CA cert
+issuer=/DC=org/DC=dmsat1/CN=LDAP CA cert
+-----BEGIN CERTIFICATE-----
+MIIDFzCCAf+gAwIBAgICA+gwDQYJKoZIhvcNAQEFBQAwRDETMBEGCgmSJomT8ixk
+ARkWA29yZzEWMBQGCgmSJomT8ixkARkWBmRtc2F0MTEVMBMGA1UEAxMMTERBUCBD
+QSBjZXJ0MB4XDTE0MDcwNjIwMjQzN1oXDTI0MDcwNjIwMjQzN1owRDETMBEGCgmS
+JomT8ixkARkWA29yZzEWMBQGCgmSJomT8ixkARkWBmRtc2F0MTEVMBMGA1UEAxMM
+TERBUCBDQSBjZXJ0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6pjG
+rJGoC2WTmN+hu8d1LgiAvyV/PMCrg5lTQh6tfzHnUgyi3fYes7VG1uxIXhyXiJOM
+gJD6D+fx5pndvZCQoMyMiUfP+UB4zrnQu1pQSVIlzX6MiR+dLKfFsjzU1REfmZX+
+Mh2562JCj+x/6mR0lwqUyu+q+sDq/yjfwongXuTjJIINukwSveIQXt2h8Ck4gdX4
+9I5oWpSGU2/pVpNelvb1VS4rHOm0Rrr9w1i/k8CNstaQv97I9SFhCJ3FxNul0WBZ
+LH5x4qGIU0no4SCYbkcUEPeqnhbE/juHNBnBXO5nx6QxYIlCTs7OCyAPQ1DueOZi
+0I7wtrAQK5VzfKPmhwIDAQABoxMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBBQUAA4IBAQAutpo3FmF+55JBIul8BNutDw67J85VYAEN0Tu1ZOmrirG4FRFl
+/5nrB2u619IyO1ECFLk7MFmrDYO4uFILktow+1OcVdz30Pac/alztX49F0tc+2MI
+9Sh28vQnbiaiTULpIrh0I8DwAdpm5euh6JRVMhJeIFxpiS83bbOlRsifYaE7qcI0
+z9vT+IjhhiswdYDQdKnrAAXUi9ec460GetYc+1nyolLltY4XwwypAzCTdXiSFRJS
+5oklmP+h8Hysfpb+Nn3PCQsS+m4wFAhJZQVGoU/bFbhbXUBBOp5/S3Kpyn74s/IP
+f0IUocN5iAuzWMcJNEjJGUsoq2TVABDWnwa0
+-----END CERTIFICATE-----
+</screen>
+  </para>
+
+</section>

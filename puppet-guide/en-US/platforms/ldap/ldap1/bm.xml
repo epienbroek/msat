@@ -1,0 +1,331 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap1-bm">
+  <title>Bare metal deployment</title>
+
+  <!-- Bare metal deployment -->
+  <para>
+    For bare metal deployment, we need to provide
+    information about the 4 nodes to the Cobbler system on
+    the Spacewalk server, <systemitem
+    class="systemname">d21sw1</systemitem>.
+  </para>
+
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create the other Cobbler scripts for placing
+    the other 3 <emphasis>ldap1</emphasis> platform instance
+    nodes to Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ds2/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.15/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:0f/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-ds2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>cat cobbler-lvs1.sh</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler_lvs1.sh
+# DESCRIPTION
+#   This script should be run on the Spacewalk server:
+#   # ./cobbler_lvs1.sh
+#
+#   IP details
+#
+#   Host     Prod            Cluster          ILO
+#   lvs1     192.168.5.16    192.168.105.16   -
+#            backup          admin
+#            -               -
+#
+#   Subnets:
+#   192.168.5.0/24     gw: 192.168.5.1
+#   192.168.105.0/24   gw: 192.168.105.1
+#   -
+#   -
+#   -
+#
+#   DNS servers:
+#   * 192.168.5.11
+#
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   sudo cobbler system remove --name=dmsat1_kvm_lvs1
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-06-09 21:31
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cobbler_lvs1.sh is free software; you can
+#   redistribute it and/or modify it under the terms of the
+#   GNU General Public License as published by the Free
+#   Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   cobbler_lvs1.sh is distributed in the hope
+#   that it will be useful, but WITHOUT ANY WARRANTY;
+#   without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+COBBLER="sudo cobbler"
+# AB: extra Spacewalk organizations have != 1
+ORGNUM="$(msat_ls_org.py)"
+
+########## PARAMETERS TO EDIT ##########
+NAME="lvs1"
+OWNERS="example"
+PROFILE="bare-kvm-6u5-x_y_z"
+ORG="SpacewalkDefaultOrganization"
+MACH="kvm"
+COMMENT="LVS 1 test node"
+GATEWAY="192.168.5.1"
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="svcs.dmsat1.org"
+HOSTNAME="${NAME}.${NAMESERVERS_SEARCH}"
+PROD_IP="192.168.5.16"
+PROD_SUBNET="255.255.255.0"
+PROD_DNS_NAME="${HOSTNAME}"
+CLUSTER_IP="192.168.105.16"
+CLUSTER_SUBNET="255.255.255.0"
+#BACKUP_IP=
+#BACKUP_SUBNET=
+#BHR_IP=
+#BHR_SUBNET=
+MAC_ETH1="52:54:00:a8:05:10"
+MAC_ETH2="52:54:00:a8:69:10"
+#MAC_ETH3=
+#MAC_ETH4=
+#MAC_ETH5=
+#MAC_ETH6=
+#MAC_ETH7=
+#MAC_ETH8=
+ETH1_NAME="em1"
+ETH2_NAME="em2"
+#ETH3_NAME=em3
+#ETH4_NAME=em4
+#ETH5_NAME=em5
+#ETH6_NAME=em6
+#ETH7_NAME=em7
+#ETH8_NAME=em8
+#PROXY=
+
+$COBBLER system list | grep -q ${ORG}_${MACH}_${NAME}
+if [ $? -eq 0 ]; then
+  echo "$NAME already exists. Removing system ...."
+  $COBBLER system remove --name=${ORG}_${MACH}_${NAME}
+fi
+
+########## START SCRIPT ##########
+$COBBLER system add \
+  --name=${ORG}_${MACH}_${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORGNUM}:${ORG} \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} nostorage depzone=dmsat1 ipv6.disable=1 biosdevname=1" \
+  --kopts-post="ipv6.disable=1 biosdevname=1" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;'
+  #--uid=UID
+  #--image=IMAGE
+  #--kopts-post=KOPTS_POST
+  #--ksmeta=KSMETA
+  #--kickstart=KICKSTART
+  #--depth=DEPTH
+  #--server=SERVER
+  #--virt-path=VIRT_PATH
+  #--virt-type=VIRT_TYPE
+  #--virt-cpus=VIRT_CPUS
+  #--virt-file-size=VIRT_FILE_SIZE
+  #--virt-ram=VIRT_RAM
+  #--virt-auto-boot=VIRT_AUTO_BOOT
+  #--ctime=CTIME
+  #--mtime=MTIME
+  #--power-address=POWER_ADDRESS
+  #--power-user=POWER_USER
+  #--power-pass=POWER_PASS
+  #--power-id=POWER_ID
+  #--ipv6-default-device=IPV6_DEFAULT_DEVICE
+  #--ipv6-autoconfiguration=IPV6_AUTOCONFIGURATION
+  #--mgmt-classes=MGMT_CLASSES
+  #--template-files=TEMPLATE_FILES
+  #--template-remote-kickstarts=TEMPLATE_REMOTE_KICKSTARTS
+  #--clobber
+  #--template-files=TEMPLATE_FILES
+  #--in-place
+
+# Add the Production ethernet interface.
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${NAME} \
+  --interface=${ETH1_NAME} \
+  --mac=${MAC_ETH1} \
+  --static=1 \
+  --ip-address=${PROD_IP} \
+  --subnet=${PROD_SUBNET} \
+  --dns-name=${DNS_NAME}
+
+# ETH2 ethernet interface not available
+
+# Add the CIC ethernet interface.
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${NAME} \
+  --interface=${ETH2_NAME} \
+  --mac=${MAC_ETH2} \
+  --static=1 \
+  --ip-address=${CLUSTER_IP} \
+  --subnet=${CLUSTER_SUBNET}
+
+# Backup ethernet interface not available
+
+# Admin ethernet interface not available
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/lvs1/lvs2/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.16/192.168.5.17/g' \</userinput>
+<userinput>  -e 's/192\.168\.105\.16/192.168.105.17/g' \</userinput>
+<userinput>  -e 's/LVS 1 test node/LVS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:10/52:54:00:a8:05:11/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:69:10/52:54:00:a8:69:11/g' \</userinput>
+<userinput>     cobbler-lvs1.sh &gt; cobbler-lvs2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Add the systems to Cobbler:
+<screen>
+&sw1p; <userinput>chmod u+x cobbler-{ds,lvs}[12].sh</userinput>
+&sw1p; <userinput>for i in ds1 ds2 lvs1 lvs2; do cobbler system remove --name SpacewalkDefaultOrganization_kvm_$i; ./cobbler-$i.sh; done</userinput>
+</screen>
+  </para>
+
+  <para>
+    For the LDAP platform instance
+    <emphasis>ldap1</emphasis>, we create a boot ISO. It is
+    created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-ldap1-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds1,SpacewalkDefaultOrganization_kvm_ds2,SpacewalkDefaultOrganization_kvm_lvs1,SpacewalkDefaultOrganization_kvm_lvs2" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-ldap1-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M Jul  7 22:43 /var/www/cobbler/pub/example/centos6u5-ldap1-kvm.iso
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-ldap1-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-ldap1-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-ds1.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=ds1 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="DS 1 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-ldap1-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/ds1,device=disk,bus=virtio \
+  --network=network=svcs,mac=52:54:00:a8:05:0e \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Adapting the script for the other 3 nodes:
+<screen>
+&hostp; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ds2/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:0f/g' \</userinput>
+<userinput>     install-ds1.sh &gt; install-ds2.sh</userinput>
+
+&hostp; <userinput>cat install-lvs1.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=lvs1 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="LVS 1 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-ldap1-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/lvs1,device=disk,bus=virtio \
+  --network=network=svcs,mac=52:54:00:a8:05:10 \
+  --network=network=ldap1cic,mac=52:54:00:a8:69:10 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+
+&hostp; <userinput>sed \</userinput>
+<userinput>  -e 's/lvs1/lvs2/g' \</userinput>
+<userinput>  -e 's/LVS 1 test node/LVS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:10/52:54:00:a8:05:11/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:69:10/52:54:00:a8:69:11/g' \</userinput>
+<userinput>     install-lvs1.sh &gt; install-lvs2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Make sure all the scripts are executable and then start
+    them all 4 as root on the host:
+<screen>
+&hostp; <userinput>chmod u+x install-{ds,lvs}[12].sh</userinput>
+&hostp; <userinput>./install-ds1.sh</userinput>
+&hostp; <userinput>./install-ds2.sh</userinput>
+&hostp; <userinput>./install-lvs1.sh</userinput>
+&hostp; <userinput>./install-lvs2.sh</userinput>
+</screen>
+  </para>
+
+</section>

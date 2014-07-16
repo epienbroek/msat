@@ -3,17 +3,23 @@
 <!ENTITY YEAR "2014">
 <!ENTITY HOLDER "| Allard Berends |">
 
+<!ENTITY ant1p   "<prompt>ant1#</prompt>">
+<!ENTITY ds1     "ds1">
+<!ENTITY ds1p    "<prompt>ds1#</prompt>">
+<!ENTITY ds2p    "<prompt>ds2#</prompt>">
+<!ENTITY hostp   "<prompt>host#</prompt>">
+<!ENTITY lpc     "localpc">
+<!ENTITY lpcp    "<prompt>localpc$</prompt>">
+<!ENTITY lvs1p   "<prompt>lvs1#</prompt>">
+<!ENTITY lvs2p   "<prompt>lvs2#</prompt>">
+<!ENTITY ntp1p   "<prompt>ntp1#</prompt>">
+<!ENTITY ntp2p   "<prompt>ntp2#</prompt>">
 <!ENTITY rprompt "<prompt>#</prompt>">
+<!ENTITY sw1     "dw1sw1">
+<!ENTITY sw1p    "<prompt>d21sw1#</prompt>">
+<!ENTITY sw2     "d21sw2">
+<!ENTITY sw2p    "<prompt>d21sw2#</prompt>">
+<!ENTITY t1      "ds1">
+<!ENTITY t1p     "<prompt>ds1#</prompt>">
+<!ENTITY uhp     "<prompt>host$</prompt>">
 <!ENTITY uprompt "<prompt>$</prompt>">
-<!ENTITY uhp "<prompt>host$</prompt>">
-<!ENTITY hostp "<prompt>host#</prompt>">
-<!ENTITY sw1 "dw1sw1">
-<!ENTITY sw1p "<prompt>d21sw1#</prompt>">
-<!ENTITY sw2 "d21sw2">
-<!ENTITY sw2p "<prompt>d21sw2#</prompt>">
-<!ENTITY t1 "ds1">
-<!ENTITY t1p "<prompt>ds1#</prompt>">
-<!ENTITY lpc "localpc">
-<!ENTITY lpcp "<prompt>localpc$</prompt>">
-<!ENTITY ds1 "ds1">
-<!ENTITY ds1p "<prompt>ds1#</prompt>">

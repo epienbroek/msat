@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap1-cert">
+  <title>CA certificate for all</title>
+
+  <!-- X.509 CA certificate -->
+  <para>
+    The CA keypair is only usefull if clients can use the
+    X.509 CA certificate part of it. Hence, we export it:
+<screen>
+&t1p; <userinput>certutil -d . -L -n 'LDAP CA cert' -a &gt; my-ca.crt</userinput>
+</screen>
+  </para>
+
+  <para>
+    Verification shows:
+<screen>
+&t1p; <userinput>cat my-ca.crt</userinput>
+-----BEGIN CERTIFICATE-----
+MIIDFzCCAf+gAwIBAgICA+gwDQYJKoZIhvcNAQEFBQAwRDETMBEGCgmSJomT8ixk
+ARkWA29yZzEWMBQGCgmSJomT8ixkARkWBmRtc2F0MTEVMBMGA1UEAxMMTERBUCBD
+QSBjZXJ0MB4XDTE0MDcwNjIwMjQzN1oXDTI0MDcwNjIwMjQzN1owRDETMBEGCgmS
+JomT8ixkARkWA29yZzEWMBQGCgmSJomT8ixkARkWBmRtc2F0MTEVMBMGA1UEAxMM
+TERBUCBDQSBjZXJ0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6pjG
+rJGoC2WTmN+hu8d1LgiAvyV/PMCrg5lTQh6tfzHnUgyi3fYes7VG1uxIXhyXiJOM
+gJD6D+fx5pndvZCQoMyMiUfP+UB4zrnQu1pQSVIlzX6MiR+dLKfFsjzU1REfmZX+
+Mh2562JCj+x/6mR0lwqUyu+q+sDq/yjfwongXuTjJIINukwSveIQXt2h8Ck4gdX4
+9I5oWpSGU2/pVpNelvb1VS4rHOm0Rrr9w1i/k8CNstaQv97I9SFhCJ3FxNul0WBZ
+LH5x4qGIU0no4SCYbkcUEPeqnhbE/juHNBnBXO5nx6QxYIlCTs7OCyAPQ1DueOZi
+0I7wtrAQK5VzfKPmhwIDAQABoxMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBBQUAA4IBAQAutpo3FmF+55JBIul8BNutDw67J85VYAEN0Tu1ZOmrirG4FRFl
+/5nrB2u619IyO1ECFLk7MFmrDYO4uFILktow+1OcVdz30Pac/alztX49F0tc+2MI
+9Sh28vQnbiaiTULpIrh0I8DwAdpm5euh6JRVMhJeIFxpiS83bbOlRsifYaE7qcI0
+z9vT+IjhhiswdYDQdKnrAAXUi9ec460GetYc+1nyolLltY4XwwypAzCTdXiSFRJS
+5oklmP+h8Hysfpb+Nn3PCQsS+m4wFAhJZQVGoU/bFbhbXUBBOp5/S3Kpyn74s/IP
+f0IUocN5iAuzWMcJNEjJGUsoq2TVABDWnwa0
+-----END CERTIFICATE-----
+</screen>
+  </para>
+
+</section>

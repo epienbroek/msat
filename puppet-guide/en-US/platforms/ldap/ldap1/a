@@ -1,0 +1,8 @@
+$COBBLER system edit \\\
+  \-\-name=${ORG}_${MACH}_${NAME} \\\
+  \-\-interface=${ETH1_NAME} \\\
+  \-\-mac=${MAC_ETH1} \\\
+  \-\-static=1 \\\
+  \-\-ip-address=${PROD_IP} \\\
+  \-\-subnet=${PROD_SUBNET} \\\
+  \-\-dns-name=${DNS_NAME}' cobbler-ds1.sh

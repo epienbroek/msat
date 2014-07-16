@@ -73,6 +73,15 @@
             different security level is applicable here.
           </entry>
         </row>
+        <row>
+          <entry>ldap1cic</entry>
+          <entry>
+            The <emphasis>ldap1cic</emphasis> network is
+            used for the heartbeat traffice of the LVS nodes
+            of the <emphasis>ldap1</emphasis> platform
+            instance.
+          </entry>
+        </row>
       </tbody>
     </tgroup>
   </table>
@@ -151,6 +160,24 @@ Network dmz defined from dmz.xml
 Network rmt defined from rmt.xml
 &hostp; <userinput>virsh net-autostart rmt</userinput>
 &hostp; <userinput>virsh net-start rmt</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&hostp; <userinput>cat ldap1cic.xml</userinput>
+&lt;network&gt;
+  &lt;name&gt;ldap1cic&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr102' stp='on' delay='0'/&gt;
+  &lt;mac address='52:54:00:A8:69:01'/&gt;
+  &lt;ip address='192.168.105.1' netmask='255.255.255.0'/&gt;
+&lt;/network&gt;
+
+&hostp; <userinput>virsh net-define ldap1cic.xml</userinput>
+Network ldap1cic defined from ldap1cic.xml
+&hostp; <userinput>virsh net-autostart ldap1cic</userinput>
+&hostp; <userinput>virsh net-start ldap1cic</userinput>
 </screen>
   </para>
 

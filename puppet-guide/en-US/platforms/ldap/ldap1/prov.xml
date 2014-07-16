@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap1-prov">
+  <title>Provisioning of the ldap1 nodes</title>
+
+  <!-- Puppet node provisioning -->
+  <para>
+    In this section we show how to provision the LDAP nodes
+    of the <emphasis>ldap1</emphasis> instance.
+  </para>
+
+  <para>
+    Make sure Puppet RPM's are available:
+<screen>
+&ds1p; <userinput>yum install puppet-dmsat1</userinput>
+.
+.
+================================================================================
+ Package            Arch     Version   Repository                          Size
+================================================================================
+Installing:
+ puppet-dmsat1      noarch   0.1.1-1   example-puppet-structure-6u5-1_0   8.6 k
+Installing for dependencies:
+ puppet-baseinfra   noarch   0.1.1-2   example-puppet-baseinfra-6u5-1_0    42 k
+ puppet-structure   noarch   0.1.1-4   example-puppet-structure-6u5-1_0   5.6 k
+.
+.
+&ds1p; <userinput>rpm -qa | grep puppet</userinput>
+puppet-3.4.3-1.el6.noarch
+puppet-structure-0.1.1-4.noarch
+puppet-dmsat1-0.1.1-1.noarch
+puppet-stdlib-0.1.1-1.noarch
+puppet-baseinfra-0.1.1-2.noarch
+.. note, versions may differ ..
+</screen>
+  </para>
+
+  <para>
+<screen>
+&ds1p; <userinput>puppet apply -e 'include support6'</userinput>
+Notice: Compiled catalog for ds1.dmsat1.org in environment production in 0.54 seconds
+Notice: /Stage[main]/Support6/Package[bind-utils]/ensure: created
+Notice: /Stage[main]/Support6/Package[sg3_utils]/ensure: created
+Notice: /Stage[main]/Support6/Package[tcpdump]/ensure: created
+Notice: /Stage[main]/Support6/Package[screen]/ensure: created
+Notice: /Stage[main]/Support6/Package[sysstat]/ensure: created
+Notice: /Stage[main]/Support6/Package[sos]/ensure: created
+Notice: /Stage[main]/Support6/Package[parted]/ensure: created
+Notice: /Stage[main]/Support6/Package[telnet]/ensure: created
+Notice: /Stage[main]/Support6/Package[biosdevname]/ensure: created
+Notice: /Stage[main]/Support6/Package[strace]/ensure: created
+Notice: /Stage[main]/Support6/Package[nc]/ensure: created
+Notice: /Stage[main]/Support6/Package[sysfsutils]/ensure: created
+Notice: Finished catalog run in 16.51 seconds
+</screen>
+  </para>
+
+  <para>
+    Make sure that the node YAML is correct:
+<screen>
+&ds1p; <userinput>grep -e instance -e platform /var/lib/hiera/depzones/dmsat1/hosts/ds1.svcs.dmsat1.org.yaml</userinput>
+instance: ldap1
+platform: ldap
+</screen>
+  </para>
+
+  <para>
+    Implement the LDAP server function:
+<screen>
+&ds1p; <userinput>puppet apply -e '$instance = hiera("instance", ""); $platform = hiera("platform", ""); include ldap::server'</userinput>
+Notice: Compiled catalog for ds1.svcs.dmsat1.org in environment production in 2.08 seconds
+Notice: /Stage[main]/Ldap::Install/Package[nscd]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[openldap-clients]/ensure: created
+Notice: /Stage[main]/Iptables::Install/File[/etc/profile.d/itl.sh]/ensure: defined content as '{md5}58d6781ad2ec759177c985a105848a10'
+Notice: /Stage[main]/Ldap::Install/Package[nss-pam-ldapd]/ensure: created
+Notice: /Stage[main]/Iptables::Filterpkttype/File[/root/iptables.filterpkttype.d]/ensure: created
+Notice: /Stage[main]/Iptables::Filterpkttype/File[/root/iptables.filterpkttype.d/zzzzz_iptables_filter]/ensure: defined content as '{md5}aefb7cbcfc4234afda279bf30f3573db'
+Notice: /Stage[main]/Iptables::Filterdport/File[/root/iptables.filterdport.d]/ensure: created
+Notice: /Stage[main]/Iptables::Filterdport/File[/root/iptables.filterdport.d/00000_iptables_filter]/ensure: defined content as '{md5}0bf44a5192ef6d33e917a793243097e4'
+Notice: /Stage[main]/Iptables::Nat/File[/root/iptables.nat.d]/ensure: created
+Notice: /Stage[main]/Iptables::Nat/File[/root/iptables.nat.d/65536_iptables_nat]/ensure: defined content as '{md5}540958ffa84654821fe664428dffcb42'
+Notice: /Stage[main]/Iptables::Nat/File[/root/iptables.nat.d/00000_iptables_nat]/ensure: defined content as '{md5}a41b3159c5b7efc3990137cefee84d0f'
+Notice: /Stage[main]/Ldap::Install/Rhn_channel[example-epel-6u5-1_0]/Exec[example-epel-6u5-1_0]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-Type1]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-9-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-15-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-xauth]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-1-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[389-ds]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-1-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-14-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-misc]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-9-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ethiopic]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-14-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-cyrillic]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-2-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-2-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-ISO8859-15-75dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[xorg-x11-fonts-100dpi]/ensure: created
+Notice: /Stage[main]/Ldap::Client/File[/etc/pam_ldap.conf]/content: content changed '{md5}5f94ffc52562ea0b3049612ff92362f1' to '{md5}6a271be002f75480febe14e939c224cb'
+Notice: /Stage[main]/Ldap::Client/File[/etc/nslcd.conf]/content: content changed '{md5}e406e00cbe6132267ccc835666dafa3a' to '{md5}5bc3ed1bb2c1039fe176691e6bc3ebfd'
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/ldap.conf]/content: content changed '{md5}6b6bb2c64d097fe4bdd635f9321f86db' to '{md5}6a271be002f75480febe14e939c224cb'
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/cacerts]/ensure: created
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/cacerts/my-ca.crt]/ensure: defined content as '{md5}ea264710853102e7d06b72a97405a21a'
+Notice: /Stage[main]/Ldap::Client/Exec[cert_symlink]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Client/Exec[cert_symlink]: Triggered 'refresh' from 1 events
+Notice: /Stage[main]/Ldap::Client/File[/etc/nsswitch.conf]/content: content changed '{md5}0d6009cdfd12646d251e86303bc0c48c' to '{md5}4ee0ebb7e00f8d08edb644513443f6d6'
+Notice: /Stage[main]/Ldap::Client/File[/etc/pam.d/system-auth-ac]/content: content changed '{md5}c8e0af6c699ac3b48b7b39bd270e8743' to '{md5}2520642f7a4c5e3278b9fd2fa56e6193'
+Notice: /Stage[main]/Ldap::Server/File[/root/setup.inf]/ensure: defined content as '{md5}8c01fb2ba0a99414f6cd7db9c770f667'
+Notice: /Stage[main]/Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00389_tcp_ldap::server]/File[/root/iptables.filterdport.d/00389_tcp_ldap::server]/ensure: defined content as '{md5}a7fc7eb8c9ee94ebda33d981fb9d8bb3'
+Notice: /Stage[main]/Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00636_tcp_ldap::server]/File[/root/iptables.filterdport.d/00636_tcp_ldap::server]/ensure: defined content as '{md5}052f1cebddb618ee269156770ffa3b0d'
+Notice: /Stage[main]/Ldap::Server/File[/etc/security/limits.d/90-nofile.conf]/ensure: defined content as '{md5}88b60a5d83226892787b250436890523'
+Notice: /Stage[main]/Ldap::Server/Exec[setup_ds]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Server/Service[dirsrv]/enable: enable changed 'false' to 'true'
+Notice: /Stage[main]/Ldap::Server/Service[dirsrv-admin]/enable: enable changed 'false' to 'true'
+Notice: /Stage[main]/Ldap::Server/File[/etc/dirsrv/slapd-ds/idle_timeout.ldif]/ensure: defined content as '{md5}659862d20f504b34f5cff271300dc6ce'
+Notice: /Stage[main]/Ldap::Ssl/File[/etc/dirsrv/slapd-ds/ca.pem]/ensure: defined content as '{md5}906ac211490edd6daa38a38a5878226b'
+Notice: /Stage[main]/Ldap::Ssl/File[/etc/dirsrv/slapd-ds/pwdfile]/ensure: defined content as '{md5}3bda1a72c4943dd8acdcab952b057634'
+Notice: /Stage[main]/Ldap::Ssl/File[/etc/dirsrv/slapd-ds/noise.txt]/ensure: defined content as '{md5}dce79f211c29783a0ac98cfec09309b6'
+Notice: /Stage[main]/Ldap::Server/Exec[set_timeout]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/09830_tcp_ldap::server]/File[/root/iptables.filterdport.d/09830_tcp_ldap::server]/ensure: defined content as '{md5}acb7ff2738c62ee7b24afa5a6812ad85'
+Notice: /Stage[main]/Ldap::Server/Iptables::Natfile[/root/iptables.nat.d/00636_tcp_ldap::server]/File[/root/iptables.nat.d/00636_tcp_ldap::server]/ensure: defined content as '{md5}54e4a91a52c284caa9aa507919304417'
+Notice: /Stage[main]/Ldap::Server/Iptables::Natfile[/root/iptables.nat.d/00389_tcp_ldap::server]/File[/root/iptables.nat.d/00389_tcp_ldap::server]/ensure: defined content as '{md5}ed7d160817c892d946168373bb4224ca'
+Notice: /Stage[main]/Iptables/Exec[update_iptables_filterpkttype]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Exec[update_iptables_filterdport]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Exec[update_iptables_nat]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Exec[update_iptables]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Service[iptables]: Triggered 'refresh' from 1 events
+Notice: /Stage[main]/Ldap::Ssl/Exec[import_capem]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Ssl/Exec[gen_srv_keypair]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Ssl/File[/etc/dirsrv/slapd-ds/modify_ssl.ldif]/ensure: defined content as '{md5}b4bcb5b63c3a474d88fc468c5a753aac'
+Notice: /Stage[main]/Ldap::Ssl/File[/etc/dirsrv/slapd-ds/pin.txt]/ensure: defined content as '{md5}a0d197c8f39d228ea1eecbad4c97cdfc'
+Notice: /Stage[main]/Ldap::Ssl/Exec[modify_ssl]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Mmr/File[/etc/dirsrv/slapd-ds/modify_mmr.ldif]/ensure: defined content as '{md5}ad506af22c509b4c056340ba6edae656'
+Notice: /Stage[main]/Ldap::Mmr/Exec[modify_mmr]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Mmr/File[/root/start-replication.sh]/ensure: defined content as '{md5}d514705318b661aefc6a3a9188aff546'
+Notice: Finished catalog run in 155.42 seconds
+</screen>
+  </para>
+
+  <para>
+    Repeat the same steps for <systemitem
+    class="systemname">ds2.svcs.dmsat1.org</systemitem>.
+<screen>
+&ds2p; <userinput>yum install puppet-dmsat1</userinput>
+.. output skipped ..
+&ds2p; <userinput>rpm -qa | grep puppet</userinput>
+.. output skipped ..
+&ds1p; <userinput>puppet apply -e 'include support6'</userinput>
+.. output skipped ..
+&ds1p; <userinput>grep -e instance -e platform /var/lib/hiera/depzones/dmsat1/hosts/ds1.svcs.dmsat1.org.yaml</userinput>
+.. output skipped ..
+&ds1p; <userinput>puppet apply -e '$instance = hiera("instance", ""); $platform = hiera("platform", ""); include ldap::server'</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    The 2 LDAP servers are provisioned. We just need to
+    start replication on one of the nodes:
+<screen>
+&ds1p; <userinput>/root/start-replication.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Next, we need to provision the LVS nodes. We show the
+    steps of the first LVS node:
+<screen>
+&lvs1p; <userinput>yum install puppet-dmsat1</userinput>
+.. output skipped ..
+&lvs1p; <userinput>rpm -qa | grep puppet</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    Also on the LVS nodes, we want the same support6 set of
+    RPM's:
+<screen>
+&lvs1p; <userinput>puppet apply -e 'include support6'</userinput>
+.. output similar to ds1 ..
+</screen>
+  </para>
+
+  <para>
+<screen>
+&lvs1p; <userinput>puppet apply -e '$instance = hiera("instance", ""); $platform = hiera("platform", ""); include lvs::ldap::server'</userinput>
+Notice: Compiled catalog for lvs1.svcs.dmsat1.org in environment production in 2.15 seconds
+Notice: /Stage[main]/Ldap::Install/Package[nscd]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[openldap-clients]/ensure: created
+Notice: /Stage[main]/Iptables::Install/File[/etc/profile.d/itl.sh]/ensure: defined content as '{md5}58d6781ad2ec759177c985a105848a10'
+Notice: /Stage[main]/Lvs::Install/Package[piranha]/ensure: created
+Notice: /Stage[main]/Ldap::Install/Package[nss-pam-ldapd]/ensure: created
+Notice: /Stage[main]/Ldap::Client/File[/etc/pam_ldap.conf]/content: content changed '{md5}5f94ffc52562ea0b3049612ff92362f1' to '{md5}6a271be002f75480febe14e939c224cb'
+Notice: /Stage[main]/Ldap::Client/File[/etc/nslcd.conf]/content: content changed '{md5}e406e00cbe6132267ccc835666dafa3a' to '{md5}5bc3ed1bb2c1039fe176691e6bc3ebfd'
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/ldap.conf]/content: content changed '{md5}6b6bb2c64d097fe4bdd635f9321f86db' to '{md5}6a271be002f75480febe14e939c224cb'
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/cacerts]/ensure: created
+Notice: /Stage[main]/Ldap::Client/File[/etc/openldap/cacerts/my-ca.crt]/ensure: defined content as '{md5}040ff7c41e41570af88d546586dd43bb'
+Notice: /Stage[main]/Ldap::Client/Exec[cert_symlink]/returns: executed successfully
+Notice: /Stage[main]/Ldap::Client/Exec[cert_symlink]: Triggered 'refresh' from 1 events
+Notice: /Stage[main]/Iptables::Filterpkttype/File[/root/iptables.filterpkttype.d]/ensure: created
+Notice: /Stage[main]/Iptables::Filterpkttype/File[/root/iptables.filterpkttype.d/zzzzz_iptables_filter]/ensure: defined content as '{md5}aefb7cbcfc4234afda279bf30f3573db'
+Notice: /Stage[main]/Iptables::Filterdport/File[/root/iptables.filterdport.d]/ensure: created
+Notice: /Stage[main]/Iptables::Filterdport/File[/root/iptables.filterdport.d/00000_iptables_filter]/ensure: defined content as '{md5}0bf44a5192ef6d33e917a793243097e4'
+Notice: /Stage[main]/Ldap::Client/File[/etc/nsswitch.conf]/content: content changed '{md5}0d6009cdfd12646d251e86303bc0c48c' to '{md5}4ee0ebb7e00f8d08edb644513443f6d6'
+Notice: /Stage[main]/Ldap::Client/File[/etc/pam.d/system-auth-ac]/content: content changed '{md5}c8e0af6c699ac3b48b7b39bd270e8743' to '{md5}2520642f7a4c5e3278b9fd2fa56e6193'
+Notice: /Stage[main]/Lvs::Ldap::Server/Selboolean[piranha_lvs_can_network_connect]/value: value changed 'off' to 'on'
+Notice: /Stage[main]/Lvs::Ldap::Server/File[/etc/sysconfig/ha/lvs.cf]/content: content changed '{md5}8171aa438632391002acce1dc84588d1' to '{md5}dcb328d65878eb2538c9c106f62b1267'
+Notice: /Stage[main]/Lvs::Ldap::Server/File[/etc/sysconfig/ha/lvs.cf]/group: group changed 'piranha' to 'root'
+Notice: /Stage[main]/Lvs::Ldap::Server/File[/etc/sysconfig/ha/lvs.cf]/mode: mode changed '0664' to '0660'
+Notice: /Stage[main]/Lvs::Ldap::Server/File[/usr/local/bin/check_ds_ssl.sh]/ensure: defined content as '{md5}fc2c98781cf44da21625d3e3ae53aa2b'
+Notice: /Stage[main]/Lvs::Ldap::Server/File[/usr/local/bin/check_ds.sh]/ensure: defined content as '{md5}1e94bf7dc5407c7bf70f65106ed91334'
+Notice: /Stage[main]/Lvs::Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00636_tcp_lvs::ldap::server]/File[/root/iptables.filterdport.d/00636_tcp_lvs::ldap::server]/ensure: defined content as '{md5}052f1cebddb618ee269156770ffa3b0d'
+Notice: /Stage[main]/Lvs::Service/Service[pulse]/ensure: ensure changed 'stopped' to 'running'
+Notice: /Stage[main]/Lvs::Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00539_tcp_lvs::ldap::server]/File[/root/iptables.filterdport.d/00539_tcp_lvs::ldap::server]/ensure: defined content as '{md5}9a52926ae5e981b978f2f9a9edbba45e'
+Notice: /Stage[main]/Lvs::Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00539_udp_lvs::ldap::server]/File[/root/iptables.filterdport.d/00539_udp_lvs::ldap::server]/ensure: defined content as '{md5}6eec8cadc8661702a76154593c07931a'
+Notice: /Stage[main]/Lvs::Ldap::Server/Iptables::Filterdportfile[/root/iptables.filterdport.d/00389_tcp_lvs::ldap::server]/File[/root/iptables.filterdport.d/00389_tcp_lvs::ldap::server]/ensure: defined content as '{md5}a7fc7eb8c9ee94ebda33d981fb9d8bb3'
+Notice: /Stage[main]/Iptables/Exec[update_iptables_filterpkttype]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Exec[update_iptables_filterdport]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Exec[update_iptables]/returns: executed successfully
+Notice: /Stage[main]/Iptables/Service[iptables]: Triggered 'refresh' from 1 events
+Notice: Finished catalog run in 34.17 seconds
+</screen>
+  </para>
+
+  <para>
+    Provisioning of the second LVS node:
+<screen>
+&lvs2p; <userinput>yum install puppet-dmsat1</userinput>
+.. output skipped ..
+&lvs2p; <userinput>rpm -qa | grep puppet</userinput>
+.. output skipped ..
+&lvs2p; <userinput>puppet apply -e 'include support6'</userinput>
+.. output skipped ..
+&lvs2p; <userinput>puppet apply -e '$instance = hiera("instance", ""); $platform = hiera("platform", ""); include lvs::ldap::server'</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+</section>

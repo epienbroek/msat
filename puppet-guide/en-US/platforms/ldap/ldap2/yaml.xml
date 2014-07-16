@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap2-yaml">
+  <title>LDAP YAML configuration</title>
+
+  <para>
+    The influence of <emphasis>ldap2</emphasis> to the YAML
+    fileset of <emphasis>dmsat1</emphasis> is depicted
+    below.
+<screen>
+&t1p; <userinput>cd /root/puppet-dmsat1/puppet-dmsat1/var/lib/hiera/depzones</userinput>
+&t1p; <userinput>tree --noreport --charset=ASCII</userinput>
+.
+|-- dmsat1
+|   |-- hosts
+|   |   `-- ds3.dmz.dmsat1.org.yaml (node)
+|   |-- platforms
+|   |   `-- ldap
+|   |       `-- ldap2.yaml          (depzone platform instance)
+|   `-- subzones
+|       `-- dmz.yaml                (depzone subzone)
+</screen>
+  </para>
+
+  <para>
+    In <xref linkend="platforms-ldap-ldap1-yaml" />, it is
+    explained how one can adapt the RPM.
+  </para>
+
+</section>

@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap2-bm">
+  <title>Bare metal deployment</title>
+
+  <!-- Bare metal deployment -->
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create a new Cobbler scripts for placing
+    the <emphasis>ldap2</emphasis> platform instance
+    node to Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ds3/g' \</userinput>
+<userinput>  -e 's/"192.168.5.1"/"192.168.6.1"/g' \</userinput>
+<userinput>  -e 's/192.168.5.0/192.168.6.0/g' \</userinput>
+<userinput>  -e 's/ 192.168.5.1$/ 192.168.6.1/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.6.18/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DS 3 test node/g' \</userinput>
+<userinput>  -e 's/svcs.dmsat1.org/dmz.dmsat1.org/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:06:12/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-ds3.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Add the system to Cobbler:
+<screen>
+&sw1p; <userinput>chmod u+x cobbler-ds3.sh</userinput>
+&sw1p; <userinput>cobbler system remove --name SpacewalkDefaultOrganization_kvm_ds3; ./cobbler-ds3.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    For the LDAP platform instance
+    <emphasis>ldap2</emphasis>, we create a boot ISO. It is
+    created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ds3" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M Jul  7 23:56 /var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-ldap2-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-ldap2-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-ds3.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=ds3 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="DS 3 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-ldap2-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/ds3,device=disk,bus=virtio \
+  --network=network=dmz,mac=52:54:00:a8:06:12 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Make sure the scripts is executable and then start
+    it as root on the host:
+<screen>
+&hostp; <userinput>chmod u+x install-*</userinput>
+&hostp; <userinput>./install-ds3.sh</userinput>
+</screen>
+  </para>
+
+</section>

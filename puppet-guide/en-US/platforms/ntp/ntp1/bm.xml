@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ntp-ntp1-bm">
+  <title>Bare metal deployment</title>
+
+  <!-- Bare metal deployment -->
+  <para>
+    For bare metal deployment, we need to provide
+    information about the 2 nodes to the Cobbler system on
+    the Spacewalk server, <systemitem
+    class="systemname">d21sw1</systemitem>.
+  </para>
+
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create the other Cobbler scripts for placing
+    the <emphasis>ntp1</emphasis> platform instance nodes
+    to Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ntp1/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.21/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/NTP 1 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:15/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-ntp1.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1/ntp2/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.22/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/NTP 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:16/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-ntp2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Add the systems to Cobbler:
+<screen>
+&sw1p; <userinput>chmod u+x cobbler-ntp[12].sh</userinput>
+&sw1p; <userinput>for i in ntp1 ntp2; do cobbler system remove --name SpacewalkDefaultOrganization_kvm_$i; ./cobbler-$i.sh; done</userinput>
+</screen>
+  </para>
+
+  <para>
+    For the NTP platform instance
+    <emphasis>ntp1</emphasis>, we create a boot ISO. It is
+    created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-ntp1-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_ntp1,SpacewalkDefaultOrganization_kvm_ntp2" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-ntp1-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M Jul  7 22:43 /var/www/cobbler/pub/example/centos6u5-ntp1-kvm.iso
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-ntp1-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-ntp1-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-ntp1.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=ntp1 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="NTP 1 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-ntp1-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/ntp1,device=disk,bus=virtio \
+  --network=network=svcs,mac=52:54:00:a8:05:15 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Adapting the script for the other node:
+<screen>
+&hostp; <userinput>sed \</userinput>
+<userinput>  -e 's/=ntp1/=ntp2/g' \</userinput>
+<userinput>  -e 's/ntp1,/ntp2,/g' \</userinput>
+<userinput>  -e 's/NTP 1 test node/NTP 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:15/52:54:00:a8:05:16/g' \</userinput>
+<userinput>     install-ntp1.sh &gt; install-ntp2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Make sure all the scripts are executable and then start
+    them all as root on the host:
+<screen>
+&hostp; <userinput>chmod u+x install-ntp[12].sh</userinput>
+&hostp; <userinput>./install-ntp1.sh</userinput>
+&hostp; <userinput>./install-ntp2.sh</userinput>
+</screen>
+  </para>
+
+</section>

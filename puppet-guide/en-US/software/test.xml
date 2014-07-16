@@ -482,7 +482,7 @@ $SNIPPET('"'"'spacewalk/'"$ORGNUM"'/bare-6-x_y_z'"'"')'
 # DEPENDENCIES
 #   The profile should not yet exist in cobbler. If it does,
 #   remove it with:
-#   sudo cobbler system remove --name=dmsat1_kvm_ds1
+#   sudo cobbler system remove --name=SpacewalkDefaultOrganization_kvm_ds1
 #   Adding an existing profile results in a clear warning
 #   from cobbler. No harm is done.
 # FAILURE
@@ -525,7 +525,7 @@ MACH="kvm"
 COMMENT="DS 1 test node"
 GATEWAY="192.168.5.1"
 NAMESERVERS="192.168.5.11"
-NAMESERVERS_SEARCH="dmsat1.org"
+NAMESERVERS_SEARCH="svcs.dmsat1.org"
 HOSTNAME="${NAME}.${NAMESERVERS_SEARCH}"
 PROD_IP="192.168.5.14"
 PROD_SUBNET="255.255.255.0"
@@ -628,7 +628,7 @@ $COBBLER system edit \
 
 # Backup ethernet interface not available
 
-# Beheer ethernet interface not available
+# Admin ethernet interface not available
 </screen>
         Add the system to Cobbler with:
 <screen>

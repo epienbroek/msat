@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-ldap-ldap2-prov">
+  <title>Provisioning of the ldap2 node</title>
+
+  <!-- Puppet node provisioning -->
+  <para>
+    In <xref linkend="platforms-ldap-ldap1-prov" />, the
+    provisioning of the <systemitem
+    class="systemname">ds1.svcs.dmsat1.org</systemitem> node
+    is shown. The commands are exactly the same for the
+    <systemitem
+    class="systemname">ds3.dmz.dmsat1.org</systemitem> node
+    of the <emphasis>ldap2</emphasis> instance. Of course,
+    if one has to provide <emphasis>ldap1</emphasis>,
+    substitude it with <emphasis>ldap2</emphasis>.
+  </para>
+
+</section>
