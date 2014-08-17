@@ -18,8 +18,7 @@
       fill the Spacewalk server. The MSAT scripts have been
       created to automate the process of defining system
       types. The goal is to make the mechanisme efficient,
-      to avoid errors and be versionable with system
-      definitions.
+      to avoid errors and be versionable.
     </para>
   </abstract>
   <corpauthor>
@@ -32,4 +31,3 @@
   <xi:include href="Common_Content/Legal_Notice.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </bookinfo>
-

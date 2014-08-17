@@ -4,6 +4,14 @@
 <!ENTITY HOLDER "| Allard Berends |">
 
 <!ENTITY ant1p   "<prompt>ant1#</prompt>">
+<!ENTITY dev1    "dev1">
+<!ENTITY dev1p   "<prompt>dev1#</prompt>">
+<!ENTITY dns1    "dns1">
+<!ENTITY dns1p   "<prompt>dns1#</prompt>">
+<!ENTITY dns2    "dns2">
+<!ENTITY dns2p   "<prompt>dns2#</prompt>">
+<!ENTITY dns3    "dns3">
+<!ENTITY dns3p   "<prompt>dns3#</prompt>">
 <!ENTITY ds1     "ds1">
 <!ENTITY ds1p    "<prompt>ds1#</prompt>">
 <!ENTITY ds2p    "<prompt>ds2#</prompt>">
@@ -14,6 +22,10 @@
 <!ENTITY lvs2p   "<prompt>lvs2#</prompt>">
 <!ENTITY ntp1p   "<prompt>ntp1#</prompt>">
 <!ENTITY ntp2p   "<prompt>ntp2#</prompt>">
+<!ENTITY proxy1p "<prompt>proxy1#</prompt>">
+<!ENTITY proxy1  "proxy1">
+<!ENTITY rpm1p   "<prompt>rpm1#</prompt>">
+<!ENTITY rpm1    "rpm1">
 <!ENTITY rprompt "<prompt>#</prompt>">
 <!ENTITY sw1     "dw1sw1">
 <!ENTITY sw1p    "<prompt>d21sw1#</prompt>">
@@ -21,5 +33,7 @@
 <!ENTITY sw2p    "<prompt>d21sw2#</prompt>">
 <!ENTITY t1      "ds1">
 <!ENTITY t1p     "<prompt>ds1#</prompt>">
+<!ENTITY tgt1p   "<prompt>tgt1#</prompt>">
+<!ENTITY tgt1    "tgt1">
 <!ENTITY uhp     "<prompt>host$</prompt>">
 <!ENTITY uprompt "<prompt>$</prompt>">

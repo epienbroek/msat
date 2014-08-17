@@ -47,6 +47,31 @@ graph cluster_dev_network {
       ];
     }
 
+    subgraph cluster_dns1 {
+      fillcolor = "white";
+      label     = "dns1 instance";
+      labelloc  = "bottom";
+      style     = "filled";
+
+      dns1 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      dns2 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+
+      dns3 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+    }
+
     subgraph cluster_ldap1 {
       fillcolor = "white";
       label     = "ldap1 instance";
@@ -97,7 +122,7 @@ graph cluster_dev_network {
       ];
     } // cluster_lts1
 
-    sw1 [
+    d21sw1 [
       fillcolor = "lightblue",
       shape     = "box",
       style     = "filled,rounded",
@@ -107,13 +132,16 @@ graph cluster_dev_network {
     svcs -- ant1;
     svcs -- ntp1;
     svcs -- ntp2;
+    svcs -- dns1;
+    svcs -- dns2;
+    svcs -- dns3;
     svcs -- ds1;
     svcs -- ds2;
     svcs -- lvs1;
     svcs -- lvs2;
     svcs -- lts1;
     svcs -- lts2;
-    svcs -- sw1;
+    svcs -- d21sw1;
   } // cluster_svcs
 
   subgraph cluster_rmt {

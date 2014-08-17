@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "msat-guide.ent">
+<!ENTITY % BOOK_ENTITIES SYSTEM "../msat-guide.ent">
 %BOOK_ENTITIES;
 ]>
 <section id="spacewalk-sw_filling">
@@ -412,6 +412,188 @@ python-hwdata
     </para>
   </section>
   
+  <section id="spacewalk-sw_filling-repos">
+    <title>CentOS repositories workaround</title>
+
+    <para>
+      The <package>centos-release</package> package
+      contains the repositories for CentOS. The files are
+      located in <filename
+      class="directory">/etc/yum.repos.d</filename>. Since
+      this package gets installed during the first phase of
+      the installation, the second phase of the
+      installation, the registration phase, tries to
+      download RPM's from the CentOS yum repositories. We
+      noticed this behavior because system installation
+      failed when we did not have Internet connection.
+    </para>
+
+    <para>
+      Our workaround is to rebuild the original
+      <package>centos-release</package> RPM, but disable all
+      the repositories in the <emphasis
+      role="strong">*.repo</emphasis> files. Consequently,
+      we need to build the CentOS 6.5 kickstartable tree
+      with our version of <package>centos-release</package>.
+    </para>
+
+    <para>
+      How do we build the workaround version of
+      <package>centos-release</package>? We use a standard
+      Centos 6.5 machine. On it, we install
+      <package>rpm-build</package> and
+      <package>yum-utils</package>. Of course, we need a GPG
+      key to sign the new RPM. How to create the GPG key is
+      explained in <xref linkend="spacewalk-gpg_key" />.
+    </para>
+
+    <para>
+      Below we show the steps to build our own version of
+      the RPM:
+    </para>
+
+    <para>
+      First, we need to configure the CentOS 6.5 repository
+      from which we can download source RPM's:
+<screen>
+&ds1p; <userinput>cat /etc/yum.repos.d/sources.repo</userinput>
+[base-source]
+name=CentOS-$releasever - Base source
+baseurl=http://vault.centos.org/6.5/os/Source/
+gpgcheck=1
+gpgkey=http://vault.centos.org/RPM-GPG-KEY-CentOS-6
+priority=1
+enabled=1
+</screen>
+    </para>
+
+    <para>
+      We download the source RPM with:
+<screen>
+&ds1p; <userinput>cd</userinput>  
+&ds1p; <userinput>yumdownloader --source centos-release</userinput>  
+Loaded plugins: fastestmirror, rhnplugin
+This system is receiving updates from RHN Classic or Red Hat Satellite.
+Loading mirror speeds from cached hostfile
+ * base: mirror.1000mbps.com
+ * centosplus: mirror.1000mbps.com
+ * contrib: mirror.1000mbps.com
+ * extras: mirror.sitbv.nl
+ * updates: mirror.1000mbps.com
+base-source                                              | 1.9 kB     00:00     
+base-source/primary_db                                   | 672 kB     00:01     
+No source RPM found for centos-release-6-5.el6.centos.11.2.x86_64
+centos-release-6-5.el6.centos.11.1.src.rpm               |  19 kB     00:00
+</screen>
+    </para>
+
+    <para>
+      We must be sure to set the RPM macros:
+<screen>
+&ds1p; <userinput>cat .rpmmacros</userinput>
+%_topdir       %{getenv:HOME}/rpm
+%_tmppath      %{_topdir}/tmp
+%_signature    gpg
+%_gpg_name     Example (Example RPM signing)
+%_gpg_path     ~/.gnupg
+</screen>
+    </para>
+
+    <para>
+      Next, we install the source RPM:
+<screen>
+&ds1p; <userinput>cd</userinput>
+&ds1p; <userinput>rpm -i centos-release-6-5.el6.centos.11.1.src.rpm</userinput>
+&ds1p; <userinput>cd ~/rpm/SOURCES</userinput>
+&ds1p; <userinput>tar xvzf centos-release-6-5.tar.gz</userinput>
+&ds1p; <userinput>ls -1 centos-release-6/*.repo</userinput>
+centos-release-6/CentOS-Base.repo
+centos-release-6/CentOS-Debuginfo.repo
+centos-release-6/CentOS-Media.repo
+centos-release-6/CentOS-Vault.repo
+</screen>
+    </para>
+
+    <para>
+      In all repo files, we disable the yum repositories.
+      For example, for the base:
+<screen>
+&ds1p; <userinput>cat centos-release-6/CentOS-Base.repo</userinput>
+.
+.
+[base]
+name=CentOS-$releasever - Base
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&amp;arch=$basearch&amp;repo=os
+#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/
+gpgcheck=1
+<emphasis role="strong">enabled=0</emphasis>
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+.
+.
+</screen>
+    </para>
+
+    <para>
+      Next, we update the spec file:
+<screen>
+&ds1p; <userinput>vim ~/rpm/SPECS/centos-release.spec</userinput>
+.
+%define debug_package %{nil}
+<emphasis role="strong">%define dist .el6.centos</emphasis>
+%define product_family CentOS
+.
+Version:        %{base_release_version}
+<emphasis role="strong">Release:</emphasis>        <emphasis role="strong">5%{?dist}.11.2</emphasis>
+Summary:        %{product_family} release file
+.
+%changelog
+<emphasis role="strong">* Sun Jul 20 2014 Allard Berends &lt;aberends@example.com&gt; - 6.5.el6.centos.11.2</emphasis>
+<emphasis role="strong">- Build for CentOS-6.5 in Spacewalk.</emphasis>
+
+* Tue Nov 26 2013 Karanbir Singh &lt;kbsingh@centos.org&gt; - 6.5.el6.centos.11.1
+.
+</screen>
+    </para>
+
+    <para>
+      Next, we need to build the RPM:
+<screen>
+&ds1p; <userinput>cd ~/rpm/SPECS</userinput>
+&ds1; <userinput>rpmbuild -ba centos-release.spec</userinput>
+.
+.
+Wrote: /root/rpm/SRPMS/centos-release-6-5.el6.centos.11.2.src.rpm
+<emphasis role="strong">Wrote: /root/rpm/RPMS/x86_64/centos-release-6-5.el6.centos.11.2.x86_64.rpm</emphasis>
+Executing(%clean): /bin/sh -e /root/rpm/tmp/rpm-tmp.cgTBCU
++ umask 022
++ cd /root/rpm/BUILD
++ cd centos-release-6
++ rm -rf /root/rpm/BUILDROOT/centos-release-6-5.el6.centos.11.2.x86_64
++ exit 0
+</screen>
+    </para>
+
+    <para>
+      Sign the RPM with our key, which is also made known to
+      the Spacewalk server:
+<screen>
+&ds1p; <userinput>rpm --resign /root/rpm/RPMS/x86_64/centos-release-6-5.el6.centos.11.2.x86_64.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/x86_64/centos-release-6-5.el6.centos.11.2.x86_64.rpm:
+</screen>
+    </para>
+
+    <para>
+      Copy the RPM to the Spacewalk server:
+<screen>
+&ds1; <userinput>scp /root/rpm/RPMS/x86_64/centos-release-6-5.el6.centos.11.2.x86_64.rpm root@192.168.5.11:</userinput>
+root@192.168.5.11's password: 
+centos-release-6-5.el6.centos.11.2.x86_64.rpm 100%   19KB  19.4KB/s   00:00
+</screen>
+    </para>
+  </section>
+
   <section id="spacewalk-sw_filling-kt">
     <title>Kickstartable tree</title>
     <para>
@@ -453,6 +635,10 @@ python-hwdata
 &sw1p; <userinput>cp -a /var/www/html/pub/iso/1/images .</userinput>
 &sw1p; <userinput>cp -a /var/www/html/pub/iso/1/isolinux .</userinput>
 &sw1p; <userinput>cp -a /var/www/html/pub/iso/1/repodata .</userinput>
+&sw1p; <userinput>cp -a /var/www/html/pub/iso/1/Packages .</userinput>
+&sw1p; <userinput>cp -a /var/www/html/pub/iso/2/Packages .</userinput>
+&sw1p; <userinput>cp /root/centos-release-6-5.el6.centos.11.2.x86_64.rpm .</userinput>
+&sw1p; <userinput>rm centos-release-6-5.el6.centos.11.1.x86_64.rpm</userinput>
 &sw1p; <userinput>cp repodata/*comps.xml comps.xml</userinput>
 .. edit comps.xml ..
 &sw1p; <userinput>egrep 'python-hwdata|rhn-check|rhn-client-tools|rhnlib|rhnsd|rhn-setup|yum-rhn-plugin'
@@ -465,7 +651,7 @@ comps.xml</userinput>
       &lt;packagereq type="mandatory"&gt;rhn-setup&lt;/packagereq&gt;
       &lt;packagereq type="mandatory"&gt;yum-rhn-plugin&lt;/packagereq&gt;
 
-&sw1p; <userinput>createrepo -o /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5 -p --simple-md-filenames --no-database -s sha -g /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5/comps.xml --split /var/www/html/pub/iso/1/Packages --split /var/www/html/pub/iso/2/Packages --split /root/registration</userinput>
+&sw1p; <userinput>createrepo -o /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5 -p --simple-md-filenames --no-database -s sha -g /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5/comps.xml --split /var/satellite/rhn/kickstart/ks-centos-x86_64-server-6u5/Packages --split /root/registration</userinput>
 .. takes about 2 minutes ..
 </screen>
 

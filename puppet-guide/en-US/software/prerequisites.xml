@@ -58,5 +58,23 @@
     server.
   </para>
 
+  <important>
+    <title>Build a Spacewalk server first</title>
+
+    <para>
+      The guide called <emphasis role="strong">MSAT
+      guide</emphasis> discusses how to set up a Spacewalk
+      server. See <xref
+      linkend="puppet-guide-ref_material-msat-guide" />.
+    </para>
+
+    <para>
+      Synchronizing the software channels from the CentOS
+      YUM repositories takes a long time. So, make sure to
+      plan this and execute this task during night. It can
+      take up to 8 hours!
+    </para>
+  </important>
+
 </section>
 

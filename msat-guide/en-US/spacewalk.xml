@@ -124,8 +124,7 @@
   </para>
   <para>
     In the remainder of the chapter we discuss the steps. We
-    keep the amount of information limited. In appendix ...
-    we show screen dumps and extra information.
+    keep the amount of information limited.
   </para>
   <xi:include href="spacewalk/prerequisites.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="spacewalk/host.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

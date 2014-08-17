@@ -84,6 +84,7 @@ virt-install \
     Make sure the script is executable and then start it as
     root on the host:
 <screen>
+&hostp; <userinput>lvcreate -n ant1 -l $((25 * 10 * 5)) vg_vm</userinput>
 &hostp; <userinput>chmod u+x install-ant1.sh</userinput>
 &hostp; <userinput>./install-ant1.sh</userinput>
 </screen>

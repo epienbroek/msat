@@ -7,21 +7,19 @@
   <title>Environments</title>
 
   <para>
-    In this chapter we discuss different environment types
-    that we envision. During the discussions we position the
-    environments and characterise their properties.
+    In this chapter we discuss different environment types.
+    During the discussions we position the environments and
+    characterise their properties.
   </para>
 
   <para>
-    By environment we mean: collaborating ICT infrastructure
-    elements on which services run.  In an environment, we
-    have a network (data transport mechanism), some compute
-    nodes (e.g. KVM machines), and data storage (e.g. disks
-    on the KVM hosts). In the environment, we run an LDAP
-    service, a DNS service, a Provisioning service
-    (Spacewalk), etc. In other words, it is an
-    infrastructure domain in which we provide different
-    services.
+    By environment we mean: ICT infrastructure on which
+    default services run. The ICT infrastructure provides
+    networks (data transport mechanism), compute nodes (data
+    processing mechanism, e.g.  KVM machines), and data
+    storage (e.g. disks on the KVM hosts). On the ICT
+    infrastructure, we run default services, like NTP, LDAP,
+    DNS, Provisioning (Spacewalk), etc.
   </para>
 
   <warning>
@@ -30,7 +28,7 @@
     $environment.</title>
 
     <para>
-      In the Puppet configuration one can set the parameter
+      In Puppet configuration one can set the parameter
       <emphasis>$environment</emphasis>, to define the set
       of configuration parameters used according to the
       Puppet <emphasis>Directory environments</emphasis>

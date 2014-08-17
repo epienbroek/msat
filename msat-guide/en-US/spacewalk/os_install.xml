@@ -51,8 +51,36 @@
     <emphasis>virt-install man page</emphasis>, we specify
     them in the same order as they appear in the man page.
   </para>
+
   <para>
-    The installation is started with: 
+    We show to variants. The first variant corresponds with
+    this text. The second variant is another host system, on
+    which we split different partitions of the Virtual
+    Machine (VM) over different Logical Volumes (LV) of the
+    host. The installation is started with: 
+<screen>
+&hostp; <userinput>virt-install \</userinput>
+  <userinput>--connect qemu:///system \</userinput>
+  <userinput>--name=d21sw1 \</userinput>
+  <userinput>--ram=4096 \</userinput>
+  <userinput>--arch=x86_64 \</userinput>
+  <userinput>--description="Development Spacewalk server version 2.1" \</userinput>
+  <userinput>--cdrom /var/lib/libvirt/isos/Fedora-20-x86_64-DVD.iso \</userinput>
+  <userinput>--os-type=linux \</userinput>
+  <userinput>--os-variant=fedora20 \</userinput>
+  <userinput>--disk path=/dev/b/sw,device=disk,bus=virtio \</userinput>
+  <userinput>--network=network=svcs,mac=52:54:00:a8:05:0b \</userinput>
+  <userinput>--graphics vnc \</userinput>
+  <userinput>--hvm \</userinput>
+  <userinput>--autostart</userinput>
+.. output skipped ..
+</screen>
+     The interactive installation is started. Answer the questions with the parameter values as specified below.
+  </para>
+
+  <para>
+    On the alternative host, the installation is started
+    with: 
 <screen>
 &hostp; <userinput>virt-install \</userinput>
   <userinput>--connect qemu:///system \</userinput>
@@ -66,7 +94,7 @@
   <userinput>--disk path=/dev/vg_vm/sw21,device=disk,bus=virtio \</userinput>
   <userinput>--disk path=/dev/vg_slow/swdb,device=disk,bus=virtio \</userinput>
   <userinput>--disk path=/dev/vg_slow/swsc,device=disk,bus=virtio \</userinput>
-  <userinput>--network=network=dmsat1,mac=52:54:00:a8:05:0b \</userinput>
+  <userinput>--network=network=svcs,mac=52:54:00:a8:05:0b \</userinput>
   <userinput>--graphics vnc \</userinput>
   <userinput>--hvm \</userinput>
   <userinput>--autostart</userinput>
@@ -74,6 +102,7 @@
 </screen>
      The interactive installation is started. Answer the questions with the parameter values as specified below.
   </para>
+
   <para>
     <table id="tabl-msat-guide-Fedora_20_installation-Installation_parameters">
       <title>Installation parameters</title>
@@ -100,7 +129,7 @@
           <row>
             <entry>Hostname</entry>
             <entry>
-              <systemitem class="fqdomainname">d21sw1.dmsat1.org</systemitem>
+              <systemitem class="fqdomainname">d21sw1.svcs.dmsat1.org</systemitem>
             </entry>
           </row>
           <row>
@@ -129,7 +158,7 @@
                 </varlistentry>
                 <varlistentry>
                   <term>Search domains</term>
-                  <listitem><para>dmsat1.org</para></listitem>
+                  <listitem><para>svcs.dmsat1.org</para></listitem>
                 </varlistentry>
               </variablelist>
             </entry>
@@ -181,7 +210,7 @@
         <tbody valign="top">
           <row>
             <entry>
-              <filename class="devicefile">/dev/sda1</filename>
+              <filename class="devicefile">/dev/vda1</filename>
             </entry>
              <entry>
               <filename class="directory">/boot</filename>
@@ -192,7 +221,7 @@
           </row>
           <row>
             <entry>
-              <filename class="devicefile">/dev/sda2</filename>
+              <filename class="devicefile">/dev/vda2</filename>
             </entry>
             <entry>
               <filename class="directory">PVS</filename>
@@ -203,7 +232,7 @@
           </row>
           <row>
             <entry>
-              <filename class="devicefile">/dev/fedora_d21sw1/swap</filename>
+              <filename class="devicefile">/dev/vg/swap</filename>
             </entry>
             <entry>
               <filename class="directory">None</filename>
@@ -214,13 +243,13 @@
           </row>
           <row>
             <entry>
-              <filename class="devicefile">/dev/fedora_d21sw1/root</filename>
+              <filename class="devicefile">/dev/vg/root</filename>
             </entry>
             <entry>
               <filename class="directory">/</filename>
             </entry>
             <entry>
-              295524 MB (remainder of disk)
+              295524 MB or 295 GB (remainder of disk)
             </entry>
           </row>
         </tbody>
@@ -240,19 +269,7 @@
     After the installation we want to add some packages, do
     as <systemitem class="username">root</systemitem>: 
 <screen>
-<userinput>yum -y install bind-utils</userinput>
-<userinput>yum -y install vim-enhanced</userinput>
-<userinput>yum -y install tree</userinput>
-<userinput>yum -y install screen</userinput>
-<userinput>yum -y install net-tools</userinput>
-<userinput>yum -y install tar</userinput>
-<userinput>yum -y install mailx</userinput>
-<userinput>yum -y install strace</userinput>
-<userinput>yum -y install setroubleshoot</userinput>
-<userinput>yum -y install syslinux</userinput>
-<userinput>yum -y install bind-chroot</userinput>
-<userinput>yum -y install mlocate</userinput>
-<userinput>yum -y install wget</userinput>
+<userinput>yum -y install bind-utils vim-enhanced tree screen net-tools tar mailx strace setroubleshoot syslinux bind-chroot mlocate wget</userinput>
 .. output of commands skipped ..
 <userinput>reboot</userinput>
 .. only if new kernel, rpm -qa | grep kernel ..
@@ -263,7 +280,7 @@
     <filename>/etc/default/grub</filename> file to include
     the following lines: 
 <screen>
-GRUB_CMDLINE_LINUX="rd.lvm.lv=fedora_d21sw1/swap rd.md=0 rd.dm=0 rd.lvm.lv=fedora_d21sw1/root $([ -x /usr/sbin/rhcrashkernel-param ] &amp;&amp; /usr/sbin/rhcrashkernel-param || :) rd.luks=0 vconsole.keymap=us console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX="rd.lvm.lv=vg/swap rd.md=0 rd.dm=0 rd.lvm.lv=vg/root $([ -x /usr/sbin/rhcrashkernel-param ] &amp;&amp; /usr/sbin/rhcrashkernel-param || :) rd.luks=0 vconsole.keymap=us console=ttyS0,115200n8"
 GRUB_TERMINAL=serial
 GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
 </screen>

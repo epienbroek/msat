@@ -29,6 +29,15 @@
       </listitem>
       <listitem>
         <para>
+          Construct a Spacewalk proxy software channel. The
+          minimal set of Spacewalk software, coming from
+          <ulink
+          url="http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64/">Yum
+          Spacewalk for RHEL 6 x86_64</ulink>.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
           Construct a puppet software channel. The minimal
           set of puppet software, coming from <ulink
           url="http://yum.puppetlabs.com/el/6.5/products/x86_64/">Puppet

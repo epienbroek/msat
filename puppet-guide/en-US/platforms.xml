@@ -8,16 +8,22 @@
 
   <para>
     In this chapter we discuss different platform types
-    from the basic Linux infrastructure.
+    from the basic Linux infrastructure. Furthermore, we
+    provide the command line statements to install all the
+    nodes in <emphasis>dmsat1</emphasis>.
   </para>
 
   <para>
     A platform is a node or a group of nodes that implement
     a certain function. For example, 2 LDAP nodes and 2 LVS
-    nodes, collaborate to provide the LDAP basic infa
-    service in a Deployment zone.
+    nodes, collaborate to provide the LDAP basic infra
+    service in the <emphasis>dmsat1</emphasis> Deployment
+    zone.
   </para>
 
   <xi:include href="platforms/ntp.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="platforms/ldap.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="platforms/dns.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="platforms/dev.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="platforms/proxy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>

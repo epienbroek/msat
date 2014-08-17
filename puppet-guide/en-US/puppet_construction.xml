@@ -20,6 +20,21 @@
     </itemizedlist>
   </para>
 
-  <xi:include href="puppet_construction/assert.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-</chapter>
+  <para>
+    In the following sections, we build RPM packages on
+    <systemitem
+    class="systemname">dev1.core.dmsat1.org</systemitem>. A
+    prerequisite is to have the RPM build directories in
+    place.
+<screen>
+&dev1p; <userinput>mkdir -p ~/rpm/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS,tmp}</userinput>
+&dev1p; <userinput>mkdir -p ~/rpm/RPMS/noarch</userinput>
+</screen>
+  </para>
 
+  <xi:include href="puppet_construction/assert.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/stdlib.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/mini_portile.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/gpgme.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/puppet_lint.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</chapter>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
 %BOOK_ENTITIES;
 ]>
 <section id="software-channels">
@@ -23,6 +23,10 @@
           <entry>20 minutes</entry>
         </row>
         <row>
+          <entry>Construction of Spacewalk channel</entry>
+          <entry>60 minutes</entry>
+        </row>
+        <row>
           <entry>Construction of puppet channel</entry>
           <entry>60 minutes</entry>
         </row>
@@ -38,38 +42,21 @@
           <entry>Construction of directory server channel</entry>
           <entry>60 minutes</entry>
         </row>
+        <row>
+          <entry>Construction of Puppet tools channel</entry>
+          <entry>20 minutes</entry>
+        </row>
       </tbody>
     </tgroup>
   </table>
-
-  <para>
-    In this section we discuss ...
-    <itemizedlist>
-      <listitem>
-        <para>
-          ...
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          ...
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          ...
-        </para>
-      </listitem>
-    </itemizedlist>
-  </para>
 
   <section id="software-channels-centos65">
     <title>Analysis of CentOS 6.5 channel</title>
 
     <para>
       The first question we need to answer, is: do we have
-      conflicts in the software channels? The OS and Puppet
-      software channels are:
+      conflicts in the software channels? The OS, Spacewalk,
+      EPEL and Puppet software channels are:
       <table id="software-channels-centos65-channellist">
         <title>Software channels</title>
         <tgroup align="left" cols="2" colsep="1" rowsep="1">
@@ -86,6 +73,16 @@
               <entry>CentOS 6.5</entry>
               <entry><ulink
               url="http://mirror.centos.org/centos/6.5/os/x86_64/Packages/">mirror.centos.org/centos/6.5/os/x86_64/Packages/</ulink></entry>
+            </row>
+            <row>
+              <entry>Spacewalk 2.1</entry>
+              <entry><ulink
+              url="http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64/">yum.spacewalkproject.org/2.1/RHEL/6/x86_64/</ulink></entry>
+            </row>
+            <row>
+              <entry>EPEL 6.5</entry>
+              <entry><ulink
+              url="http://epel.mirror.net.in/epel/6/x86_64/">epel.mirror.net.in/epel/6/x86_64/</ulink></entry>
             </row>
             <row>
               <entry>Puppet 6.5</entry>
@@ -107,6 +104,10 @@
 <screen>
 &uprompt; <userinput>wget -O - http://mirror.centos.org/centos/6.5/os/x86_64/Packages/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > centos65.txt</userinput>
 
+&uprompt; <userinput>wget -O - http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > centos65_sw21.txt</userinput>
+
+&uprompt; <userinput>wget -O - http://epel.mirror.net.in/epel/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > epel6.txt</userinput>
+
 &uprompt; <userinput>wget -O - http://yum.puppetlabs.com/el/6.5/products/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > puppet65.txt</userinput>
 
 &uprompt; <userinput>wget -O - http://yum.puppetlabs.com/el/6.5/dependencies/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | sed 's/-[0-9]\+.*//' | sort -u > puppetdeps65.txt</userinput>
@@ -122,20 +123,384 @@
 &uprompt; <userinput>line_sets.py -a centos65.txt -b puppet65.txt -o '&amp;'</userinput>
 .. no output == no intersection ..
 
+&uprompt; <userinput>line_sets.py -a centos65.txt -b centos65_sw21.txt -o '&amp;'</userinput>
+.. no output == no intersection ..
+
 &uprompt; <userinput>line_sets.py -a centos65.txt -b puppetdeps65.txt -o '&amp;'</userinput>
 .. no output == no intersection ..
+
+&uprompt; <userinput>line_sets.py -a centos65_sw21.txt -b puppet65.txt -o '&amp;'</userinput>
+.. no output == no intersection ..
+
+&uprompt; <userinput>line_sets.py -a centos65_sw21.txt -b puppetdeps65.txt -o '&amp;'</userinput>
+tanukiwrapper
+.. forms no problem, since we don't use it ..
+
+&uprompt; <userinput>line_sets.py -a centos65.txt -b epel6.txt -o '&amp;'</userinput>
+.. 65 RPM's intersect ..
+
+&uprompt; <userinput>line_sets.py -a centos65_sw21.txt -b epel6.txt -o '&amp;'</userinput>
+.. 17 RPM's intersect ..
+
 </screen>
     </para>
 
     <para>
       From the above analysis, we can conclude that it is
-      safe to place the contents of the Puppet and Puppet
-      dependencies in software channels. We don't risk a
-      conflict.
+      safe to place the contents of the Spacewalk, Puppet
+      and Puppet dependencies in software channels. We don't
+      risk a conflict.
+    </para>
+
+    <para>
+      There is an overlap between Epel and CentOS. Since, we
+      only download the Epel packages used for the 389
+      Directory Server, the overlap does not exist.
+    </para>
+
+    <para>
+      A similar sort of overlap exists between the Spacewalk
+      RPM's and Epel. Since, we only download the Epel
+      packages used for the 389 Directory Server, the
+      overlap does not exist.
     </para>
 
   </section>
   
+  <section id="software-channels-spacewalk">
+    <title>Construction of Spacewalk channel</title>
+
+    <para>
+      In order to determine what RPM's need to be placed in
+      the Spacewalk proxy software channel, we conduct a
+      test installation of a Spacewalk proxy server on
+      <systemitem
+      class="systemname">proxy1.rmt.dmsat1.org</systemitem>.
+    </para>
+
+    <para>
+      After installing a bare CentOS 6.5 OS on the virtual
+      machine, we install the Spacewalk proxy software. By
+      comparing the RPM sets before and after the
+      installation, we can figure out what RPM's from the
+      Spacewalk channel are needed.
+    </para>
+
+    <para>
+      The set of RPM's before the Spacewalk proxy software
+      installation:
+<screen>
+&proxy1p; <userinput>rpm -qa --qf '[%{name} %{version} %{release} %{arch}\n]' | sort &gt; a</userinput>
+</screen>
+    </para>
+
+    <para>
+      The installation is done with:
+<screen>
+&proxy1p; <userinput>rpm -Uvh http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64/spacewalk-repo-2.1-2.el6.noarch.rpm</userinput>
+
+&proxy1p; <userinput>yum install spacewalk-proxy-selinux spacewalk-proxy-installer</userinput>
+</screen>
+    </para>
+
+    <para>
+      With the current set of RPM's in our Spacewalk server
+      and the locally configured YUM repo's at <systemitem
+      class="systemname">proxy1.rmt.dmsat1.org</systemitem>,
+      the installation of the Spacewalk proxy fails. Reason:
+      we miss the <package>jabberd</package> RPM and some
+      dependencies. It comes from EPEL, so we add it (we
+      iteratively figured out what was missing by doing the
+      <userinput>yum install jabberd</userinput>).
+    </para>
+
+    <para>
+      We obtain these packages from <ulink
+      url="http://epel.mirror.net.in/epel/6/x86_64/">Index
+      of /epel/6/x86_64/</ulink>. Since they need to be
+      placed on the Spacewalker server, we have to execute,
+      on the Spacewalk server:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-epel-6u5-1_0</userinput>
+.. if it did not exist ..
+&sw1p; <userinput>cd /var/satellite/example-epel-6u5-1_0</userinput>
+&sw1p; <userinput>wget -O - http://epel.mirror.net.in/epel/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | grep -e ^jabberd -e ^perl-BerkeleyDB -e libgsasl-1 -e perl-Authen-PAM -e udns-0 -e python-debian -e python-chardet -e python-six | grep -v i686 | while read line; do wget http://epel.mirror.net.in/epel/6/x86_64/$line; done</userinput>
+.. output skipped ..
+
+&sw1p; <userinput>ls -1 jabberd* perl-BerkeleyDB* libgsasl-1* perl-Authen-PAM* udns-0* python-debian* python-chardet* python-six*</userinput>
+jabberd-2.2.14-5.el6.x86_64.rpm
+libgsasl-1.4.0-4.el6.x86_64.rpm
+perl-Authen-PAM-0.16-8.el6.x86_64.rpm
+perl-BerkeleyDB-0.43-3.el6.x86_64.rpm
+python-chardet-2.0.1-1.el6.noarch.rpm
+python-debian-0.1.21-10.el6.noarch.rpm
+python-six-1.6.1-1.el6.noarch.rpm
+udns-0.0.9-5.el6.x86_64.rpm
+
+&sw1p; <userinput>rhnpush -c example-epel-6u5-1_0 -u example -p redhat jabberd-2.2.14-5.el6.x86_64.rpm perl-BerkeleyDB-0.43-3.el6.x86_64.rpm libgsasl-1.4.0-4.el6.x86_64.rpm perl-Authen-PAM-0.16-8.el6.x86_64.rpm udns-0.0.9-5.el6.x86_64.rpm python-debian-0.1.21-10.el6.noarch.rpm python-chardet-2.0.1-1.el6.noarch.rpm python-six-1.6.1-1.el6.noarch.rpm</userinput>
+</screen>
+    </para>
+
+    <para>
+      Now, we repeat the installation. Hopefully all EPEL
+      dependencies are resolved:
+<screen>
+&proxy1p; <userinput>yum install spacewalk-proxy-selinux spacewalk-proxy-installer</userinput>
+.. output skipped ..
+
+&proxy1p; <userinput>rpm -qa --qf '[%{name} %{version} %{release} %{arch}\n]' | sort &gt; b</userinput>
+</screen>
+    </para>
+
+    <para>
+      From the RPM sets <emphasis>a</emphasis> and
+      <emphasis>b</emphasis>, we deduce the RPM's coming
+      from the Spacewalk YUM repo. These RPM's are placed in
+      a separate software channel called
+      <emphasis>example-spacewalk-proxy-6u5-1_0</emphasis>.
+    </para>
+
+    <para>
+      In the <emphasis role="bold">Spacewalk
+      proxy</emphasis> channel, we place the RPM's, needed
+      to support the Spacewalk proxy. The minimal set, we
+      need for our purposes<footnote><para>We figured out
+      the minimal set of RPM's by installing the Spacewalk
+      proxy.</para></footnote>, is:
+      <itemizedlist>
+        <listitem>
+          <para><package>spacewalk-proxy-installer</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-selinux</package></para>
+        </listitem>
+        <listitem>
+          <para><package>rhnpush</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-backend</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-backend-libs</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-base-minimal</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-base-minimal-config</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-broker</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-common</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-docs</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-html</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-management</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-package-manager</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-proxy-redirect</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-setup-jabberd</package></para>
+        </listitem>
+        <listitem>
+          <para><package>spacewalk-ssl-cert-check</package></para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      We obtain these packages from <ulink
+      url="http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64/">Index of /2.1/RHEL/6/x86_64</ulink>. Since they need to be
+      placed on the Spacewalker server, we have to execute,
+      on the Spacewalk server:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-spacewalk-proxy-6u5-1_0</userinput>
+<userinput>cd /var/satellite/example-spacewalk-proxy-6u5-1_0</userinput>
+<userinput>REPO=http://yum.spacewalkproject.org/2.1/RHEL/6/x86_64</userinput>
+<userinput>wget $REPO/rhnpush-5.5.71-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-backend-2.1.56-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-backend-libs-2.1.56-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-base-minimal-2.1.60-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-base-minimal-config-2.1.60-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-broker-2.1.15-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-common-2.1.15-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-docs-2.0.1-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-html-2.0.1-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-installer-2.1.6-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-management-2.1.15-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-package-manager-2.1.15-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-redirect-2.1.15-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-proxy-selinux-2.0.1-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-setup-jabberd-2.0.1-1.el6.noarch.rpm</userinput>
+<userinput>wget $REPO/spacewalk-ssl-cert-check-2.3-1.el6.noarch.rpm</userinput>
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-spacewalk-proxy-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-spacewalk-proxy-6u5-1_0 -n example-spacewalk-proxy-6u5-1_0 -s example-spacewalk-proxy-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-spacewalk-proxy-6u5-1_0</userinput>
+example-spacewalk-proxy-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-spacewalk-proxy-6u5-1_0 -u example -p redhat -d example-spacewalk-proxy-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-spacewalk-proxy-6u5-1_0</userinput>
+rhnpush 5.5.71 1.el6 noarch
+spacewalk-backend 2.1.56 1.el6 noarch
+spacewalk-backend-libs 2.1.56 1.el6 noarch
+spacewalk-base-minimal 2.1.60 1.el6 noarch
+spacewalk-base-minimal-config 2.1.60 1.el6 noarch
+spacewalk-proxy-broker 2.1.15 1.el6 noarch
+spacewalk-proxy-common 2.1.15 1.el6 noarch
+spacewalk-proxy-docs 2.0.1 1.el6 noarch
+spacewalk-proxy-html 2.0.1 1.el6 noarch
+spacewalk-proxy-installer 2.1.6 1.el6 noarch
+spacewalk-proxy-management 2.1.15 1.el6 noarch
+spacewalk-proxy-package-manager 2.1.15 1.el6 noarch
+spacewalk-proxy-redirect 2.1.15 1.el6 noarch
+spacewalk-proxy-selinux 2.0.1 1.el6 noarch
+spacewalk-setup-jabberd 2.0.1 1.el6 noarch
+spacewalk-ssl-cert-check 2.3 1.el6 noarch
+</screen>
+    </para>
+
+    <para>
+      Now, we repeat the installation of the Spacewalk proxy
+      server software on <systemitem
+      class="systemname">proxy1.rmt.dmsat1.org</systemitem>.
+      On the Spacewalk interface, we manually add the
+      <emphasis>example-epel-6u5-1_0</emphasis> and
+      <emphasis>example-spacewalk-proxy-6u5-1_0</emphasis>
+      software channels to the <systemitem
+      class="systemname">proxy1.rmt.dmsat1.org</systemitem>
+      machine: <userinput>Spacewalk GUI &gt; Systems &gt;
+      proxy1.rmt.dmsat1.org &gt; Subscribed Channels (Alter
+      Channel Subscriptions) &gt; example-epel-6u5-1_0
+      (vink) and example-spacewalk-proxy-6u5-1_0
+      (vink) &gt; Change Subscriptions</userinput>.
+    </para>
+
+    <para>
+      Now, we repeat the installation.
+<screen>
+&proxy1p; <userinput>yum install spacewalk-proxy-selinux spacewalk-proxy-installer</userinput>
+.. success ..
+</screen>
+    </para>
+
+    <para>
+      For completeness, we show here how the configuration
+      of the Spacewalk proxy is done:
+<screen>
+&proxy1p; <userinput>mkdir ~/ssl-build</userinput>
+&proxy1p; <userinput>yum install openssh-clients</userinput>
+</screen>
+    </para>
+
+    <para>
+      From the Spacewalk server:
+<screen>
+&sw1p; <userinput>scp ~/ssl-build/{RHN-ORG-PRIVATE-SSL-KEY,RHN-ORG-TRUSTED-SSL-CERT,rhn-ca-openssl.cnf} root@192.168.7.11:/root/ssl-build</userinput>
+</screen>
+    </para>
+
+    <para>
+      Continue on the Spacewalk proxy:
+<screen>
+&proxy1p; <userinput>cat proxy-answers.txt</userinput>
+VERSION=2.1
+TRACEBACK_EMAIL=root@proxy1.rmt.dmsat1.org
+USE_SSL=Y
+HTTP_PROXY=''
+SSL_ORG=Example
+SSL_ORGUNIT=dmsat1
+SSL_COMMON=proxy1.rmt.dmsat1.org
+SSL_CITY=Utrecht
+SSL_STATE=Utrecht
+SSL_COUNTRY=NL
+SSL_EMAIL=root@proxy1.rmt.dmsat1.org
+SSL_CNAME_ASK=''
+SSL_PASSWORD=redhat
+INSTALL_MONITORING=N
+POPULATE_CONFIG_CHANNEL=Y
+RHN_USER=example
+RHN_PASSWORD=redhat
+
+&proxy1p; <userinput>configure-proxy.sh --answer-file=proxy-answers.txt</userinput>
+.. success ..
+</screen>
+    </para>
+
+    <para>
+      For testing, don't forget to adapt the firewall of the
+      Spacewalk proxy server:
+<screen>
+&proxy1p; <userinput>cat /etc/sysconfig/iptables</userinput>
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 443 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 5222 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+
+&proxy1p; <userinput>service iptables restart</userinput>
+</screen>
+    </para>
+
+    <note>
+      <title>Where are the Spacewalk and EPEL GPG keys?</title>
+
+      <para>
+        In the kickstart profile, we have already added the
+        GPG keys: <emphasis
+        role="strong">RPM-GPG-KEY-EPEL-6</emphasis> and
+        <emphasis
+        role="strong">RPM-GPG-KEY-spacewalk-2012</emphasis>.
+        That's why we did not specifically mentioned the GPG
+        keys. Otherwise, we should have added them for the
+        Spacewalk and EPEL RPM's.
+      </para>
+    </note>
+
+  </section>
+
   <section id="software-channels-puppet">
     <title>Construction of puppet channel</title>
 
@@ -477,6 +842,28 @@ ruby-shadow 2.2.0 2.el6 x86_64
     </para>
 
     <para>
+      Note that we added more packages from EPEL, needed for
+      the Puppet tools channel. These are:
+      <itemizedlist>
+        <listitem>
+          <para>
+            <package>libyaml</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>python-iptools</package>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <package>PyYAML</package>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
       We use the specific versions:
       <table id="software-channels-ds-rpms">
         <title>Directory Server channel RPM's</title>
@@ -493,49 +880,83 @@ ruby-shadow 2.2.0 2.el6 x86_64
           </thead>
           <tbody valign="top">
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-ds</entry>
+              <entry>The 389 Directory Server,
+              Administration Server, and Console Suite
+              provide the LDAPv3 server, the httpd daemon
+              used to administer the server, and the console
+              GUI application used for server and user/group
+              administration.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-admin</entry>
+              <entry>389 Administration Server is an HTTP
+              agent that provides management features
+              for 389 Directory Server.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-admin-console</entry>
+              <entry>A Java based remote management console
+              used for Managing 389
+              Admin Server.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-admin-console-doc</entry>
+              <entry>Documentation for the management
+              console of the Admin Server.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-adminutil</entry>
+              <entry>Libraries for the administration
+              utilities.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-console</entry>
+              <entry>Java based console to manage the
+              Directory Server and the administration
+              server.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-ds-console</entry>
+              <entry>Java based console to manage the
+              Directory Sever.</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-ds-console-doc</entry>
+              <entry>Documentation for the console manager</entry>
+              <entry>EPEL</entry>
             </row>
             <row>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
-              <entry>ruby</entry>
+              <entry>389-dsgw</entry>
+              <entry>Directory Server GateWay. A phonebook,
+              orgchart and admin interface, running on top
+              of the administration server.</entry>
+              <entry>EPEL</entry>
+            </row>
+            <row>
+              <entry>libyaml</entry>
+              <entry>YAML parser written in C.</entry>
+              <entry>EPEL</entry>
+            </row>
+            <row>
+              <entry>python-iptools</entry>
+              <entry>A few useful functions and objects for
+              manipulating IPv4 and IPv6 addresses
+              in python.</entry>
+              <entry>EPEL</entry>
+            </row>
+            <row>
+              <entry>PyYAML</entry>
+              <entry>Python interface to the YAML language.
+              It needs libyaml.</entry>
+              <entry>EPEL</entry>
             </row>
           </tbody>
         </tgroup>
@@ -551,10 +972,10 @@ ruby-shadow 2.2.0 2.el6 x86_64
 <screen>
 &sw1p; <userinput>mkdir /var/satellite/example-epel-6u5-1_0</userinput>
 &sw1p; <userinput>cd /var/satellite/example-epel-6u5-1_0</userinput>
-&sw1p; <userinput>wget -O - http://epel.mirror.net.in/epel/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\.rpm\)".*$/\1/p' | grep ^389 | grep -v i686 | while read line; do wget http://epel.mirror.net.in/epel/6/x86_64/$line; done</userinput>
+&sw1p; <userinput>wget -O - http://epel.mirror.net.in/epel/6/x86_64/ 2>/dev/null | sed -n 's/^.* href="\([^ "]\+\.rpm\)".*$/\1/p' | grep -e ^389 -e libyaml -e python-iptools -e PyYAML | grep -v i686 | while read line; do wget http://epel.mirror.net.in/epel/6/x86_64/$line; done</userinput>
 .. output skipped ..
 
-&sw1p; <userinput>ls -1</userinput>
+&sw1p; <userinput>ls -1 389* *yaml* *YAML*</userinput>
 389-admin-1.1.35-1.el6.x86_64.rpm
 389-admin-console-1.1.8-1.el6.noarch.rpm
 389-admin-console-doc-1.1.8-1.el6.noarch.rpm
@@ -565,6 +986,9 @@ ruby-shadow 2.2.0 2.el6 x86_64
 389-ds-console-1.2.6-1.el6.noarch.rpm
 389-ds-console-doc-1.2.6-1.el6.noarch.rpm
 389-dsgw-1.1.11-1.el6.x86_64.rpm
+libyaml-0.1.6-1.el6.x86_64.rpm
+python-iptools-0.6.1-1.el6.noarch.rpm
+PyYAML-3.10-3.el6.x86_64.rpm
 </screen>
     </para>
 
@@ -627,6 +1051,165 @@ example-epel-6u5-1_0
 
     <para>
       ...
+    </para>
+
+  </section>
+
+  <section id="software-channels-software">
+    <title>Construction of puppet-software channel</title>
+
+    <para>
+      The <package>puppet-software</package> RPM's are built with:
+<screen>
+&dev1p; <userinput>cd</userinput>
+&dev1p; <userinput>git clone git@github.com:aberends/puppet-software.git</userinput>
+.. output skipped ..
+&dev1p; <userinput>cd puppet-software</userinput>
+&dev1p; <userinput>./build-all.sh</userinput>
+.. output skipped ..
+</screen>
+    </para>
+
+    <para>
+      Now, per RPM, do:
+<screen>
+&dev1p; <userinput>rpm --resign /root/rpm/RPMS/*/&lt;name&gt;.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/*/&lt;name&gt;.rpm
+</screen>
+    </para>
+
+    <para>
+      After building the RPM's, we place them on the
+      Spacewalk server with:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-puppet-software-6u5-1_0</userinput>
+&sw1p; <userinput>cd /var/satellite/example-puppet-software-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      Per RPM, for example:
+<screen>
+&dev1p; <userinput>scp /root/rpm/RPMS/noarch/puppet-stdlib-0.1.1-1.noarch.rpm root@192.168.5.11:/var/satellite/example-puppet-software-6u5-1_0</userinput>
+.. output skipped ..
+</screen>
+    </para>
+
+    <para>
+<screen>
+&sw1p; <userinput>cd /var/satellite/example-puppet-software-6u5-1_0</userinput>
+&sw1p; <userinput>ls -1</userinput>
+puppet-stdlib-0.1.1-1.noarch.rpm
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-puppet-software-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-puppet-software-6u5-1_0 -n example-puppet-software-6u5-1_0 -s example-puppet-software-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-puppet-software-6u5-1_0</userinput>
+example-puppet-software-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-software-6u5-1_0 -u example -p redhat -d example-puppet-software-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-puppet-software-6u5-1_0</userinput>
+puppet-stdlib 0.1.1 1 noarch
+</screen>
+    </para>
+
+  </section>
+
+  <section id="software-channels-tools">
+    <title>Construction of puppet tools channel</title>
+
+    <para>
+      The <package>puppet-tools</package> RPM is built with:
+<screen>
+&dev1p; <userinput>cd</userinput>
+&dev1p; <userinput>git clone git@github.com:aberends/puppet-tools.git</userinput>
+.. output skipped ..
+&dev1p; <userinput>cd puppet-tools</userinput>
+&dev1p; <userinput>./build.sh</userinput>
+.. output skipped ..
+&dev1p; <userinput>rpm --resign /root/rpm/RPMS/noarch/puppet-tools-0.1.1-1.noarch.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/noarch/puppet-tools-0.1.1-1.noarch.rpm:
+</screen>
+    </para>
+
+    <para>
+      After building the RPM's, we place them on the
+      Spacewalk server with:
+<screen>
+&sw1p; <userinput>mkdir /var/satellite/example-puppet-tools-6u5-1_0</userinput>
+&sw1p; <userinput>cd /var/satellite/example-puppet-tools-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+<screen>
+&dev1p; <userinput>scp /root/rpm/RPMS/noarch/puppet-tools-0.1.1-1.noarch.rpm root@192.168.5.11:/var/satellite/example-puppet-tools-6u5-1_0</userinput>
+.. output skipped ..
+</screen>
+    </para>
+
+    <para>
+<screen>
+&sw1p; <userinput>cd /var/satellite/example-puppet-tools-6u5-1_0</userinput>
+&sw1p; <userinput>ls -1</userinput>
+puppet-tools-0.1.1-1.noarch.rpm
+</screen>
+    </para>
+
+    <para>
+      On the Spacewalk server, we construct a new channel,
+      called <userinput>example-puppet-tools-6u5-1_0</userinput>,
+      with the command:
+<screen>
+&sw1p; <userinput>msat_mk_sc.py -l example-puppet-tools-6u5-1_0 -n example-puppet-tools-6u5-1_0 -s example-puppet-tools-6u5-1_0 --softwarechannel-arch=channel-x86_64 --softwarechannel-parent=centos-x86_64-server-6</userinput>
+</screen>
+      The result can be verified on the web interface of the
+      Spacewalk server or on the command line:
+<screen>
+&sw1p; <userinput>msat_ls_sc.py | grep example-puppet-tools-6u5-1_0</userinput>
+example-puppet-tools-6u5-1_0
+</screen>
+    </para>
+
+    <para>
+      We add the downloaded RPM's to the channel with:
+<screen>
+&sw1p; <userinput>cd /var/satellite</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-tools-6u5-1_0 -u example -p redhat -d example-puppet-tools-6u5-1_0</userinput>
+</screen>
+    </para>
+
+    <para>
+      We verify the result with:
+<screen>
+&sw1p; <userinput>msat_ls_sc_rpms.py -l example-puppet-tools-6u5-1_0</userinput>
+puppet-tools 0.1.1 1 noarch
+</screen>
     </para>
 
   </section>

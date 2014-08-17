@@ -109,6 +109,8 @@ virt-install \
     Make sure all the scripts are executable and then start
     them all as root on the host:
 <screen>
+&hostp; <userinput>lvcreate -n ntp1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n ntp2 -l $((25 * 10 * 5)) vg_vm</userinput>
 &hostp; <userinput>chmod u+x install-ntp[12].sh</userinput>
 &hostp; <userinput>./install-ntp1.sh</userinput>
 &hostp; <userinput>./install-ntp2.sh</userinput>

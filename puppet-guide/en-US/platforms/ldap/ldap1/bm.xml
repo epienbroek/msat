@@ -320,6 +320,10 @@ virt-install \
     Make sure all the scripts are executable and then start
     them all 4 as root on the host:
 <screen>
+&hostp; <userinput>lvcreate -n ds1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n ds2 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n lvs1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n lvs2 -l $((25 * 10 * 5)) vg_vm</userinput>
 &hostp; <userinput>chmod u+x install-{ds,lvs}[12].sh</userinput>
 &hostp; <userinput>./install-ds1.sh</userinput>
 &hostp; <userinput>./install-ds2.sh</userinput>

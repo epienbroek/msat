@@ -88,10 +88,12 @@ virtlockd.socket                            disabled
     The host is now ready to run KVM guest systems. To make
     it possible to configure guests, we need extra software,
     in the form of RPM packages,
-    <package>virt-manager</package> and
-    <package>virt-install</package>.
+    <package>virt-manager</package>,
+    <package>virt-install</package>,
+    <package>libvirt-daemon-config-network</package>,
+    <package>virt-viewer</package>
 <screen>
-&hostp; <userinput>yum install virt-manager virt-install</userinput> 
+&hostp; <userinput>yum install virt-manager virt-install libvirt-daemon-config-network virt-viewer</userinput> 
 .. output skipped ..
 </screen>
   </para>
@@ -145,6 +147,10 @@ virtlockd.socket                            disabled
           </row>
         </thead>
         <tbody valign="top">
+          <row>
+            <entry>Connection type</entry>
+            <entry>Bridge</entry>
+          </row>
           <row>
             <entry>Connection name</entry>
             <entry>br0</entry>
@@ -257,6 +263,10 @@ virtlockd.socket                            disabled
           </row>
         </thead>
         <tbody valign="top">
+          <row>
+            <entry>Connection type</entry>
+            <entry>Ethernet</entry>
+          </row>
           <row>
             <entry>Connection name</entry>
             <entry>br0 slave 1</entry>

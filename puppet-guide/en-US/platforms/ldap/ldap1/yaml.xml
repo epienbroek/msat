@@ -42,7 +42,7 @@
   <para>
     The code of the <package>puppet-dmsat1</package> RPM can
     be found in <xref
-    linkend="puppet-guide-ref_material-puppet-dmsat1" />.
+    linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
     The RPM is built with:
 <screen>
 &t1p; <userinput>cd ~/puppet-dmsat1</userinput>
@@ -77,7 +77,7 @@ puppet-dmsat1-0.1.1-1.noarch.rpm              100% 8743     8.5KB/s   00:00
       role="strong">ldap::params::</emphasis> and <emphasis
       role="strong">lvs::ldap::params::</emphasis> from
       <xref
-      linkend="puppet-guide-ref_material-puppet-dmsat1" />.
+      linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
       The list of files to inspect can be found with:
 <screen>
 &t1p; <userinput>cd ~/puppet-dmsat1</userinput>

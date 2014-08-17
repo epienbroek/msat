@@ -34,7 +34,7 @@ base.yaml                                       (base)
   <para>
     The code of the <package>puppet-dmsat1</package> RPM can
     be found in <xref
-    linkend="puppet-guide-ref_material-puppet-dmsat1" />.
+    linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
     The RPM is built with:
 <screen>
 &t1p; <userinput>cd ~/puppet-dmsat1</userinput>

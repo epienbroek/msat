@@ -30,11 +30,18 @@
   <para>
     In the table, <xref
     linkend="environment-development-nodes" />, the third
-    column refers to specific YAML parameters. What do we
-    mean by them? This answer is given in <xref
+    column refers to node specific YAML parameters. But what
+    do we mean by YAML parameters in general? This answer is
+    given in <xref
     linkend="puppet_configuration-layers-table" />. By
     studying <xref linkend="puppet_configuration" />, the
     usage of these parameter must become clear.
+  </para>
+
+  <para>
+    The order in which the nodes of
+    <emphasis>dmsat1</emphasis> are mentioned in the table,
+    corresponds to the order in which we install them.
   </para>
 
   <table id="environment-development-nodes">
@@ -47,7 +54,7 @@
         <row>
           <entry>Node</entry>
           <entry>Description</entry>
-          <entry>Parameters</entry>
+          <entry>Node YAML Parameters</entry>
         </row>
       </thead>
       <tbody valign="top">
@@ -56,8 +63,63 @@
           <entry>
             The Spacewalk provisioning server. It is used
             for bare metal deployment of the other nodes.
+            The Spacewalk server is installed by hand. This
+            is described in <ulink
+            url="http://msat.disruptivefoss.org/Docs/msat/index.html">MSAT
+            guide</ulink>.
           </entry>
           <entry>None.</entry>
+        </row>
+        <row>
+          <entry>ant1</entry>
+          <entry>
+            Simulation of a stratum 1 NTP server, using the
+            NTP software.
+          </entry>
+          <entry>
+<literallayout>profiles::base6::ntp_type: 'server'
+roles:
+ - roles::ntp::clock
+</literallayout>
+          </entry>
+        </row>
+        <row>
+          <entry>ntp1</entry>
+          <entry>
+            Network Time Protocol (NTP) 1 node, providing
+            the NTP service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other NTP node. It uses the <systemitem
+            class="systemname">ant1</systemitem> stratum 1
+            server as upstream clock.
+          </entry>
+          <entry>
+<literallayout>profiles::base6::ntp_type: 'server'
+ntp::server::instance: 'ntp1'
+ntp::server::platform: 'ntp'
+roles:
+ - 'roles::ntp::server
+</literallayout>
+          </entry>
+        </row>
+        <row>
+          <entry>ntp2</entry>
+          <entry>
+            Network Time Protocol (NTP) 1 node, providing
+            the NTP service for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It collaborates
+            with the other NTP node. It uses the <systemitem
+            class="systemname">ant1</systemitem> stratum 1
+            server as upstream clock.
+          </entry>
+          <entry>
+<literallayout>profiles::base6::ntp_type: 'server'
+ntp::server::instance: 'ntp1'
+ntp::server::platform: 'ntp'
+roles:
+ - 'roles::ntp::server
+</literallayout>
+          </entry>
         </row>
         <row>
           <entry>ds1</entry>
@@ -69,17 +131,12 @@
             MultiMaster Replication (MMR).
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ldap1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ldap</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>ldap::ha::instance: 'ldap1'
+ldap::ha::platform: 'ldap'
+profiles::base6::ldap_type: 'server'
+roles:
+ - 'roles::ldap::ha'
+</literallayout>
           </entry>
         </row>
         <row>
@@ -92,17 +149,12 @@
             MultiMaster Replication (MMR).
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ldap1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ldap</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>ldap::ha::instance: 'ldap1'
+ldap::ha::platform: 'ldap'
+profiles::base6::ldap_type: 'server'
+roles:
+ - 'roles::ldap::ha'
+</literallayout>
           </entry>
         </row>
         <row>
@@ -116,17 +168,12 @@
             mechanism.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ldap1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ldap</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>profiles::base6::ldap_type: 'server'
+lvs::ldap::instance: 'ldap1'
+lvs::ldap::platform: 'lvs'
+roles:
+ - 'roles::lvs::ldap'
+</literallayout>
           </entry>
         </row>
         <row>
@@ -140,75 +187,60 @@
             mechanism.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ldap1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ldap</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>profiles::base6::ldap_type: 'server'
+lvs::ldap::instance: 'ldap1'
+lvs::ldap::platform: 'lvs'
+roles:
+ - 'roles::lvs::ldap'
+</literallayout>
           </entry>
         </row>
         <row>
-          <entry>ant1</entry>
+          <entry>dns1</entry>
           <entry>
-            Simulation of a stratum 1 NTP server, using the
-            NTP software.
-          </entry>
-          <entry>None.</entry>
-        </row>
-        <row>
-          <entry>ntp1</entry>
-          <entry>
-            Network Time Protocol (NTP) 1 node, providing
-            the NTP service for the Deployment zone
-            <emphasis>dmsat1</emphasis>. It collaborates
-            with the other NTP node via a custom heartbeat
-            mechanism. It uses the <systemitem
-            class="systemname">ant1</systemitem> stratum 1
-            server as upstream clock.
+            Domain Name System (DNS) 1 node, providing name
+            services for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It is identical to
+            the other DNS node.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ntp1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ntp</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>dns::server::instance: 'dns1'
+dns::server::platform: 'dns'
+roles:
+ - roles::dns::server
+</literallayout>
           </entry>
         </row>
         <row>
-          <entry>ntp2</entry>
+          <entry>dns2</entry>
           <entry>
-            Network Time Protocol (NTP) 2 node, providing
-            the NTP service for the Deployment zone
-            <emphasis>dmsat1</emphasis>. It collaborates
-            with the other NTP node via a custom heartbeat
-            mechanism. It uses the <systemitem
-            class="systemname">ant1</systemitem> stratum 1
-            server as upstream clock.
+            Domain Name System (DNS) 2 node, providing name
+            services for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It is identical to
+            the other DNS node.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ntp1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ntp</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>dns::server::instance: 'dns1'
+dns::server::platform: 'dns'
+roles:
+ - roles::dns::server
+</literallayout>
+          </entry>
+        </row>
+        <row>
+          <entry>dns3</entry>
+          <entry>
+            Domain Name System (DNS) 3 node, providing name
+            services for the Deployment zone
+            <emphasis>dmsat1</emphasis>. It is identical to
+            the other DNS node.
+          </entry>
+          <entry>
+<literallayout>dns::server::instance: 'dns1'
+dns::server::platform: 'dns'
+roles:
+ - roles::dns::server
+</literallayout>
           </entry>
         </row>
         <row>
@@ -220,17 +252,6 @@
             <emphasis>dmsat1</emphasis> Deployment zone.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>lts1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>lts</para></listitem>
-              </varlistentry>
-            </variablelist>
           </entry>
         </row>
         <row>
@@ -242,17 +263,6 @@
             <emphasis>dmsat1</emphasis> Deployment zone.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>lts1</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>lts</para></listitem>
-              </varlistentry>
-            </variablelist>
           </entry>
         </row>
         <row>
@@ -263,7 +273,14 @@
             <emphasis>rmt</emphasis> zone of the
             <emphasis>dmsat1</emphasis> Deployment zone.
           </entry>
-          <entry>None.</entry>
+          <entry>
+<literallayout>prov::proxy::instance: 'proxy'
+prov::proxy::platform: 'prov'
+subzone:               'rmt'
+roles:
+ - 'roles::prov::proxy'
+</literallayout>
+          </entry>
         </row>
         <row>
           <entry>tgt1</entry>
@@ -272,7 +289,11 @@
             <systemitem
             class="systemname">proxy1</systemitem> node.
           </entry>
-          <entry>None.</entry>
+          <entry>
+<literallayout>roles:
+ - role::base
+</literallayout>
+          </entry>
         </row>
         <row>
           <entry>ds3</entry>
@@ -286,21 +307,13 @@
             <emphasis>dmz</emphasis> subzone.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>instance</term>
-                <listitem><para>ldap2</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>platform</term>
-                <listitem><para>ldap</para></listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>subzone</term>
-                <listitem><para>dmz</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>ldap::single::instance: 'ldap2'
+ldap::single::platform: 'ldap'
+subzone:                'dmz'
+profiles::base6::ldap_type: 'server'
+roles:
+ - 'roles::ldap::single'
+</literallayout>
           </entry>
         </row>
         <row>
@@ -311,13 +324,9 @@
             ftp.
           </entry>
           <entry>
-            Node YAML parameters:
-            <variablelist>
-              <varlistentry>
-                <term>subzone</term>
-                <listitem><para>dmz</para></listitem>
-              </varlistentry>
-            </variablelist>
+<literallayout>roles:
+ - role::base
+</literallayout>
           </entry>
         </row>
         <row>
@@ -326,7 +335,11 @@
             Development machine 1. It is used to build and
             test Puppet code.
           </entry>
-          <entry>None.</entry>
+          <entry>
+<literallayout>roles:
+ - 'roles::dev::dev'
+</literallayout>
+          </entry>
         </row>
         <row>
           <entry>rpm1</entry>
@@ -334,15 +347,23 @@
             RPM development machine 1. It is used to build
             RPM packages.
           </entry>
-          <entry>None.</entry>
+          <entry>
+<literallayout>roles:
+ - 'roles::dev::rpm'
+</literallayout>
+          </entry>
         </row>
         <row>
           <entry>yum1</entry>
           <entry>
-            YUM development machine 1. It is used to build
-            figure out YUM.
+            YUM development machine 1. It is used to figure
+            out YUM.
           </entry>
-          <entry>None.</entry>
+          <entry>
+<literallayout>roles:
+ - role::base
+</literallayout>
+          </entry>
         </row>
       </tbody>
     </tgroup>

@@ -95,5 +95,36 @@
     explained in <xref linkend="puppet_configuration-layers" />.
   </para>
 
+  <para>
+    If one wants to extend Puppet with custom facts, the
+    configuration setting <emphasis>pluginsync</emphasis>
+    must be enabled. See what the default value is:
+<screen>
+&t1p; <userinput>puppet config print pluginsync</userinput>
+true
+</screen>
+  </para>
+
+  <para>
+    The custom fact can be tested with:
+<screen>
+&t1p; <userinput>cat /etc/puppet/modules/dev/lib/facter/loadavg1.rb</userinput>
+# loadavg1
+# /proc/loadavg, CPU utilization of the last 1, 5, and 10
+# minute periods, number of currently running processes,
+# total number of processes
+
+Facter.add('loadavg1') do
+  setcode do
+    Facter::Util::Resolution.exec('/bin/awk \'{print $1}\' /proc/loadavg')
+  end
+end
+
+&t1p; <userinput>export FACTERLIB="/etc/puppet/modules/dev/lib"</userinput>
+&t1p; <userinput>facter loadavg1</userinput>
+0.00
+</screen>
+  </para>
+
 </section>
 

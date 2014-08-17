@@ -86,6 +86,10 @@
         url="http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html-single/Virtualization_Administration_Guide/index.html">Virtualization
         Administration Guide</ulink>.
       </para>
+
+      <para>
+        At least check <xref linkend="msat-guide-apdx_kvm" />.
+      </para>
     </note>
     <para>
       The virtual network can be created via the
@@ -97,13 +101,12 @@
     <para>
       We have the following XML file: 
 <screen>
-&hostp; <userinput>cat dmsat1.xml</userinput>
+&hostp; <userinput>cat svcs.xml</userinput>
 &lt;network&gt;
-  &lt;name&gt;dmsat1&lt;/name&gt;
+  &lt;name&gt;svcs&lt;/name&gt;
   &lt;forward mode='nat'/&gt;
-  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;bridge name='virbr2' stp='on' delay='0'/&gt;
   &lt;mac address='52:54:00:A8:05:01'/&gt;
-  &lt;domain name='dmsat1.org'/&gt;
   &lt;ip address='192.168.5.1' netmask='255.255.255.0'/&gt;
 &lt;/network&gt;
 </screen>
@@ -136,14 +139,14 @@
       Now, create the network, mark it as autostart and
       activate it, with: 
 <screen>
-&hostp; <userinput>virsh net-define dmsat1.xml</userinput>
-Network dmsat1 defined from test.xml
+&hostp; <userinput>virsh net-define svcs.xml</userinput>
+Network svcs defined from test.xml
 
-&hostp; <userinput>virsh net-autostart dmsat1</userinput>
-Network dmsat1 marked as autostarted
+&hostp; <userinput>virsh net-autostart svcs</userinput>
+Network svcs marked as autostarted
 
-&hostp; <userinput>virsh net-start dmsat1</userinput>
-Network dmsat1 started
+&hostp; <userinput>virsh net-start svcs</userinput>
+Network svcs started
 
 </screen>
     </para>
@@ -161,7 +164,7 @@ Network dmsat1 started
       </menuchoice>. The <guilabel>Create a new virtual
       network</guilabel> dialog pops up. Press
       <guibutton>Forward</guibutton>. Enter
-      <userinput>dmsat1</userinput> in the <guilabel>Network
+      <userinput>svcs</userinput> in the <guilabel>Network
       Name:</guilabel> dialog box. Press
       <guibutton>Forward</guibutton> again. The
       <guilabel>Network:</guilabel> is
@@ -185,21 +188,25 @@ Network dmsat1 started
       create the virtual network.
     </para>
     <para>
-      We assume that the newly created network is the second
-      network after the <code>default</code> network. Hence,
-      it is connected to the <code>virbr1</code> device. The
+      We assume that the newly created network is the third
+      network after the <code>default</code> network and a
+      future core network. Hence,
+      it is connected to the <code>virbr2</code> device. The
       network is defined in an XML file in <filename
       class="directory">/etc/libvirt/qemu/networks</filename>,
-      named <filename>dmsat1.xml</filename>. It can be shown
+      named <filename>svcs.xml</filename>. It can be shown
       with: 
 <screen>
-&hostp; <userinput>virsh net-dumpxml dmsat1</userinput>
+&hostp; <userinput>virsh net-dumpxml svcs</userinput>
 &lt;network&gt;
-  &lt;name&gt;dmsat1&lt;/name&gt;
-  &lt;forward mode='nat'/&gt;
-  &lt;bridge name='virbr1' stp='on' delay='0'/&gt;
+  &lt;name&gt;svcs&lt;/name&gt;
+  &lt;forward mode='nat'&gt;
+    &lt;nat&gt;
+      &lt;port start='1024' end='65535'/&gt;
+    &lt;/nat&gt;
+  &lt;/forward&gt;
+  &lt;bridge name='virbr2' stp='on' delay='0'/&gt;
   &lt;mac address='52:54:00:A8:05:01'/&gt;
-  &lt;domain name='dmsat1.org'/&gt;
   &lt;ip address='192.168.5.1' netmask='255.255.255.0'/&gt;
 &lt;/network&gt;
 </screen>
@@ -213,7 +220,7 @@ Network dmsat1 started
 Name                 State      Autostart
 -----------------------------------------
 default              active     yes       
-dmsat1               active     yes
+svcs                 active     yes
 
 </screen>
     </para>
@@ -222,6 +229,45 @@ dmsat1               active     yes
   <section id="spacewalk-host-storage">
     <title>Storage setup</title>
     <para>
+      Note, the screen dumps in this section are examples.
+      If you don't have 6 disks in you hosts, the output is
+      very different! The idea is that one creates the
+      storage for the Spacewalk server. The storage is a
+      block device in the form of a logical volume. To make
+      things easy, call it <emphasis>sw</emphasis>, or
+      something similar. Here, we use
+      <emphasis>sw</emphasis> to remind ourselves that it is
+      the storage of the SpaceWalk server.
+    </para>
+
+    <para>
+<screen>
+&hostp; <userinput>parted -s /dev/sdb mklabel msdos</userinput>
+&hostp; <userinput>parted -s /dev/sdb mkpart primary 0% 100%</userinput>
+&hostp; <userinput>parted -s /dev/sdb print</userinput>
+Model: ATA WDC WD10EADS-00M (scsi)
+Disk /dev/sdb: 1000GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Disk Flags: 
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  1000GB  1000GB  primary  ext4
+</screen>
+    </para>
+
+    <para>
+<screen>
+&hostp; <userinput>pvcreate /dev/sdb1</userinput>
+WARNING: ext4 signature detected on /dev/sdb1 at offset 1080. Wipe it? [y/n] y
+  Wiping ext4 signature on /dev/sdb1.
+  Physical volume "/dev/sdb1" successfully created
+&hostp; <userinput>vgcreate b /dev/sdb1</userinput>
+  Volume group "b" successfully created
+</screen>
+    </para>
+
+    <para>
       The KVM Spacewalk server needs disk space to run on.
       We provide it by means of a LV (Logical Volume)
       created on the host. The creation is done as follows: 
@@ -229,15 +275,15 @@ dmsat1               active     yes
 &hostp; <userinput>pvs</userinput>
   PV         VG        Fmt  Attr PSize   PFree
   /dev/sda3  vg_server lvm2 a--  931.00g      0
-  /dev/sdb   b         lvm2 a--  931.51g 931.51g
-  /dev/sdc   c         lvm2 a--  931.51g 931.51g
-  /dev/sdd   d         lvm2 a--  931.51g 931.51g
-  /dev/sde   e         lvm2 a--  931.51g 931.51g
-  /dev/sdf   f         lvm2 a--  931.51g 931.51g
+  /dev/sdb1  b         lvm2 a--  931.51g 931.51g
+  /dev/sdc1  c         lvm2 a--  931.51g 931.51g
+  /dev/sdd1  d         lvm2 a--  931.51g 931.51g
+  /dev/sde1  e         lvm2 a--  931.51g 931.51g
+  /dev/sdf1  f         lvm2 a--  931.51g 931.51g
 
-&hostp; <userinput>pvs -o +vg_extent_size /dev/sdb</userinput>
+&hostp; <userinput>pvs -o +vg_extent_size /dev/sdb1</userinput>
   PV         VG   Fmt  Attr PSize   PFree   Ext
-  /dev/sdb   b    lvm2 a--  931.51g 931.51g 4.00m
+  /dev/sdb1  b    lvm2 a--  931.51g 931.51g 4.00m
 
 &hostp; <userinput>lvcreate -n sw -l $((25 * 10 * 300)) b</userinput>
   Logical volume "sw" created
@@ -273,4 +319,3 @@ MemTotal:       16435452 kB
   </section>
 
 </section>
-

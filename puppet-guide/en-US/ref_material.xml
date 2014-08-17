@@ -27,18 +27,34 @@
         </listitem>
       </varlistentry>
 
-      <varlistentry id="puppet-guide-ref_material-puppet-dmsat1">
-        <term>git repo - puppet-dmsat1</term>
+      <varlistentry id="puppet-guide-ref_material-puppet-conf-dmsat1">
+        <term>git repo - puppet-conf-dmsat1</term>
         <listitem>
           <para>
-            Git repository containing Puppet module
-            parameters of the puppet-baseinfra modules in
-            the <emphasis>dmsat1</emphasis> Deployment zone.
+            Git repository containing Puppet configuration
+            parameters to be used on the
+            <emphasis>dmsat1</emphasis> Deployment zone.
           </para>
 
           <para>
             <ulink
             url="https://github.com/aberends/puppet-dmsat1"><citetitle>aberends/puppet-dmsat1</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-puppet-software">
+        <term>git repo - puppet-software</term>
+        <listitem>
+          <para>
+            Git repository containing software used by
+            Puppet for extra functions, like the Puppet
+            stdlib, GPG support, Puppet lint, etc.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/puppet-software"><citetitle>aberends/puppet-software</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>
@@ -49,6 +65,28 @@
           <para>
             Git repository containing setup for Puppet
             structure.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/puppet-structure"><citetitle>aberends/puppet-structure</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-puppet-tools">
+        <term>git repo - puppet-tools</term>
+        <listitem>
+          <para>
+            Git repository containing tools used by Puppet
+            to make things easier. For example, it contains
+            a python tool to automatically create DNS
+            resource records from the node YAML files,
+            provided that enough information is put in.
+            Another example is a python tool that
+            automatically creates the Cobbler script for
+            bare metal deployment, also based on the node
+            YAML files.
           </para>
 
           <para>
@@ -70,6 +108,23 @@
           <para>
             <ulink
             url="http://libvirt.org/"><citetitle>libvirt: The virtualization API</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-msat-guide">
+        <term>msat-guide: MSAT guide, Allard Berends,
+        Disruptivefoss MSAT</term>
+        <listitem>
+          <para>
+            This guide discusses how to set up a Spacewalk
+            server and how to use the MSAT script to
+            configure it.
+          </para>
+
+          <para>
+            <ulink
+            url="http://msat.disruptivefoss.org/"><citetitle>MSAT (Meta Spacewalk and Satellite)</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>
