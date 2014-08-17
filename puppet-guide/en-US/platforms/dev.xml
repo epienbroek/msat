@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-dev">
+  <title>DEV platform</title>
+
+  <para>
+    We show the DEV, RPM and YUM platform instances in the
+    following sections. We use the
+    <emphasis>dmsat1</emphasis> Deployment zone as an
+    example.
+  </para>
+
+  <xi:include href="dev/dev1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="dev/rpm1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <!--
+  <xi:include href="dev/yum1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  -->
+</section>

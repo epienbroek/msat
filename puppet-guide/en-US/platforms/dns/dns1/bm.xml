@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-dns-dns1-bm">
+  <title>Bare metal deployment</title>
+
+  <!-- Bare metal deployment -->
+  <para>
+    For bare metal deployment, we need to provide
+    information about the 3 nodes to the Cobbler system on
+    the Spacewalk server, <systemitem
+    class="systemname">d21sw1</systemitem>.
+  </para>
+
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create the other Cobbler scripts for placing
+    the <emphasis>dns1</emphasis> platform instance nodes
+    in Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1 /dns1/g' \</userinput>
+<userinput>  -e 's/ds1/dns1/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.25/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DNS 1 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:19/g' \</userinput>
+     <userinput>cobbler-ds1.sh &gt; cobbler-dns1.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1 /dns2/g' \</userinput>
+<userinput>  -e 's/ds1/dns2/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.26/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DNS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:1a/g' \</userinput>
+     <userinput>cobbler-ds1.sh &gt; cobbler-dns2.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1 /dns3/g' \</userinput>
+<userinput>  -e 's/ds1/dns3/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.5.27/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DNS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:05:1b/g' \</userinput>
+     <userinput>cobbler-ds1.sh &gt; cobbler-dns3.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Add the systems to Cobbler:
+<screen>
+&sw1p; <userinput>chmod u+x cobbler-dns[123].sh</userinput>
+&sw1p; <userinput>for i in dns1 dns2 dns3; do cobbler system remove --name SpacewalkDefaultOrganization_kvm_$i; ./cobbler-$i.sh; done</userinput>
+</screen>
+  </para>
+
+  <para>
+    For the DNS platform instance
+    <emphasis>dns1</emphasis>, we create a boot ISO. It is
+    created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-dns1-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_dns1,SpacewalkDefaultOrganization_kvm_dns2,SpacewalkDefaultOrganization_kvm_dns3" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-dns1-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M Jul  7 22:43 /var/www/cobbler/pub/example/centos6u5-dns1-kvm.iso
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-dns1-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-dns1-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-dns1.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=dns1 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="DNS 1 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-dns1-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/dns1,device=disk,bus=virtio \
+  --network=network=svcs,mac=52:54:00:a8:05:19 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Adapting the script for the other nodes:
+<screen>
+&hostp; <userinput>sed \</userinput>
+<userinput>  -e 's/=dns1/=dns2/g' \</userinput>
+<userinput>  -e 's/dns1,/dns2,/g' \</userinput>
+<userinput>  -e 's/DNS 1 test node/DNS 2 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:19/52:54:00:a8:05:1a/g' \</userinput>
+<userinput>     install-dns1.sh &gt; install-dns2.sh</userinput>
+
+&hostp; <userinput>sed \</userinput>
+<userinput>  -e 's/=dns1/=dns3/g' \</userinput>
+<userinput>  -e 's/dns1,/dns3,/g' \</userinput>
+<userinput>  -e 's/DNS 1 test node/DNS 3 test node/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:19/52:54:00:a8:05:1b/g' \</userinput>
+<userinput>     install-dns1.sh &gt; install-dns3.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Make sure all the scripts are executable and then start
+    them all as root on the host:
+<screen>
+&hostp; <userinput>lvcreate -n dns1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n dns2 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>lvcreate -n dns3 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>chmod u+x install-dns[123].sh</userinput>
+&hostp; <userinput>./install-dns1.sh</userinput>
+&hostp; <userinput>./install-dns2.sh</userinput>
+&hostp; <userinput>./install-dns3.sh</userinput>
+</screen>
+  </para>
+
+</section>

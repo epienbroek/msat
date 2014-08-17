@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-dev-dev1">
+  <title>DEV 1 instance</title>
+
+  <para>
+    In the development environment we have depicted a
+    network drawing, <xref
+    linkend="environment-development-network" />, in which
+    a development node, called <systemitem
+    class="systemname">dev1.core.dmsat1.org</systemitem>, is
+    present.
+  </para>
+
+  <para>
+    In order to get the <systemitem
+    class="systemname">dev1</systemitem> system
+    operational, we need to conduct the following tasks:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Do bare metal deployment of the target node.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Adapt the <package>puppet-dmsat1</package> RPM
+          package with all the YAML files needed for the
+          Linux base infrastructure services in the
+          <emphasis>dmsat1</emphasis> Deployment zone and
+          make it available via the Spacewalk server in the
+          <emphasis>example-puppet-structure-6u5-1_0</emphasis>
+          software channel.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Provision the <systemitem
+          class="systemname">dev1</systemitem> node via
+          Puppet.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <xi:include href="dev1/bm.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="dev1/yaml.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="dev1/prov.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</section>

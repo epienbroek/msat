@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-dev-dev1-bm">
+  <title>Bare metal deployment</title>
+
+  <!-- Bare metal deployment -->
+  <para>
+    For bare metal deployment, we need to provide
+    information about the node to the Cobbler system on
+    the Spacewalk server, <systemitem
+    class="systemname">d21sw1</systemitem>.
+  </para>
+
+  <para>
+    In <xref linkend="software-test-kp-cobbler" />, we
+    showed the Cobbler script for the <systemitem
+    class="systemname">ds1</systemitem> system. We use it as
+    a basis to create the Cobbler scripts for placing the
+    <systemitem class="systemname">dev1</systemitem> node to
+    Cobbler.
+<screen>
+&sw1p; <userinput>sed \</userinput>
+<userinput>  -e 's/ds1 /dev1/g' \</userinput>
+<userinput>  -e 's/ds1/dev1/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.14/192.168.4.22/g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.0\//192.168.4.0\//g' \</userinput>
+<userinput>  -e 's/192\.168\.5\.1\>/192.168.4.1/g' \</userinput>
+<userinput>  -e 's/DS 1 test node/DEV 1 test node/g' \</userinput>
+<userinput>  -e 's/svcs\.dmsat1\.org/core.dmsat1.org/g' \</userinput>
+<userinput>  -e 's/52:54:00:a8:05:0e/52:54:00:a8:04:16/g' \</userinput>
+<userinput>     cobbler-ds1.sh &gt; cobbler-dev1.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    Add the systems to Cobbler:
+<screen>
+&sw1p; <userinput>chmod u+x cobbler-dev1.sh</userinput>
+&sw1p; <userinput>cobbler system remove --name SpacewalkDefaultOrganization_kvm_dev1; ./cobbler-dev1.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+    The boot ISO is created with:
+<screen>
+&sw1p; <userinput>sudo cobbler buildiso --iso=/var/www/cobbler/pub/example/centos6u5-dev1-kvm.iso --profiles="" --systems="SpacewalkDefaultOrganization_kvm_dev1" --tempdir=/tmp</userinput>
+&sw1p; <userinput>ls -lh /var/www/cobbler/pub/example/centos6u5-dev1-kvm.iso</userinput>
+-rw-r--r--. 1 root root 37M Jul 18 14:50 /var/www/cobbler/pub/example/centos6u5-dev1-kvm.iso
+</screen>
+  </para>
+
+  <para>
+    The boot ISO needs to be copied to the KVM host:
+<screen>
+&sw1p; <userinput>scp /var/www/cobbler/pub/example/centos6u5-dev1-kvm.iso root@192.168.5.1:/var/lib/libvirt/isos</userinput>
+root@192.168.5.1's password: <userinput>redhat</userinput>
+centos6u5-dev1-kvm.iso                       100%   36MB  36.3MB/s   00:00
+</screen>
+  </para>
+
+  <para>
+    Installation on the machines is done with:
+<screen>
+&hostp; <userinput>cat install-dev1.sh</userinput>
+#!/bin/bash
+
+virt-install \
+  --connect qemu:///system \
+  --name=dev1 \
+  --ram=512 \
+  --arch=x86_64 \
+  --description="DEV 1 test node" \
+  --cdrom /var/lib/libvirt/isos/centos6u5-dev1-kvm.iso \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --disk path=/dev/vg_vm/dev1,device=disk,bus=virtio \
+  --network=network=core,mac=52:54:00:a8:04:16 \
+  --graphics vnc \
+  --hvm \
+  --autostart
+</screen>
+  </para>
+
+  <para>
+    Make sure the script is executable and then start it as
+    root on the host:
+<screen>
+&hostp; <userinput>lvcreate -n dev1 -l $((25 * 10 * 5)) vg_vm</userinput>
+&hostp; <userinput>chmod u+x install-dev1.sh</userinput>
+&hostp; <userinput>./install-dev1.sh</userinput>
+</screen>
+  </para>
+
+</section>

@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_construction-stdlib">
+  <title>Puppet stdlib RPM</title>
+
+  <para>
+    By reading documentation on the Internet from Puppet
+    Labs, we figured out how to install the standard library
+    Puppet module:
+<screen>
+&dev1p; <userinput>puppet module install puppetlabs-stdlib</userinput>
+&dev1p; <userinput>find / \( -wholename /dev -o -wholename /proc -o -wholename /sys \) -prune -o -mmin -2</userinput>
+</screen>
+  </para>
+
+  <para>
+    Because of the <command>find</command> command above, we
+    have figured out that the only relevant information,
+    functional Ruby and Puppet code, is located at <filename
+    class="directory">/etc/puppet/modules/stdlib</filename>.
+    Consequently, only that directory is copied in our RPM
+    tree for <package>puppet-stdlib</package>.
+<screen>
+&dev1p; <userinput>mkdir -p ~/puppet-software/puppet-stdlib/puppet-stdlib/etc/puppet/modules</userinput>
+&dev1p; <userinput>cp -R /etc/puppet/modules/stdlib ~/puppet-software/puppet-stdlib/puppet-stdlib/etc/puppet/modules</userinput>
+&dev1p; <userinput>ls ~/puppet-software/puppet-stdlib</userinput>
+build.sh  puppet-stdlib  puppet-stdlib.spec
+</screen>
+  </para>
+
+  <para>
+<screen>
+&dev1p; <userinput>cat ~/puppet-software/puppet-stdlib/build.sh</userinput>
+#!/bin/bash
+RPM=puppet-stdlib
+tar -cz --exclude=.git -f ~/rpm/SOURCES/${RPM}.tar.gz ${RPM}
+rpmbuild --target noarch --clean -bb ${RPM}.spec
+RC=$?
+if [ $RC -ne 0 ]; then
+  echo "ERROR: rpmbuild failed with exit code: $RC"
+fi
+rm ~/rpm/SOURCES/${RPM}.tar.gz
+exit $RC
+
+&dev1p; <userinput>chmod u+x ~/puppet-software/puppet-stdlib/build.sh</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&dev1p; <userinput>cat ~/puppet-software/puppet-stdlib/puppet-stdlib.spec</userinput>
+Name:         puppet-stdlib
+Version:      0.1.1
+Release:      1
+Summary:      Puppet stdlib
+Group:        Applications/System
+License:      GPL
+Vendor:       MSAT
+Source:       %{name}.tar.gz
+BuildRoot:    %{_tmppath}/%{name}-root
+Requires:     puppet
+
+%description
+This package contains the result of:
+puppet module install puppetlabs-stdlib
+mkdir -p ~/puppet-software/puppet-stdlib/puppet-stdlib/etc/puppet/modules
+cp -R /etc/puppet/modules/stdlib \
+    ~/puppet-software/puppet-stdlib/puppet-stdlib/etc/puppet/modules
+
+%prep
+%setup -q -n %{name}
+
+%build
+# Empty.
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+cp -R etc $RPM_BUILD_ROOT
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pre
+# Empty.
+
+%post
+# Empty.
+
+%preun
+# Empty.
+
+%postun
+# Empty.
+
+%files
+%defattr(0644,root,root)
+%dir /etc/puppet/modules/stdlib
+/etc/puppet/modules/stdlib
+
+%changelog
+* Tue Jul 22 2014 Allard Berends &lt;allard.berends@example.com&gt; - 0.1.1-1
+- Initial creation of the RPM
+</screen>
+  </para>
+
+  <para>
+    We build and sign the RPM with:
+<screen>
+&dev1p; <userinput>cd ~/puppet-software/puppet-stdlib</userinput>
+&dev1p; <userinput>./build.sh</userinput>
+.. output skipped ..
+&dev1p; <userinput>rpm --resign /root/rpm/RPMS/noarch/puppet-stdlib-0.1.1-1.noarch.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/noarch/puppet-stdlib-0.1.1-1.noarch.rpm:
+</screen>
+  </para>
+
+  <para>
+    The RPM is transferred and placed in Spacewalk:
+<screen>
+&dev1p; <userinput>scp /root/rpm/RPMS/noarch/puppet-stdlib-0.1.1-1.noarch.rpm root@192.168.5.11:/tmp</userinput>
+root@192.168.5.11's password: <userinput>redhat</userinput>
+puppet-stdlib-0.1.1-1.noarch.rpm              100%  136KB 136.0KB/s   00:00
+
+&sw1p; <userinput>cd /tmp</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-software-6u5-1_0 -u example -p redhat puppet-stdlib-0.1.1-1.noarch.rpm</userinput>
+</screen>
+  </para>
+
+</section>

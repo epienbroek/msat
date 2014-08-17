@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-proxy-tgt1-prov">
+  <title>Provisioning of the tgt1 nodes</title>
+
+  <!-- Puppet node provisioning -->
+  <para>
+    In this section we show how to provision the RPM build
+    node, <systemitem class="systemname">tgt1</systemitem>
+    instance.
+  </para>
+
+  <para>
+    Make sure Puppet RPM's are available:
+<screen>
+&tgt1p; <userinput>yum install puppet-dmsat1</userinput>
+.
+.
+================================================================================
+ Package            Arch     Version   Repository                          Size
+================================================================================
+Installing:
+ puppet-dmsat1      noarch   0.1.1-1   example-puppet-structure-6u5-1_0   8.6 k
+Installing for dependencies:
+ puppet-baseinfra   noarch   0.1.1-2   example-puppet-baseinfra-6u5-1_0    42 k
+ puppet-structure   noarch   0.1.1-4   example-puppet-structure-6u5-1_0   5.6 k
+.
+.
+&tgt1p; <userinput>rpm -qa | grep puppet</userinput>
+puppet-3.4.3-1.el6.noarch
+puppet-structure-0.1.1-4.noarch
+puppet-dmsat1-0.1.1-1.noarch
+puppet-stdlib-0.1.1-1.noarch
+puppet-baseinfra-0.1.1-2.noarch
+.. note, versions may differ ..
+</screen>
+  </para>
+
+  <para>
+<screen>
+&tgt1p; <userinput>puppet apply /etc/puppet/manifests/site.pp</userinput>
+</screen>
+  </para>
+
+</section>

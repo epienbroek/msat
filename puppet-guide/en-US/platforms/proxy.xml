@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-proxy">
+  <title>PROXY platform</title>
+
+  <para>
+    We show the PROXY and TGT platform instances in the
+    following sections. We use the
+    <emphasis>dmsat1</emphasis> Deployment zone as an
+    example.
+  </para>
+
+  <xi:include href="proxy/proxy1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="proxy/tgt1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <!--
+  <xi:include href="proxy/yum1.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  -->
+</section>

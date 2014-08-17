@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_construction-mini_portile">
+  <title>Puppet mini_portile RPM</title>
+
+  <para>
+    On a test installtion of the <systemitem
+    class="systemname">rpm1.core.dmsat1.org</systemitem>, we
+    install the <application>gpgme</application> application
+    via our custom <package>puppet-gpgme</package> RPM.
+    After installation, it turns out that it depends on
+    <application>mini_portile</application>.
+    Hence, we create a
+    <package>puppet-mini_portile</package> RPM.
+<screen>
+&rpm1p; <userinput>yum install tree vim-enhanced rsync</userinput>
+.. output skipped ..
+&rpm1p; <userinput>gem install mini_portile</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    Now, we copy all the parts we need for the
+    <package>puppet-mini_portile</package> RPM:
+<screen>
+&rpm1p; <userinput>find / \( -wholename /dev -o -wholename /proc -o -wholename /sys \) -prune -o -mmin -2 -print</userinput>
+.. do some clever analysis ..
+&rpm1p; <userinput>mkdir -p ~/puppet-mini_portile</userinput>
+&rpm1p; <userinput>cd ~/puppet-mini_portile</userinput>
+&rpm1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/gems/mini_portile-0.6.0 .</userinput>
+&rpm1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/doc/mini_portile-0.6.0 .</userinput>
+&rpm1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/specifications/mini_portile-0.6.0.gemspec .</userinput>
+
+&dev1p; <userinput>mkdir -p ~/puppet-software/puppet-mini_portile/puppet-mini_portile</userinput>
+&dev1p; <userinput>cd ~/puppet-software/puppet-mini_portile/puppet-mini_portile</userinput>
+&dev1p; <userinput>rsync -au root@192.168.4.20:/root/puppet-mini_portile/usr .</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&dev1p; <userinput>cat ~/puppet-software/puppet-mini_portile/build.sh</userinput>
+#!/bin/bash
+RPM=puppet-mini_portile
+tar -cz --exclude=.git -f ~/rpm/SOURCES/${RPM}.tar.gz ${RPM}
+rpmbuild --target x86_64 --clean -bb ${RPM}.spec
+RC=$?
+if [ $RC -ne 0 ]; then
+  echo "ERROR: rpmbuild failed with exit code: $RC"
+fi
+rm ~/rpm/SOURCES/${RPM}.tar.gz
+exit $RC
+
+&dev1p; <userinput>cat ~/puppet-software/puppet-mini_portile/puppet-mini_portile.spec</userinput>
+Name:         puppet-mini_portile
+Version:      0.1.1
+Release:      1
+Summary:      Puppet mini_portile
+Group:        Applications/System
+License:      GPL
+Vendor:       MSAT
+Source:       %{name}.tar.gz
+BuildRoot:    %{_tmppath}/%{name}-root
+Requires:     puppet
+
+%description
+This package contains the result of:
+gem install mini_portile
+
+find / \( -wholename /dev -o -wholename /proc -o -wholename /sys \) -prune -o -mmin -2 -print
+.. do smart analysis ..
+
+mkdir -p ~/puppet-software/puppet-mini_portile/puppet-mini_portile/
+rsync -aR /usr/lib/ruby/gems/1.8/gems/mini_portile-0.6.0 \
+    ~/puppet-software/puppet-mini_portile/puppet-mini_portile/
+rsync -aR /usr/lib/ruby/gems/1.8/doc/mini_portile-0.6.0 \
+    ~/puppet-software/puppet-mini_portile/puppet-mini_portile/
+rsync -aR /usr/lib/ruby/gems/1.8/specifications/mini_portile-0.6.0.gemspec
+    ~/puppet-software/puppet-mini_portile/puppet-mini_portile/
+
+%prep
+%setup -q -n %{name}
+
+%build
+# Empty.
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+cp -R usr $RPM_BUILD_ROOT
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pre
+# Empty.
+
+%post
+# Empty.
+
+%preun
+# Empty.
+
+%postun
+# Empty.
+
+%files
+%defattr(0644,root,root)
+%dir /usr/lib/ruby/gems/1.8/doc/mini_portile-0.6.0
+/usr/lib/ruby/gems/1.8/doc/mini_portile-0.6.0/rdoc
+/usr/lib/ruby/gems/1.8/doc/mini_portile-0.6.0/ri
+%dir /usr/lib/ruby/gems/1.8/gems/mini_portile-0.6.0
+/usr/lib/ruby/gems/1.8/gems/mini_portile-0.6.0
+/usr/lib/ruby/gems/1.8/specifications/mini_portile-0.6.0.gemspec
+
+%changelog
+* Tue Jul 22 2014 Allard Berends &lt;allard.berends@example.com&gt; - 0.1.1-1
+- Initial creation of the RPM
+</screen>
+  </para>
+
+  <para>
+    All parts are done. Now we build the RPM:
+<screen>
+&dev1p; <userinput>cd ~/puppet-software/puppet-mini_portile</userinput>
+&dev1p; <userinput>./build.sh</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>rhnpush -c example-puppet-software-6u5-1_0 -u example -p redhat puppet-mini_portile-0.1.1-1.x86_64.rpm</userinput>
+</screen>    
+  </para>
+
+</section>

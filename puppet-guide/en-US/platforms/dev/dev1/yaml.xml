@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../../../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="platforms-dev-dev1-yaml">
+  <title>DEV YAML configuration</title>
+
+  <!-- puppet-dmsat1 rpm -->
+  <para>
+    The contribution of the <emphasis>dev1</emphasis>
+    instance to the <package>puppet-dmsat1</package> RPM is
+    a set of parameters, distributed over different YAML
+    files. Each time the set of parameters is changed, we
+    need to build a new version of the
+    <package>puppet-dmsat1</package> RPM. This is also true
+    if other platforms, or subzones, are added to the
+    <emphasis>dmsat1</emphasis> Deployment zone.
+  </para>
+
+  <para>
+    The influence of <emphasis>dev1</emphasis> to the YAML
+    fileset of <emphasis>dmsat1</emphasis> is depicted
+    below.
+<screen>
+&t1p; <userinput>cd /root/puppet-dmsat1/puppet-dmsat1/var/lib/hiera</userinput>
+&t1p; <userinput>./depzone_platform_instance.sh -d dmsat1 -h dev1.core.dmsat1.org -i dev1 -p dev</userinput>
+depzones/dmsat1/hosts/dev1.core.dmsat1.org.yaml (node)
+depzones/dmsat1.yaml                            (depzone)
+base.yaml                                       (base)
+</screen>
+  </para>
+
+  <para>
+    The code of the <package>puppet-dmsat1</package> RPM can
+    be found in <xref
+    linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
+    The RPM is built with:
+<screen>
+&t1p; <userinput>cd ~/puppet-dmsat1</userinput>
+&t1p; <userinput>./build.sh</userinput>
+.. output skipped ..
+&t1p; <userinput>rpm --resign /root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm:
+&t1p; <userinput>scp /root/rpm/RPMS/noarch/puppet-dmsat1-0.1.1-1.noarch.rpm root@192.168.5.11:/tmp</userinput>
+root@192.168.5.11's password: <userinput>redhat</userinput>
+puppet-dmsat1-0.1.1-1.noarch.rpm              100% 8743     8.5KB/s   00:00
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>cd /tmp</userinput>
+&sw1p; <userinput>rhnpush -c example-puppet-structure-6u5-1_0 -u example -p redhat puppet-dmsat1-0.1.1-1.noarch.rpm</userinput>
+.. no output is success ..
+</screen>
+  </para>
+
+</section>
