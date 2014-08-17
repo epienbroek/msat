@@ -7,17 +7,43 @@
   <title>Puppet lint RPM</title>
 
   <para>
+    On a test installtion of the <systemitem
+    class="systemname">dev1.core.dmsat1.org</systemitem>, we
+    install the <application>puppet-lint</application>
+    application. After testing the functionality, we copy
+    the files we need to a separate directory and build an
+    RPM. After doing a second test installation on
+    <systemitem
+    class="systemname">dev1.core.dmsat1.org</systemitem>, we
+    verify if the RPM provides the same functionality.
 <screen>
-&t1p; <userinput>mkdir -p ~/puppet-puppet_lint/puppet-puppet_lint/etc/puppet/modules</userinput>
-&t1p; <userinput>puppet module install puppetlabs-puppet_lint</userinput>
-&t1p; <userinput>cp -R /etc/puppet/modules/stdlib ~/puppet-puppet_lint/puppet-puppet_lint/etc/puppet/modules</userinput>
-&t1p; <userinput>ls ~/puppet-puppet_lint</userinput>
-build.sh  puppet-puppet_lint  puppet-puppet_lint.spec
-&t1p; <userinput>cat ~/puppet-puppet_lint/build.sh</userinput>
+&dev1p; <userinput>gem install puppet-lint</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+    Now, we copy all the parts we need for the
+    <package>puppet-lint</package> RPM:
+<screen>
+&dev1p; <userinput>find / \( -wholename /dev -o -wholename /proc -o -wholename /sys \) -prune -o -mmin -2 -print</userinput>
+.. do some clever analysis ..
+&dev1p; <userinput>mkdir -p ~/puppet-software/puppet-lint/puppet-lint</userinput>
+&dev1p; <userinput>cd ~/puppet-software/puppet-lint/puppet-lint</userinput>
+&dev1p; <userinput>rsync -aR /usr/bin/puppet-lint .</userinput>
+&dev1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/gems/puppet-lint-0.3.2 .</userinput>
+&dev1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/doc/puppet-lint-0.3.2 .</userinput>
+&dev1p; <userinput>rsync -aR /usr/lib/ruby/gems/1.8/specifications/puppet-lint-0.3.2.gemspec .</userinput>
+</screen>
+  </para>
+
+  <para>
+<screen>
+&dev1p; <userinput>cat ~/puppet-software/puppet-lint/build.sh</userinput>
 #!/bin/bash
-RPM=puppet-puppet_lint
+RPM=puppet-lint
 tar -cz --exclude=.git -f ~/rpm/SOURCES/${RPM}.tar.gz ${RPM}
-rpmbuild --target noarch --clean -bb ${RPM}.spec
+rpmbuild --target x86_64 --clean -bb ${RPM}.spec
 RC=$?
 if [ $RC -ne 0 ]; then
   echo "ERROR: rpmbuild failed with exit code: $RC"
@@ -25,11 +51,11 @@ fi
 rm ~/rpm/SOURCES/${RPM}.tar.gz
 exit $RC
 
-&t1p; <userinput>cat ~/puppet-puppet_lint/puppet-puppet_lint.spec</userinput>
-Name:         puppet-puppet_lint
+&dev1p; <userinput>cat ~/puppet-software/puppet-lint/puppet-lint.spec</userinput>
+Name:         puppet-lint
 Version:      0.1.1
 Release:      1
-Summary:      Puppet gpgme
+Summary:      Puppet lint
 Group:        Applications/System
 License:      GPL
 Vendor:       MSAT
@@ -39,10 +65,21 @@ Requires:     puppet
 
 %description
 This package contains the result of:
-puppet module install puppetlabs-puppet_lint
-mkdir -p ~/puppet-puppet_lint/puppet-puppet_lint/etc/puppet/modules
-cp -R /etc/puppet/modules/stdlib \
-    ~/puppet-puppet_lint/puppet-puppet_lint/etc/puppet/modules
+gem install lint
+
+find / \( -wholename /dev -o -wholename /proc -o -wholename /sys \) -prune -o -mmin -2 -print
+.. do smart analysis ..
+
+mkdir -p ~/puppet-software/puppet-lint/puppet-lint/
+rsync -aR /usr/bin/puppet-lint \
+    ~/puppet-software/puppet-lint/puppet-lint/
+rsync -aR /usr/lib/ruby/gems/1.8/gems/puppet-lint-0.3.2 \
+    ~/puppet-software/puppet-lint/puppet-lint/
+rsync -aR /usr/lib/ruby/gems/1.8/doc/puppet-lint-0.3.2 \
+    ~/puppet-software/puppet-lint/puppet-lint/
+rsync -aR
+/usr/lib/ruby/gems/1.8/specifications/puppet-lint-0.3.2.gemspec \
+    ~/puppet-software/puppet-lint/puppet-lint/
 
 %prep
 %setup -q -n %{name}
@@ -53,7 +90,7 @@ cp -R /etc/puppet/modules/stdlib \
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir $RPM_BUILD_ROOT
-cp -R etc $RPM_BUILD_ROOT
+cp -R usr $RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -72,13 +109,33 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(0644,root,root)
-%dir /etc/puppet/modules/stdlib
-/etc/puppet/modules/stdlib
+%attr(0755,root,root) /usr/bin/puppet-lint
+%dir /usr/lib/ruby/gems/1.8/doc/puppet-lint-0.3.2
+/usr/lib/ruby/gems/1.8/doc/puppet-lint-0.3.2/rdoc
+/usr/lib/ruby/gems/1.8/doc/puppet-lint-0.3.2/ri
+%dir /usr/lib/ruby/gems/1.8/gems/puppet-lint-0.3.2
+/usr/lib/ruby/gems/1.8/gems/puppet-lint-0.3.2
+/usr/lib/ruby/gems/1.8/specifications/puppet-lint-0.3.2.gemspec
 
 %changelog
 * Tue Jul 22 2014 Allard Berends &lt;allard.berends@example.com&gt; - 0.1.1-1
 - Initial creation of the RPM
 </screen>
+  </para>
+
+  <para>
+    All parts are done. Now we build the RPM:
+<screen>
+&dev1p; <userinput>cd ~/puppet-software/puppet-lint</userinput>
+&dev1p; <userinput>./build.sh</userinput>
+.. output skipped ..
+</screen>
+  </para>
+
+  <para>
+<screen>
+&sw1p; <userinput>rhnpush -c example-puppet-software-6u5-1_0 -u example -p redhat puppet-lint-0.1.1-1.x86_64.rpm</userinput>
+</screen>    
   </para>
 
 </section>

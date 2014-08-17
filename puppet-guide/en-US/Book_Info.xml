@@ -16,8 +16,8 @@
       that can be used to develop different Linux node
       types. The environment is explained, and also some
       basic node types. For the node types, we develop
-      puppet classes. Each class is tested as isolated as
-      possible.
+      puppet modules. Each module is tested in isolation and
+      lateron integrated with other modules.
     </para>
   </abstract>
   <corpauthor>

@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="puppet_tools">
+  <title>Puppet tools</title>
+
+  <para>
+    Since we need to have a node YAML file per target node,
+    we figured, let us add some extra information to it to
+    make automatic generation of all sorts of information
+    possible.
+  </para>
+
+  <para>
+    We want to generate the Cobbler scripts, as shown in
+    <xref linkend="platforms" />, automatically from the
+    node YAML files.
+  </para>
+
+  <para>
+<screen>
+&dev1p; <userinput>cat /var/lib/hiera/depzones/dmsat1/hosts/ant1.svcs.dmsat1.org.yaml</userinput>  
+---
+
+roles:
+ - roles::ntp::clock
+
+profiles::base6::ntp_type: 'server'
+
+machine: <co id="puppet_tools-co_machine" linkends="puppet_tools-machine" />
+ fqdn: <co id="puppet_tools-co_fqdn" linkends="puppet_tools-fqdn" />
+  p:    ant1.svcs.dmsat1.org <co id="puppet_tools-co_fqdnp" linkends="puppet_tools-fqdnp" />
+ aliases: <co id="puppet_tools-co_aliases" linkends="puppet_tools-aliases" />
+  p: <co id="puppet_tools-co_aliasesp" linkends="puppet_tools-aliasesp" />
+   - ant1 <co id="puppet_tools-co_aliasesp1" linkends="puppet_tools-aliasesp1" />
+ ipv4: <co id="puppet_tools-co_ipv4" linkends="puppet_tools-ipv4" />
+  p:     192.168.5.20/24 <co id="puppet_tools-co_ipv4_p" linkends="puppet_tools-ipv4_p" />
+  dp:    192.168.5.1 <co id="puppet_tools-co_dp" linkends="puppet_tools-dp" />
+ nics: <co id="puppet_tools-co_nics" linkends="puppet_tools-nics" />
+  - 52:54:00:a8:05:14 <co id="puppet_tools-co_em1" linkends="puppet_tools-em1" />
+ description:  "ANT 1 test node" <co id="puppet_tools-co_description" linkends="puppet_tools-description" />
+ information:  "proxy" <co id="puppet_tools-co_information" linkends="puppet_tools-information" />
+ location:     "services domain" <co id="puppet_tools-co_location" linkends="puppet_tools-location" />
+ machinetype:  "kvm" <co id="puppet_tools-co_machinetype" linkends="puppet_tools-machinetype" />
+ platform:     "generic" <co id="puppet_tools-co_platform" linkends="puppet_tools-platform" />
+ provisioning: "d21sw1.svcs.dmsat1.org" <co id="puppet_tools-co_provisioning" linkends="puppet_tools-provisioning" />
+ rhelversion:  "6.5" <co id="puppet_tools-co_rhelversion" linkends="puppet_tools-rhelversion" />
+ use_proxy:    "no" <co id="puppet_tools-co_use_proxy" linkends="puppet_tools-use_proxy" />
+</screen>
+  </para>
+
+  <calloutlist>
+    <callout arearefs="puppet_tools-co_machine" id="puppet_tools-machine">
+      <para>
+        The yaml key, <code>machine</code>, must be
+        available for the
+        <application>mk_cobbler.py</application> tool to be
+        able to find the machine specific parameters. The
+        <code>machine</code> key denotes a hash in YAML.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_fqdn" id="puppet_tools-fqdn">
+      <para>
+        The yaml key, <code>fqdn</code>, denotes the YAML
+        hash of the FQDN's of the target node.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_fqdnp" id="puppet_tools-fqdnp">
+      <para>
+        The yaml key, <code>p</code>, holds the FQDN of the
+        target node on the production address.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_aliases" id="puppet_tools-aliases">
+      <para>
+        The yaml key, <code>aliases</code>, contains hashes
+        of aliases of the target node on the different
+        networks.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_aliasesp" id="puppet_tools-aliasesp">
+      <para>
+        The yaml key, <code>aliases['p']</code>, denotes the
+        array of aliases of the target node's production
+        name.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_aliasesp1" id="puppet_tools-aliasesp1">
+      <para>
+        The yaml key, <code>ant1</code>, denotes the first
+        alias of the target node's production name.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_ipv4" id="puppet_tools-ipv4">
+      <para>
+        The yaml key, <code>ipv4</code>, denotes the YAML
+        hash in which the IPv4 addresses of the target node
+        are stored and the corresponding gateways.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_ipv4_p" id="puppet_tools-ipv4_p">
+      <para>
+        The yaml key, <code>p</code>, is the IPv4 production
+        IP address of the target node.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_dp" id="puppet_tools-dp">
+      <para>
+        The yaml key, <code>dp</code>, contains the value of
+        the default gateway on the production network.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_nics" id="puppet_tools-nics">
+      <para>
+        The yaml key, <code>nics</code>, denotes the array
+        of Ethernet interfaces.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_em1" id="puppet_tools-em1">
+      <para>
+        The yaml key, <code>nics[0]</code>, is the first
+        array element of <code>nics</code>. It is the
+        Ethernet interface on which the production network
+        is connected.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_description" id="puppet_tools-description">
+      <para>
+        The yaml key, <code>description</code>, is used in
+        the description field of the Cobbler script.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_information" id="puppet_tools-information">
+      <para>
+        The yaml key, <code>information</code>, is used in
+        the network drawing.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_location" id="puppet_tools-location">
+      <para>
+        The yaml key, <code>location</code>, is used in the
+        network drawing.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_machinetype" id="puppet_tools-machinetype">
+      <para>
+        The yaml key, <code>machinetype</code>, determines
+        in the generated Cobbler script which kickstart
+        profile is used. The bare kickstart profiles are, in
+        essence, the same, but machine specific settings
+        might be needed. For example, on a KVM target
+        machine, the first disk is called <code>vda</code>,
+        whilst, on a physical machine, it it called
+        <code>sda</code>.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_platform" id="puppet_tools-platform">
+      <para>
+        The yaml key, <code>platform</code>, is used in the
+        network drawing.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_provisioning" id="puppet_tools-provisioning">
+      <para>
+        The yaml key, <code>provisioning</code>, specifies
+        the provisioning server of the target node. So, this
+        value is used in the generated Cobbler boot ISO, as
+        the server, to load the kickstart profile from. This
+        key works in conjunction with
+        <code>use_proxy</code>.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_rhelversion" id="puppet_tools-rhelversion">
+      <para>
+        The yaml key, <code>rhelversion</code>, is used in
+        the network drawing.
+      </para>
+    </callout>
+
+    <callout arearefs="puppet_tools-co_use_proxy" id="puppet_tools-use_proxy">
+      <para>
+        The yaml key, <code>use_proxy</code>, if set to
+        <emphasis>yes</emphasis>, configures the specified
+        value of the <code>provisioning</code> key as the
+        proxy server.
+      </para>
+    </callout>
+
+  </calloutlist>
+
+  <xi:include href="puppet_tools/cobbler.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_tools/dns.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_tools/network.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_tools/bashrc.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_tools/cmdb.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</chapter>

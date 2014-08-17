@@ -90,6 +90,12 @@ and check to make sure that only the key(s) you wanted were added.
       </listitem>
       <listitem>
         <para>
+          <package>puppet-mini_portile</package>, see <xref
+          linkend="puppet_construction-mini_portile" />
+        </para>
+      </listitem>
+      <listitem>
+        <para>
           <package>puppet-gpgme</package>, see <xref
           linkend="puppet_construction-gpgme" />
         </para>
@@ -172,14 +178,16 @@ and check to make sure that only the key(s) you wanted were added.
   <para>
     The RPM packages are installed with:
 <screen>
-&dev1p; <userinput>yum install vim-enhanced rsync puppet puppet-stdlib puppet-gpgme puppet-lint tree man mlocate git rpm-build rpmlint</userinput>  
+&dev1p; <userinput>yum install vim-enhanced rsync puppet puppet-stdlib puppet-mini_portile puppet-gpgme puppet-lint tree man mlocate git rpm-build rpmlint</userinput>  
 No package puppet-stdlib available.
+No package puppet-mini_portile available.
 No package puppet-gpgme available.
 No package puppet-lint available.
 .. output skipped ..
 </screen>
     Note, initially we don't have the packages
     <package>puppet-stdlib</package>,
+    <package>puppet-mini_portile</package>,
     <package>puppet-gpgme</package> and
     <package>puppet-lint</package>. In <xref
     linkend="puppet_construction" /> the details are
@@ -333,7 +341,8 @@ if [ -f /etc/bashrc ]; then
 fi
 
 # Command aliases.
-alias puppet-lint='puppet-lint --no-class_inherits_from_params_class-check --no-variable_scope-check'
+alias puppet-lint='puppet-lint --no-class_inherits_from_params_class-check --no-variable_scope-check --no-80chars-check --no-class_parameter_defaults-check'
+alias pl='puppet-lint'
 
 # Path aliases.
 alias dev='cd /etc/puppet/modules/dev/manifests'
