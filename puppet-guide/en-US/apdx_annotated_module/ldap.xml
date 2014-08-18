@@ -65,7 +65,7 @@
   <para>
     The complete code of the example module can be found at
     <xref
-    linkend="puppet-guide-ref_material-puppet-baseinfra" />.
+    linkend="puppet-guide-ref_material-puppet-construction" />.
   </para>
 
   <para>
@@ -136,7 +136,7 @@
         `-- lvs.cf.erb       (submodule template)
 </screen>
       The code of the LVS module can be found at <xref
-      linkend="puppet-guide-ref_material-puppet-baseinfra" />.
+      linkend="puppet-guide-ref_material-puppet-construction" />.
     </para>
   </note>
 

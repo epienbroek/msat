@@ -100,7 +100,7 @@ class &lt;module&gt;::params (
     <emphasis>ldap::params</emphasis>. Note, many parts of
     the code are skipped. For a complete working example,
     refer to <xref
-    linkend="puppet-guide-ref_material-puppet-baseinfra" />.
+    linkend="puppet-guide-ref_material-puppet-construction" />.
 <screen>
 # == Class: ldap::params
 #

@@ -5,6 +5,111 @@
 ]>
 <chapter id="software">
   <title>Puppet software channels in Spacewalk</title>
+
+  <para>
+    The software we need to provide the standard services in
+    our infrastructure environment, is placed in software
+    channels on the Spacewalk server. The set of channels is
+    shown in the table:
+    <table id="software-channels-table">
+      <title>Spacewalk software channels</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>channel</entry>
+            <entry>description</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>example-centos-6u5-1_0</entry>
+            <entry>The base channel containing the CenOS 6u5
+            RPM's</entry>
+          </row>
+          <row>
+            <entry>example-con-tools-centos-6u5-1_0</entry>
+            <entry>Channel containing tools to interact with
+            the Spacewalk server</entry>
+          </row>
+          <row>
+            <entry>example-epel-6u5-1_0</entry>
+            <entry>Extra Packages for Enterprise Linux is a
+            set of RPM's with all sorts of supporting
+            software, e.g. the 389 Directory Server</entry>
+          </row>
+          <row>
+            <entry>example-puppet-6u5-1_0</entry>
+            <entry>The Puppet tools themselves</entry>
+          </row>
+          <row>
+            <entry>example-puppet-deps-6u5-1_0</entry>
+            <entry>RPM's to support the puppet tools.
+            Basically software that is not in CentOS 6u5,
+            but is needed to make Puppet run.</entry>
+          </row>
+          <row>
+            <entry>example-puppet-software-6u5-1_0</entry>
+            <entry>Our custom software additions to make
+            Puppet run for us, e.g. the Puppet stdlib
+            library, packaged in RPM</entry>
+          </row>
+          <row>
+            <entry>example-puppet-tools-6u5-1_0</entry>
+            <entry>Custom tools to use with our Puppet
+            setup. For example, a tool to generate Cobbler
+            script from node YAML (explained later)
+            files</entry>
+          </row>
+          <row>
+            <entry>example-puppet-construction-6u5-1_0</entry>
+            <entry>RPM's containing our custom Puppet
+            modules to provision systems. For example, the
+            puppet-baseinfra set of modules</entry>
+          </row>
+          <row>
+            <entry>example-puppet-integration-6u5-1_0</entry>
+            <entry>RPM's containing our custom integration
+            profiles and rols to bind the basic Puppet
+            modules to parameter sets</entry>
+          </row>
+          <row>
+            <entry>example-puppet-configuration-6u5-1_0</entry>
+            <entry>RPM's containing custom parameter sets to
+            make our custom Puppet module work. For example,
+            the YAML files needed for the dmsat1 deployment
+            zone are provide with the puppet-conf-dmsat1
+            RPM</entry>
+          </row>
+          <row>
+            <entry>example-spacewalk-proxy-6u5-1_0</entry>
+            <entry></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    One might notice that all software channels start with
+    the string <code>example-</code>. The base organization
+    of the Spacewalk server is called
+    <emphasis>example</emphasis>. With this naming
+    convention, we want to indicate that these channels are
+    cloned channels and managed from the
+    <emphasis>example</emphasis> base organization. Clone
+    channels oppose growing channels.  Growing channels are
+    updated on a daily basis with new RPM's. Hence, they
+    grow and may contain multiple versions of an RPM. The
+    idea of the cloned channels is to keep the set of RPM's
+    constant and controlled. I.e.  they are not
+    automatically updated, but only manually for a reason.
+    For example, if we encounter a bug which is solved in a
+    later version of an RPM, we update it manually in the
+    cloned channel.
+  </para>
+
   <para>
     This chapter discusses how to setup software channels
     inside the Spacewalk server to use for Puppet
@@ -62,11 +167,13 @@
       </listitem>
       <listitem>
         <para>
-          Construct a puppet provisioning software channel.
-          In this channel we place our own code to
-          provision systems with Puppet. We use the RPM
-          mechanism to get this software on the Linux nodes.
-          This means that we run Puppet in <emphasis
+          Construct custom Puppet software channels, needed
+          to support custom Puppet modules, system
+          integration and configuration. In this channel we
+          place our own code and configuration to provision
+          systems with Puppet. We use the RPM mechanism to
+          get this software on the Linux nodes. This means
+          that we run Puppet in <emphasis
           role="bold">agentless</emphasis> mode.
         </para>
       </listitem>

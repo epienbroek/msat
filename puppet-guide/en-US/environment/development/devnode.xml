@@ -350,22 +350,23 @@ alias dms='cd ~/puppet-dmsat1/puppet-dmsat1'
 alias dns='cd /etc/puppet/modules/dns/manifests'
 alias hier='cd /var/lib/hiera'
 alias hosts='cd /var/lib/hiera/depzones/dmsat1/hosts'
-alias ipt='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/iptables/manifests'
-alias lb='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/lvs/manifests'
+alias ipt='cd ~/puppet-construction/puppet-construction/etc/puppet/modules/iptables/manifests'
+alias lb='cd ~/puppet-construction/puppet-construction/etc/puppet/modules/lvs/manifests'
 alias ldap='cd /etc/puppet/modules/ldap/manifests'
 alias mod='cd /etc/puppet/modules'
 alias nodes='cd /var/lib/hiera/depzones/dmsat1/hosts/'
 alias ntp='cd /etc/puppet/modules/ntp/manifests'
-alias pbi='cd ~/puppet-baseinfra'
-alias pcd='cd ~/puppet-conf-dmsat1'
+alias pcs='cd ~/puppet-construction'
+alias pcf='cd ~/puppet-configuration'
+alias pin='cd ~/puppet-integration'
 alias prof='cd /etc/puppet/modules/profiles/manifests'
 alias prov='cd /etc/puppet/modules/prov/manifests'
 alias pso='cd ~/puppet-software'
 alias pst='cd ~/puppet-structure'
 alias pto='cd ~/puppet-tools'
 alias role='cd /etc/puppet/modules/roles/manifests'
-alias sup='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/support6/manifests'
-alias tst='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/test/manifests'
+alias sup='cd ~/puppet-construction/puppet-construction/etc/puppet/modules/support6/manifests'
+alias tst='cd ~/puppet-construction/puppet-construction/etc/puppet/modules/test/manifests'
 </screen>
   </para>
 
@@ -391,7 +392,7 @@ alias tst='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/test/manife
           <row>
             <entry>
               <xref
-              linkend="puppet-guide-ref_material-puppet-baseinfra"
+              linkend="puppet-guide-ref_material-puppet-construction"
               />
             </entry>
             <entry>
@@ -403,7 +404,7 @@ alias tst='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/test/manife
           <row>
             <entry>
               <xref
-              linkend="puppet-guide-ref_material-puppet-conf-dmsat1"
+              linkend="puppet-guide-ref_material-puppet-configuration"
               />
             </entry>
             <entry>
@@ -425,7 +426,7 @@ alias tst='cd ~/puppet-baseinfra/puppet-baseinfra/etc/puppet/modules/test/manife
           <row>
             <entry>
               <xref
-              linkend="puppet-guide-ref_material-puppet-structure"
+              linkend="puppet-guide-ref_material-puppet-configuration"
               />
             </entry>
             <entry>

@@ -6,7 +6,6 @@
 <section id="platforms-rpm-rpm1-prov">
   <title>Provisioning of the rpm1 nodes</title>
 
-  <!-- Puppet node provisioning -->
   <para>
     In this section we show how to provision the RPM build
     node, <systemitem class="systemname">rpm1</systemitem>

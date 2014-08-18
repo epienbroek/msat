@@ -38,7 +38,7 @@ base.yaml                                       (base)
   <para>
     The code of the <package>puppet-dmsat1</package> RPM can
     be found in <xref
-    linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
+    linkend="puppet-guide-ref_material-puppet-configuration" />.
     The RPM is built with:
 <screen>
 &t1p; <userinput>cd ~/puppet-dmsat1</userinput>
@@ -72,7 +72,7 @@ puppet-dmsat1-0.1.1-1.noarch.proxy              100% 8743     8.5KB/s   00:00
       all parameters that start with <emphasis
       role="strong">proxy::server::params::</emphasis> from
       <xref
-      linkend="puppet-guide-ref_material-puppet-conf-dmsat1" />.
+      linkend="puppet-guide-ref_material-puppet-configuration" />.
       The list of files to inspect can be found with:
 <screen>
 &t1p; <userinput>cd /root/puppet-dmsat1/puppet-dmsat1/var/lib/hiera</userinput>
@@ -98,9 +98,9 @@ base.yaml                                             (base)
 
   <para>
     An example set of parameters can be found in <xref
-    linkend="puppet-guide-ref_material-puppet-baseinfra" />,
+    linkend="puppet-guide-ref_material-puppet-construction" />,
     in the documentation path, <filename
-    class="directory">/usr/share/doc/puppet-baseinfra</filename>.
+    class="directory">/usr/share/doc/puppet-construction</filename>.
     Start with reading the <filename>README.proxy</filename>
     file.
   </para>

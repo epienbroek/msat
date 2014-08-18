@@ -12,33 +12,37 @@
 
   <para>
     <variablelist>
-      <varlistentry id="puppet-guide-ref_material-puppet-baseinfra">
-        <term>git repo - puppet-baseinfra</term>
+      <varlistentry id="puppet-guide-ref_material-puppet-construction">
+        <term>git repo - puppet-construction</term>
         <listitem>
           <para>
             Git repository containing basic Linux
-            infrastructure Puppet modules.
+            infrastructure Puppet modules. It can be
+            expanded with Puppet modules for other
+            functions.
           </para>
 
           <para>
             <ulink
-            url="https://github.com/aberends/puppet-baseinfra"><citetitle>aberends/puppet-baseinfra</citetitle></ulink>
+            url="https://github.com/aberends/puppet-construction"><citetitle>aberends/puppet-construction</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>
 
-      <varlistentry id="puppet-guide-ref_material-puppet-conf-dmsat1">
-        <term>git repo - puppet-conf-dmsat1</term>
+      <varlistentry id="puppet-guide-ref_material-puppet-configuration">
+        <term>git repo - puppet-configuration</term>
         <listitem>
           <para>
-            Git repository containing Puppet configuration
-            parameters to be used on the
-            <emphasis>dmsat1</emphasis> Deployment zone.
+            Git repository containing Puppet structure and
+            Puppet configuration parameters to be used as a
+            basis and on the <emphasis>dmsat1</emphasis>
+            Deployment zone. It can be expanded with
+            parameters from other zones.
           </para>
 
           <para>
             <ulink
-            url="https://github.com/aberends/puppet-dmsat1"><citetitle>aberends/puppet-dmsat1</citetitle></ulink>
+            url="https://github.com/aberends/puppet-configuration"><citetitle>aberends/puppet-configuration</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>
@@ -55,21 +59,6 @@
           <para>
             <ulink
             url="https://github.com/aberends/puppet-software"><citetitle>aberends/puppet-software</citetitle></ulink>
-          </para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry id="puppet-guide-ref_material-puppet-structure">
-        <term>git repo - puppet-structure</term>
-        <listitem>
-          <para>
-            Git repository containing setup for Puppet
-            structure.
-          </para>
-
-          <para>
-            <ulink
-            url="https://github.com/aberends/puppet-structure"><citetitle>aberends/puppet-structure</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>
