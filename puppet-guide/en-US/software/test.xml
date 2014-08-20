@@ -153,11 +153,11 @@
 #   Software Foundation; either version 3 of the License, or
 #   (at your option) any later version.
 #
-#   ak-bare-6u5-x_y_z.sh is distributed in the hope
-#   that it will be useful, but WITHOUT ANY WARRANTY;
-#   without even the implied warranty of MERCHANTABILITY or
-#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
+#   ak-bare-6u5-x_y_z.sh is distributed in the hope that it
+#   will be useful, but WITHOUT ANY WARRANTY; without even
+#   the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
 #
 #   You should have received a copy of the GNU General
 #   Public License along with this program; if not, write to
@@ -175,7 +175,7 @@ msat_mk_ak.py \
   --activationkey-virtualization false \
   --activationkey-node false \
   --activationkey-universal false \
-  --activationkey-childchannels 'example-puppet-6u5-1_0,example-puppet-deps-6u5-1_0,example-puppet-conf-6u5-1_0,con-tools-centos-x86_64-server-6' \
+  --activationkey-childchannels 'example-con-tools-centos-6u5-1_0,example-puppet-6u5-1_0,example-puppet-deps-6u5-1_0,example-puppet-software-6u5-1_0,example-puppet-construction-6u5-1_0,example-puppet-integration-6u5-1_0,example-puppet-configuration-6u5-1_0' \
   --activationkey-packages '' \
   --activationkey-configchannels ''
 </screen>
@@ -295,11 +295,11 @@ msat_mk_cs.py \
 #   Software Foundation; either version 3 of the License, or
 #   (at your option) any later version.
 #
-#   cs-bare-6-x_y_z.sh is distributed in the hope
-#   that it will be useful, but WITHOUT ANY WARRANTY;
-#   without even the implied warranty of MERCHANTABILITY or
-#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
+#   cs-bare-6-x_y_z.sh is distributed in the hope that it
+#   will be useful, but WITHOUT ANY WARRANTY; without even
+#   the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
 #
 #   You should have received a copy of the GNU General
 #   Public License along with this program; if not, write to
@@ -318,6 +318,9 @@ depzone=\$(/bin/cat /proc/cmdline | /bin/sed '"'"'s/.*depzone=\([^ ]\{1,\}\).*\$
 /bin/cat &lt;&lt; EOF &gt; /etc/profile.d/depzone.sh
 export FACTER_depzone="\$depzone"
 EOF
+
+# AB: install the depzone dependent meta RPM.
+yum -y install puppet-\${depzone}
 
 # AB: if we want to update the kernel, do it here. Use the
 # exact kernel version.
