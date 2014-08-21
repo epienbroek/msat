@@ -562,7 +562,7 @@ $COBBLER system add \
   --name=${ORG}_${MACH}_${NAME} \
   --owners=${OWNERS} \
   --profile=${PROFILE}:${ORGNUM}:${ORG} \
-  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} nostorage depzone=dmsat1 ipv6.disable=1 biosdevname=1" \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} depzone=dmsat1 ipv6.disable=1 biosdevname=1" \
   --kopts-post="ipv6.disable=1 biosdevname=1" \
   --netboot-enabled=0 \
   --comment=${COMMENT} \
