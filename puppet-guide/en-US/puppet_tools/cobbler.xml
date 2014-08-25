@@ -7,6 +7,538 @@
   <title>Puppet Cobbler tool</title>
 
   <para>
+    For a machine to come to life, it needs an operating
+    system. The first step is to create a boot ISO via which
+    the installation is started. This mechanism is described
+    in <xref linkend="software-test" />. Part of the
+    mechanism is to create a Cobbler script. When the
+    Cobbler script is run, information about the machine is
+    placed in Cobbler. An example of a Cobbler script is
+    shown in <xref linkend="software-test-kp-cobbler" />.
+  </para>
+
+  <para>
+    In the Cobbler script section, <code>PARAMETERS TO
+    EDIT</code>, a number of parameters are already present
+    in the node YAML file. For example, the node YAML
+    filename corresponds to the FQDN of the node. From the
+    FQDN, we can derive the nodename and the domain name. By
+    adding the other information of the machine to the node
+    YAML file, we can automatically generate a Cobbler
+    script. The code is maintained in <xref
+    linkend="puppet-guide-ref_material-puppet-tools" />.
+  </para>
+
+  <para>
+    In this section we demonstrate the usage of the tool. An
+    example of a node YAML file is given in <xref
+    linkend="puppet_tools" />. The <code>machine</code> key
+    is important. To get help:
+<screen>
+&dev1p; <userinput>mk_cobbler.py -h</userinput>
+Usage: mk_cobbler.py [options] &lt;node YAML file&gt;
+
+This script creates a Cobbler script from a node YAML file.
+
+Options:
+  -h, --help            show this help message and exit
+  -d DEPLOYMENT_ZONE, --deployment-zone=DEPLOYMENT_ZONE
+                        Deployment zone in which this system is deployed
+  -s DNS_SERVER, --dns-server=DNS_SERVER
+                        IP of DNS server used for deployment
+  -o SPACEWALK_ORG, --spacewalk-org=SPACEWALK_ORG
+                        Organization name on Spacewalk used for deployment
+</screen>
+  </para>
+
+  <para>
+    Some remarks are needed here. The <code>-d</code> is
+    clear; it is the installation domain of the Satellite
+    server, called the Deployment zone, or depzone.
+    Throughout this guide we have used this term. Basically
+    it is the environment in which the target nodes are
+    installed.
+  </para>
+
+  <para>
+    The <code>-s</code> option gives the IP address of the
+    DNS server used during installation. Afterwards, via the
+    <code>dns::client</code> Puppet module, a target node
+    can be equipped with the final set of DNS servers.
+  </para>
+
+  <para>
+    The <code>-o</code> option gives us the name of the
+    Spacewalk organization used to deploy the node. Since we
+    can use multiple organizations on a Spacewalk or
+    Satellite server to deploy a node, we add the Spacewalk
+    organizaton name to the Cobbler name of a node. This
+    way, we can distinguish between <code>ant1</code> in
+    <code>dmsat1</code> and <code>ant1</code> in
+    <code>dmsat2</code>, assuming we map the depzones names
+    to Spacewalk organizations.
+  </para>
+
+  <para>
+    An example of a Cobbler script based upon the following
+    machine key:
+<screen>
+machine:
+ fqdn:
+  p:    ant1.svcs.dmsat1.org
+ aliases:
+  p:
+   - ant1
+ ipv4:
+  p:     192.168.5.20/24
+  dp:    192.168.5.1
+ nics:
+  - 52:54:00:a8:05:14
+ description:  "ANT 1 test node"
+ information:  "proxy"
+ location:     "services domain"
+ machinetype:  "kvm"
+ platform:     "generic"
+ provisioning: "d21sw1.svcs.dmsat1.org"
+ rhelversion:  "6.5"
+ use_proxy:    "no"
+</screen>
+    The result:
+<screen>
+&dev1p; <userinput>mk_cobbler.py -d dmsat1 -s 192.168.5.11 -o SpacewalkDefaultOrganization /var/lib/hiera/depzones/dmsat1/hosts/ant1.svcs.dmsat1.org.yaml</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler-ant1.sh
+# DESCRIPTION
+#   This script should be run on the Satellite server:
+#   # ./cobbler-ant1.sh
+#
+#   IP details
+#
+#   Host     Prod            Cluster         ILO
+#   ant1     192.168.5.20                                   
+#            EXT1            EXT2
+#                                           
+#            Backup          Admin
+#                                           
+#
+#   Subnets:
+#   P:  192.168.5.0/24     gw: 192.168.5.1
+#   C:  
+#   I:                     gw: 
+#   E1:                    gw: 
+#   E2:                    gw: 
+#   B:                     gw: 
+#   A:                     gw: 
+#
+#   DNS servers:
+#   * 192.168.5.11
+#
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   sudo cobbler system remove --name=SpacewalkDefaultOrganization_kvm_ant1
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-08-25 20:24
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cobbler-ant1.sh is free software; you can redistribute
+#   it and/or modify it under the terms of the GNU General
+#   Public License as published by the Free Software
+#   Foundation; either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cobbler-ant1.sh is distributed in the hope that it will
+#   be useful, but WITHOUT ANY WARRANTY; without even the
+#   implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+COBBLER="sudo cobbler"
+# AB: extra Spacewalk organizations have != 1
+ORGNUM="$(msat_ls_org.py)"
+
+########## PARAMETERS TO EDIT ##########
+NAME="ant1"
+DEPZONE="dmsat1"
+OWNERS="example"
+PROFILE="bare-kvm-6u5-x_y_z"
+ORG="SpacewalkDefaultOrganization"
+MACH="kvm"
+COMMENT="ANT 1 test node"
+GATEWAY="192.168.5.1"
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="svcs.dmsat1.org"
+HOSTNAME="ant1.svcs.dmsat1.org"
+PROD_IP="192.168.5.20"
+PROD_SUBNET_MASK="255.255.255.0"
+PROD_DNS_NAME="${HOSTNAME}"
+MAC_ETH1="52:54:00:a8:05:14"
+ETH1_NAME="em1"
+P=""
+
+$COBBLER system list | grep -q ${ORG}_${MACH}_${P}${NAME}$
+if [ $? -eq 0 ]; then
+  echo "$NAME already exists. Removing system ...."
+  $COBBLER system remove --name=${ORG}_${MACH}_${P}${NAME}
+fi
+
+########## START SCRIPT ##########
+$COBBLER system add \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORGNUM}:${ORG} \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} depzone=${DEPZONE} ipv6.disable=1 biosdevname=1" \
+  --kopts-post="ipv6.disable=1 biosdevname=1" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;'
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH1_NAME} \
+  --mac=${MAC_ETH1} \
+  --static=1 \
+  --ip-address=${PROD_IP} \
+  --subnet=${PROD_SUBNET} \
+  --dns-name=${DNS_NAME}
+</screen>
+  </para>
+
+  <para>
+    Next, we show an example of a more eloborate machine
+    key:
+<screen>
+machine:
+ fqdn:
+  p:    dhos1a.rmt.dmsat1.org
+  ilo:  dhos1a-ilo.rmt.dmsat1.org
+  c:    dhos1a-cic.rmt.dmsat1.org
+  ext1: dhos1a-ext1.rmt.dmsat1.org
+  ext2: dhos1a-ext2.rmt.dmsat1.org
+  bck:  dhos1a-bck.rmt.dmsat1.org
+  adm:  dhos1a-adm.rmt.dmsat1.org
+ aliases:
+  p:
+   - dhos1a
+  ilo:
+   - dhos1a-ilo
+  c:
+   - dhos1a-cic
+  ext1:
+   - dhos1a-ext1
+  ext2:
+   - dhos1a-ext2
+  bck:
+   - dhos1a-bck
+  adm:
+   - dhos1a-adm
+ ipv4:
+  p:     192.168.5.20/24
+  dp:    192.168.5.1
+  ilo:   192.168.29.20/24
+  dilo:  192.168.29.254
+  c:     10.4.20.20/28
+  ext1:  172.16.3.20/16
+  dext1: 172.16.3.1
+  ext2:  172.31.4.20/24
+  dext2: 172.31.4.254
+  bck:   10.2.2.20/24
+  dbck:  10.2.2.1
+  adm:   1.168.50.20/24
+  dadm:  1.168.50.254
+ nics:
+  - 00:17:a4:77:08:40
+  - 00:17:a4:77:08:42
+  - 00:17:a4:77:08:44
+  - 00:17:a4:77:08:46
+  - 00:17:a4:77:08:48
+  - 00:17:a4:77:08:4a
+  - 00:17:a4:77:08:4c
+  - 00:17:a4:77:08:4e
+ description:  "ANT 1 test node"
+ information:  "proxy"
+ location:     "Home attic"
+ machinetype:  "dl3x0"
+ platform:     "generic"
+ provisioning: "dhos3f.rmt.dmsat1.org"
+ rhelversion:  "6.5"
+ use_proxy:    "yes"
+</screen>
+    The result:
+<screen>
+&dev1p; <userinput>mk_cobbler.py -d dmsat1 -s 192.168.5.11 -o SpacewalkDefaultOrganization /var/lib/hiera/depzones/dmsat1/hosts/dhos1a.rmt.dmsat1.org.yaml</userinput>
+#!/bin/bash
+#
+# SCRIPT
+#   cobbler-dhos1a.sh
+# DESCRIPTION
+#   This script should be run on the Satellite server:
+#   # ./cobbler-dhos1a.sh
+#
+#   IP details
+#
+#   Host     Prod            Cluster         ILO
+#   dhos1a   192.168.5.20    10.4.20.20      192.168.29.20  
+#            EXT1            EXT2
+#            172.16.3.20     172.31.4.20    
+#            Backup          Admin
+#            10.2.2.20       1.168.50.20    
+#
+#   Subnets:
+#   P:  192.168.5.0/24     gw: 192.168.5.1
+#   C:  10.4.20.16/28
+#   I:  192.168.29.0/24    gw: 192.168.29.254
+#   E1: 172.16.0.0/16      gw: 172.16.3.1
+#   E2: 172.31.4.0/24      gw: 172.31.4.254
+#   B:  10.2.2.0/24        gw: 10.2.2.1
+#   A:  1.168.50.0/24      gw: 1.168.50.254
+#
+#   DNS servers:
+#   * 192.168.5.11
+#
+# ARGUMENTS
+#   None.
+# RETURN
+#   Value from cobbler command. See cobbler man page.
+# DEPENDENCIES
+#   The profile should not yet exist in cobbler. If it does,
+#   remove it with:
+#   sudo cobbler system remove --name=SpacewalkDefaultOrganization_dl3x0_dhos1a
+#   Adding an existing profile results in a clear warning
+#   from cobbler. No harm is done.
+# FAILURE
+# AUTHORS
+#   Date strings made with 'date +"\%Y-\%m-\%d \%H:\%M"'.
+#   Allard Berends (AB), 2014-08-25 20:39
+# HISTORY
+# LICENSE
+#   Copyright (C) 2014 Allard Berends
+# 
+#   cobbler-dhos1a.sh is free software; you can redistribute
+#   it and/or modify it under the terms of the GNU General
+#   Public License as published by the Free Software
+#   Foundation; either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cobbler-dhos1a.sh is distributed in the hope that it will
+#   be useful, but WITHOUT ANY WARRANTY; without even the
+#   implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
+#
+#   You should have received a copy of the GNU General
+#   Public License along with this program; if not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place -
+#   Suite 330, Boston, MA 02111-1307, USA.
+# DESIGN
+#
+
+COBBLER="sudo cobbler"
+# AB: extra Spacewalk organizations have != 1
+ORGNUM="$(msat_ls_org.py)"
+
+########## PARAMETERS TO EDIT ##########
+NAME="dhos1a"
+DEPZONE="dmsat1"
+OWNERS="example"
+PROFILE="bare-dl3x0-6u5-x_y_z"
+ORG="SpacewalkDefaultOrganization"
+MACH="dl3x0"
+COMMENT="ANT 1 test node"
+GATEWAY="192.168.5.1"
+NAMESERVERS="192.168.5.11"
+NAMESERVERS_SEARCH="rmt.dmsat1.org"
+HOSTNAME="dhos1a.rmt.dmsat1.org"
+PROD_IP="192.168.5.20"
+PROD_SUBNET_MASK="255.255.255.0"
+PROD_DNS_NAME="${HOSTNAME}"
+CLUSTER_IP="10.4.20.20"
+CLUSTER_SUBNET_MASK="255.255.255.240"
+EXT1_IP="172.16.3.20"
+EXT1_SUBNET_MASK="255.255.0.0"
+EXT2_IP="172.31.4.20"
+EXT2_SUBNET_MASK="255.255.255.0"
+BCK_IP="10.2.2.20"
+BCK_SUBNET_MASK="255.255.255.0"
+ADMIN_IP="1.168.50.20"
+ADMIN_SUBNET_MASK="255.255.255.0"
+MAC_ETH1="00:17:a4:77:08:40"
+MAC_ETH2="00:17:a4:77:08:42"
+MAC_ETH3="00:17:a4:77:08:44"
+MAC_ETH4="00:17:a4:77:08:46"
+MAC_ETH5="00:17:a4:77:08:48"
+MAC_ETH6="00:17:a4:77:08:4a"
+MAC_ETH7="00:17:a4:77:08:4c"
+MAC_ETH8="00:17:a4:77:08:4e"
+ETH1_NAME="em1"
+ETH2_NAME="em2"
+ETH3_NAME="em3"
+ETH4_NAME="em4"
+ETH5_NAME="em5"
+ETH6_NAME="em6"
+ETH7_NAME="em7"
+ETH8_NAME="em8"
+PROXY="dhos3f.rmt.dmsat1.org"
+P="proxy_"
+
+$COBBLER system list | grep -q ${ORG}_${MACH}_${P}${NAME}$
+if [ $? -eq 0 ]; then
+  echo "$NAME already exists. Removing system ...."
+  $COBBLER system remove --name=${ORG}_${MACH}_${P}${NAME}
+fi
+
+########## START SCRIPT ##########
+$COBBLER system add \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --owners=${OWNERS} \
+  --profile=${PROFILE}:${ORGNUM}:${ORG} \
+  --kopts="ip=${PROD_IP} netmask=${PROD_SUBNET} ksdevice=${MAC_ETH1} hostname=${HOSTNAME} depzone=${DEPZONE} ipv6.disable=1 biosdevname=1" \
+  --kopts-post="ipv6.disable=1 biosdevname=1" \
+  --netboot-enabled=0 \
+  --comment=${COMMENT} \
+  --power-type=ipmitool \
+  --hostname=${HOSTNAME} \
+  --gateway=${GATEWAY} \
+  --name-servers="$NAMESERVERS" \
+  --name-servers-search=$NAMESERVERS_SEARCH \
+  --redhat-management-key='&lt;&lt;inherit&gt;&gt;' \
+  --redhat-management-server='&lt;&lt;inherit&gt;&gt;' \
+  --server=$PROXY
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH1_NAME} \
+  --mac=${MAC_ETH1} \
+  --bonding=slave \
+  --bonding-master=bond0
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH2_NAME} \
+  --mac=${MAC_ETH2} \
+  --bonding=slave \
+  --bonding-master=bond0
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=bond0 \
+  --mac=${MAC_ETH1} \
+  --bonding=master \
+  --bonding-opts="mode=1 primary=${ETH1_NAME} miimon=100" \
+  --static=1 \
+  --ip-address=${PROD_IP} \
+  --subnet=${PROD_SUBNET_MASK} \
+  --dns-name=${DNS_NAME} \
+  --dhcp-tag=${DHCP_TAG}
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH3_NAME} \
+  --mac=${MAC_ETH3} \
+  --bonding=slave \
+  --bonding-master=bond1
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH4_NAME} \
+  --mac=${MAC_ETH4} \
+  --bonding=slave \
+  --bonding-master=bond1
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=bond1 \
+  --mac=${MAC_ETH3} \
+  --bonding=master \
+  --bonding-opts="mode=1 primary=${ETH3_NAME} miimon=100" \
+  --static=1 \
+  --ip-address=${CLUSTER_IP} \
+  --subnet=${CLUSTER_SUBNET_MASK} \
+  --dhcp-tag=${DHCP_TAG}
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH5_NAME} \
+  --mac=${MAC_ETH5} \
+  --static=1 \
+  --ip-address=${EXT1_IP} \
+  --subnet=${EXT1_SUBNET_MASK}
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH6_NAME} \
+  --mac=${MAC_ETH6} \
+  --static=1 \
+  --ip-address=${EXT2_IP} \
+  --subnet=${EXT2_SUBNET_MASK}
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH7_NAME} \
+  --mac=${MAC_ETH7} \
+  --static=1 \
+  --ip-address=${BCK_IP} \
+  --subnet=${BCK_SUBNET_MASK}
+
+$COBBLER system edit \
+  --name=${ORG}_${MACH}_${P}${NAME} \
+  --interface=${ETH8_NAME} \
+  --mac=${MAC_ETH8} \
+  --static=1 \
+  --ip-address=${ADMIN_IP} \
+  --subnet=${ADMIN_SUBNET_MASK}
+</screen>
+  </para>
+
+  <para>
+    From the examples above, one can see that the tool
+    <command>mk_cobbler.py</command> contains some internal
+    logic. We have a maximum of 6 networks to which a target
+    node can attach, in order: production, cluster
+    interconnect, external 1, external 2, backup and
+    administration. When we deal with a physical machine, of
+    machine type <emphasis>dl3x0</emphasis>, then we have
+    either 4 or 8 Ethernet interfaces. If we have 8, then
+    1-4 are 2 bonds, with bond0 for production (p) and bond1
+    for the cluster interconnect (cic). 5 is for external 1
+    (ext1), 6 is for external 2 (ext2), 7 for backup (bck)
+    and 8 for administration (adm). If we have 4 Ethernet
+    interfaces, then cic, ext1 and ext2 are gone. So we have
+    1-2 for bond0, 3 for bck and 4 for adm.
+  </para>
+
+  <para>
+    When dealing with virtual machines, we skip the
+    bonded interfaces. So, the the maximum we can have: 1
+    for p, 2 for cic, 3 for ext1, 4 for ext2, 5 for bck and
+    6 for adm. Only the p interface is mandatory. So, the
+    firxt example above shows a minimal Cobbler script and
+    the second example show the maximal Cobbler script.
   </para>
 
 </section>
