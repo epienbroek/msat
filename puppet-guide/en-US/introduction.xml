@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="introduction">
+  <title>Introduction</title>
+
+  <para>
+    In this book, we want to demonstrate how one can set up
+    a standard Linux environment using a Spacewalk or
+    Satellite server and Puppet. The aim is to setup this
+    standard Linux environment is such a way that it can be
+    used as a development, test, quality assurance, and
+    production environment. In this text, we mainly focus on
+    running all machines on a single KVM host. The
+    investment of a simple PC with enough memory (16 Gbyte)
+    and disk space (500 Gbyte), combined with a CPU that
+    provides virutalization options, should be enough.
+  </para>
+
+  <para>
+    We solely use free open source tools in the standard Linux
+    environment. So, for the software, an individual does
+    not need to invest any money at all, just time. Having
+    made this statement, we strongly encourage individuals
+    and companies, to use RHEL (Red Hat Enterprise Linux)
+    and the Satellite server. By investing some money, one
+    receives great support from Red Hat and one invests in
+    the open source business. Furthermore, by buying Puppet
+    from Puppet Labs, one also supports the development of
+    Puppet and one can get support from Puppet Labs on
+    Puppet.
+  </para>
+
+  <para>
+    The Spacewalk or Satellite server is used for bare metal
+    deployment of machines, both virtual and physical. This
+    is the action of putting the Linux OS, CentOS 6, or RHEL
+    6, on the machine. By adding just a little extra, the
+    machine also receives the Puppet software. So, after the
+    initial install (bare metal deployment), we have a
+    machine with:
+    <itemizedlist>
+      <listitem>
+        <para>basic Linux OS</para>
+      </listitem>
+      <listitem>
+        <para>access to yum repo's on Spacewalk or Satellite</para>
+      </listitem>
+      <listitem>
+        <para>initial set of Puppet software</para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    How we need to organize the Spacewalk or Satellite
+    server with respect to software channels and the
+    kickstart profile for bare metal deployment is discussed
+    in <xref linkend="software" />.
+  </para>
+
+  <important>
+    <title>Get the Spacewalk or Satellite server in order
+    first</title>
+
+    <para>
+      At first glance, it seems appealing to skip to the
+      Puppet part of this book. Resist the temptation! Make
+      the Spacewalk or Satellite server work first. Once
+      one can quickly deploy machines, it is much easier and
+      more efficient to provision the default services!
+    </para>
+  </important>
+
+  <para>
+    Before, we start with the actual Puppet work, we have
+    chosen to deal with the standard services of the
+    environment fist. To run the services in an environment,
+    we need to set it up first. In <xref
+    linkend="environment" />, we discuss the network setup
+    and the services we want to run. We have tested the code
+    of <xref linkend="environment" />, by literally copying
+    and pasting it in our Gnome terminal. The advise to the
+    reader is to do the same. Copy everything! Get things
+    working first. Afterwards, play with the setup and tweak
+    things to figure out how it works.
+  </para>
+
+  <para>
+    Instead of discussing how the Puppet layers work, we
+    use the code first. In <xref linkend="platforms" />, we
+    bring to life the standard services. Again, all the code
+    is tested by literally copying it to the Gnome terminal.
+    Every node just needs to be booted with the generated
+    boot ISO and started with the correct label on the boot
+    menu. It installs and configures itself completely. The
+    only exception is the LDAP service. Since we use
+    multimaster replication, replication needs to be started
+    on either of the two nodes by running a script on the
+    command line. The reader should have a complete
+    environment running after completing <xref
+    linkend="platforms" />.
+  </para>
+
+  <para>
+    Having done <xref linkend="software" />, <xref
+    linkend="environment" /> and <xref linkend="platforms"
+    />, the time has come to study our Puppet setup. So, we
+    have a machine on which we did bare metal deployment.
+    What happens next? After the installation, the machine
+    reboots itself. Automatically the Puppet code kicks in
+    and the machine is provisioned with the recipes we
+    prescribed. The act of provisioning is configuring the
+    machine to provide a specific function or combination of
+    functions. For example, we can tell a machine to become
+    an LDAP server, or an LDAP, NTP, and DNS server.
+  </para>
+
+  <para>
+    The Puppet part is divided into three major chunks:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Puppet construction, see <xref
+          linkend="puppet_construction" />
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Puppet integration, see <xref
+          linkend="puppet_integration" />
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Puppet configuration, see <xref
+          linkend="puppet_configuration" />
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    Since we use some external software and we have written
+    some tools, we add two extra chunks:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Puppet software, see <xref
+          linkend="puppet_software" />
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Puppet tools, see <xref linkend="puppet_tools" />
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    In the <emphasis>Puppet construction</emphasis> layer,
+    we construct Puppet modules. A Puppet module implements
+    a specific function or task. Sometimes it implements
+    multiple functions or tasks. For example, the
+    <code>ntp</code> module provides the
+    <code>ntp::client</code>, <code>ntp::clock</code> and
+    <code>ntp::server</code> (sub)modules. The code of a
+    module can be executed by applying its class in Puppet.
+    For example, the statement <code>puppet apply -e
+    'include ntp::clock'</code>, will run the code in
+    <filename>/etc/puppet/modules/ntp/manifests/clock.pp</filename>.
+    The result is a standalone NTP server configured to run
+    as a clock, using the machine's system clock as its only
+    time source.
+  </para>
+
+  <para>
+    The Puppet construction layer does not have any
+    knowledge about the environment in which it is deployed.
+    So, in the code, no statements dealing with location
+    specific situations must exists. In other words, the
+    Puppet construction modules are environment agnostic.
+  </para>
+
+  <para>
+    In <xref linkend="puppet_construction" />, more details
+    about the Puppet construction modules are presented. In
+    <xref linkend="apdx_annotated_module" />, the LDAP
+    module is illustrated as an example.
+  </para>
+
+  <para>
+    In the <emphasis>Puppet integration</emphasis> layer,
+    we provide parameters to the Puppet construction
+    modules. By defining special Puppet modules, called
+    <emphasis>profiles</emphasis> and
+    <emphasis>roles</emphasis>, explicit sets of parameters
+    are loaded from YAML files and fed to the Puppet
+    construction modules. The YAML files are provide by the
+    Puppet configuration layer. Consequently, coordination
+    between the integration and configuration layers must
+    exist; the integration layer must know where to get the
+    parameters from and the configuration layer must
+    understand where the integration layer looks for the
+    parameters.
+  </para>
+
+  <para>
+    Like the construction layer, the Puppet integration
+    layer is environment agnostic.
+  </para>
+
+  <para>
+    In the <emphasis>Puppet configuration</emphasis> layer,
+    we provide parameter sets to the Puppet modules in the
+    form of YAML files. By organizing the YAML files in a
+    specific directory structure, we can categorize the
+    parameters by type. This structure enables us to make
+    the configuration modular, like the Puppet modules.
+  </para>
+
+  <para>
+    The lookup of parameters and the structure is discussed
+    at length in <xref linkend="puppet_configuration" />.
+    Furthermore, how we put all configuration in RPM's is
+    also discussed in the <emphasis>Puppet
+    configuration</emphasis> layer.
+  </para>
+
+  <para>
+    To aid our Puppet modules, which we discuss in the
+    <emphasis>Puppet construction</emphasis> layer, we use
+    some Ruby and/or Puppet libraries. The question arises:
+    how do we get this software on the target node (the node
+    being provisioned with Puppet)? Since, we use a setup
+    where all software comes in via RPM's, located at the
+    Spacewalk or Satellite server, we package all supporting
+    libraries, like Ruby gems and external Puppet modules in
+    RPM's. How this works, is discussed in <xref
+    linkend="puppet_software" />.
+  </para>
+
+  <para>
+    Looking at the <emphasis>Puppet configuration</emphasis>
+    layer, we thought that everything comes in via the node
+    YAML file. Why not add a little extra information and
+    state that every target node must have a node YAML file
+    to automate some standard stuff? This
+    <emphasis>standard stuff</emphasis> is described in
+    <xref linkend="puppet_tools" />.
+  </para>
+</chapter>
+

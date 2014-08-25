@@ -7,14 +7,131 @@
   <title>Puppet construction</title>
 
   <para>
+    The Puppet construction layer is the basic layer in
+    which we build elementary functions. The Puppet modules
+    in the construction layer are our simple lego blocks.
+    The responsibility of the Puppet construction layer is
+    to provide modules that give us the nuts and bolds to
+    make a service work. We don't care, in this layer, how
+    the correct configuration is passed on. We only provide
+    mechanics of a function and the means to tweak it via its
+    interface, the class parameters of the params class.
   </para>
 
   <para>
-    Tasks we need to conduct:
+    By writing down some programming guidelines, I noticed
+    that I am repeating work done by Eric S. Raymond. The
+    advice is to read his book. It provides a sound
+    methodology to good programming. Although the title of
+    the book seems off topic, it is still very accurate and
+    to the point, see <xref
+    linkend="puppet-guide-ref_material-unix_programing" />.
+  </para>
+
+  <para>
+    We start by setting out some development rules:
     <itemizedlist>
       <listitem>
         <para>
-          Analyze the CentOS 6.5 channel. We want our
+          Always develop a module in isolation. A single
+          module provides a specific function. By developing
+          the module in isolation, focus can be given to the
+          function and the developer can concentrate on the
+          specifics.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A module always has exactly one params class, in
+          which all the module parameters are defined. The
+          params class provides the interface towards the
+          outside world. Variables used in more than one
+          class of a module, must be defined in the params
+          class to avoid repetition. DRY (Don't Repeat
+          Yourself). The params class is inherited by all
+          other classes in the module.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A module always has exactly one construction
+          class. The construction class is used to implement
+          the module's function. All outside configuration
+          comes from the params class. A construction class
+          can be helped by helper classes. A reason for
+          helper classes would be: breaking up a large class
+          in specific subfunctions.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A module can have helper classes to implement
+          specific subfunctions. The helper classes are
+          unknown to the outside world. Hence they must only
+          be called by the construction class.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          During the development phase all outside
+          parameters come from the node YAML file. This
+          ensures that one does not need to worry about how
+          configuration is pulled in. The configuration of a
+          module is the worry of the integration and
+          configuration phase.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A module may only make decisions on parameters or
+          generic facts. If-statements based on node names
+          and the like, are forbidden. This way, a module
+          stays generic and has no unexpected side effects.
+          This strategy also ensures that the behavior of a
+          module does not change from the development phase,
+          to the test, quality assurance, or production
+          phases.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A module must apply <emphasis>defensive
+          programming</emphasis> techniques. What is meant
+          by that? In mathematics, functions are only
+          defined for a specific domain of numbers. It is
+          illegal to use a number outside of the domain. For
+          example, with real numbers, the square root of the
+          number -1 is not defined. The domain is from 0 to
+          positive infinity. So, for the domain the square
+          root is defined. We can calculate the square root
+          of 4 (=2). The same principle is applied to the
+          params class of a Puppet module. The complete set
+          of input parameters must be defined and checked in
+          the Puppet code, inside the params class, as
+          thoroughly as possible. If we define a parameter
+          as an IPv4 address, check that it actually is an
+          IPv4 address. If it is not, immediately fail.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          In the Puppet module RPM, always provide a working
+          example of the module by giving a node YAML file
+          and a <code>puppet apply -e</code> command line
+          statement how to include the Puppet module. Place
+          it in an easily to find README file and tag it as
+          documentation.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Categorize Puppet modules by placing client and
+          server code in the same directory structure. For
+          example, <code>puppet apply -e 'include
+          dns::server'</code> and <code>puppet apply -e
+          'include dns::client'</code> makes sense. Note,
+          that the client and server code are still separate
+          Puppet modules.
         </para>
       </listitem>
     </itemizedlist>
@@ -33,8 +150,4 @@
   </para>
 
   <xi:include href="puppet_construction/assert.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="puppet_construction/stdlib.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="puppet_construction/mini_portile.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="puppet_construction/gpgme.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="puppet_construction/puppet_lint.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>

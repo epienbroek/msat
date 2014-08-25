@@ -6,12 +6,14 @@
 <book>
   <xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="Preface.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="introduction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="software.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="environment.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="platforms.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_construction.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_integration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_software.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="puppet_tools.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="apdx_annotated_module.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="apdx_puppet_lang.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

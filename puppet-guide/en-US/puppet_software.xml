@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="puppet_software">
+  <title>Puppet software</title>
+
+  <para>
+    This chapter illustrates how external software is
+    packaged in RPM's. The sections show different pieces of
+    software and the analysis done to figure out what needs
+    to be packaged. All the external software needed for the
+    standard services in our infrastructure environment is
+    packaged in RPM's.
+  </para>
+
+  <para>
+    This raises the question: why do we want to do this? Is
+    it not much simpler to just do:
+<screen>
+&dev1p; <userinput>gem install gpgme</userinput>
+</screen>
+    The answer is: yes! But, we want a robust and controlled
+    environment. What if we don't have an Internet
+    connection, because the environment is labelled as
+    <emphasis>mission critical</emphasis>, and no Internet
+    connection is allowed? What if, we want to develop while
+    travelling by air? Many examples can be given to show
+    that it is sometimes necessary to have all external
+    software preloaded on a local Spacewalk or Satellite
+    server. In this scenario, we are independent and
+    completely in control what software can be deployed on
+    target nodes.
+  </para>
+
+  <para>
+    During the development phase, we do have an Internet
+    connection and load external software via the
+    <code>gem install</code> and <code>puppet module
+    install</code> methods. The trick is to put the right
+    directories and files in an RPM. Be aware, this is an
+    iterative process!
+  </para>
+
+  <xi:include href="puppet_software/stdlib.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_software/mini_portile.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_software/gpgme.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_software/puppet_lint.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</chapter>

@@ -118,6 +118,43 @@
         </listitem>
       </varlistentry>
 
+      <varlistentry id="puppet-guide-ref_material-unix_programing">
+        <term>The Art of Unix programming, Eric Steven
+        Raymond, Addison-Wesley</term>
+        <listitem>
+          <para>
+            The Art of Unix Programming attempts to capture
+            the engineering wisdom and philosophy of the
+            Unix community as it's applied today — not
+            merely as it has been written down in the past,
+            but as a living "special transmission, outside
+            the scriptures" passed from guru to guru.
+            Accordingly, the book doesn't focus so much on
+            "what" as on "why", showing the connection
+            between Unix philosophy and practice through
+            case studies in widely available open-source
+            software
+          </para>
+
+          <para>
+            This book provides very good guidelines for
+            writing Puppet modules. For example: Rule of
+            Modularity: Write simple parts connected by
+            clean interfaces, or: Rule of Clarity: Clarity
+            is better than cleverness.
+          </para>
+          <para>
+            <ulink
+            url="http://www.catb.org/esr/writings/taoup/"><citetitle>The Art of Unix Programming</citetitle></ulink>
+          </para>
+
+          <para>
+            <ulink
+            url="http://www.catb.org/esr/writings/taoup/html/"><citetitle>Online - The Art of Unix Programming</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
     </variablelist>
   </para>
 </appendix>
