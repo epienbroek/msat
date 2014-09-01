@@ -150,4 +150,6 @@
   </para>
 
   <xi:include href="puppet_construction/assert.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/types.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="puppet_construction/augeas.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </chapter>

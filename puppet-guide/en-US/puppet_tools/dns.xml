@@ -7,6 +7,122 @@
   <title>Puppet DNS tool</title>
 
   <para>
+    In an environment like <emphasis>dmsat1</emphasis>, we
+    need a hosts database. DNS is used to provide us with
+    information about the hosts in the environment. Since
+    each host already has a node YAML file and 1 or more
+    FQDN's and corresponding IP addresses in the machine
+    key, see <xref linkend="puppet_tools" /> and
+    <xref linkend="puppet_tools-cobbler" />, we generate the
+    DNS configuration file and the zone files from the node
+    YAML files. In this section we show how the
+    <command>mk_zones_from_yaml.py</command> command works.
+  </para>
+
+  <para>
+    We can get help with:
+<screen>
+&dev1p; <userinput>mk_zones_from_yaml.py -h</userinput>
+Usage: mk_zones_from_yaml.py [options] &lt;node YAML dir&gt;
+
+This script creates DNS zone files from node YAML files. The input is the
+directory where the node YAML files are located. The output is a custom zone
+configuration file and the zone files.
+
+Options:
+  -h, --help            show this help message and exit
+  -c CONF_DIR, --conf-dir=CONF_DIR
+                        Path of the directory where the named configuration is
+                        located
+  -n NAME_SERVER, --name-server=NAME_SERVER
+                        FQDN of the nameserver for which the zones are created
+  -z ZONES_DIR, --zones-dir=ZONES_DIR
+                        Path of the directory where the named zone files are
+                        located
+</screen>
+  </para>
+
+  <para>
+    Since the zone files and configuration file can be
+    placed in different directories, one needs to specify
+    their locations. We use the
+    <package>bind-chroot</package> RPM, so the location for
+    the configuration file is <filename
+    class="directory">/var/named/chroot/etc</filename>, and
+    the location for the zone files is <filename
+    class="directory">/var/named/chroot/var/named</filename>.
+    Now we can generate the Resource Records (RR's) with:
+<screen>
+&dev1p; <userinput>mk_zones_from_yaml.py -c /var/named/chroot/etc -n d21sw1.svcs.dmsat1.org -z /var/named/chroot/var/named /var/lib/hiera/depzones/dmsat1/hosts</userinput>
+</screen>
+    The result is:
+<screen>
+&dev1p; <userinput>ls -l /var/named/chroot/etc/named.custom.zones</userinput>
+-rw-r--r--. 1 root root 992 Aug 26 18:50 /var/named/chroot/etc/named.custom.zones
+
+&dev1p; <userinput>ls -l /var/named/chroot/var/named | grep -e zone\$ -e arpa\$</userinput>
+-rw-r--r--. 1 root  root  1305 Aug 26 18:50 192.168.4.in-addr.arpa
+-rw-r--r--. 1 root  root  1695 Aug 26 18:50 192.168.5.in-addr.arpa
+-rw-r--r--. 1 root  root  1263 Aug 26 18:50 192.168.6.in-addr.arpa
+-rw-r--r--. 1 root  root  1266 Aug 26 18:50 192.168.7.in-addr.arpa
+-rw-r--r--. 1 root  root  1338 Aug 26 18:50 core.dmsat1.org.zone
+-rw-r--r--. 1 root  root  1288 Aug 26 18:50 dmz.dmsat1.org.zone
+-rw-r--r--. 1 root  root  1289 Aug 26 18:50 rmt.dmsat1.org.zone
+-rw-r--r--. 1 root  root  1838 Aug 26 18:50 svcs.dmsat1.org.zone
+</screen>
+  </para>
+
+  <para>
+    We show the content of one of the generated zone files:
+<screen>
+&dev1p; <userinput>cat /var/named/chroot/var/named/svcs.dmsat1.org.zone</userinput>
+$TTL    86400
+@       IN SOA d21sw1.svcs.dmsat1.org. root.d21sw1.svcs.dmsat1.org. (
+        2014082618      ; serial, format: YYYYMMDDNN, where
+      ; NN is the daily sequence number.
+      ; After editing this file, always
+      ; update this serial number to give
+      ; slaves a chance to keep
+      ; synchronized.
+        3H              ; refresh. The refresh interval
+      ; tells a slave for the zone how
+      ; often to check that the data for
+      ; this zone is up to date.
+        15M             ; retry. If a slave fails to connect
+      ; to the master, it will retry in
+      ; this amount of time. So here it is
+      ; 15 minutes.
+        1W              ; expiry. If a slave did not contact
+      ; the server for this amount of
+      ; time, its records become useless,
+      ; i.e. are expired.
+        1D )            ; minimum. TTL for negative
+      ; responses of this nameserver for
+      ; authoriative requests. So the
+      ; client must not ask for the same
+      ; RR (Resource Record) it got a
+      ; negative response for in the
+      ; specified amount of time.
+
+;
+; @ (short for domain name) is implied!
+;
+        IN NS   d21sw1.svcs.dmsat1.org.
+
+d21sw1               IN      A       192.168.5.11
+ds1                  IN      A       192.168.5.14
+ds2                  IN      A       192.168.5.15
+lvs1                 IN      A       192.168.5.16
+lvs2                 IN      A       192.168.5.17
+ant1                 IN      A       192.168.5.20
+ntp1                 IN      A       192.168.5.21
+ntp2                 IN      A       192.168.5.22
+dns1                 IN      A       192.168.5.25
+dns2                 IN      A       192.168.5.26
+dns3                 IN      A       192.168.5.27
+lts1                 IN      A       192.168.5.31
+lts2                 IN      A       192.168.5.32
+</screen>
   </para>
 
 </section>

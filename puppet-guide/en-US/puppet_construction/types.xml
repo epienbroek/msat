@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="puppet_construction-types">
+  <title>Puppet simple and aggregated resource types</title>
+
+  <para>
+    The terms simple and aggregate resource types sound very
+    interesting, but what do they really mean? Our
+    definitions are: <termdef
+    id="puppet_construction-types-simple_type">A Puppet
+    resource type, called <firstterm>simple resource
+    type</firstterm>, is only used by one elementary Puppet
+    module.</termdef> As a consequence, this Puppet module
+    never needs to compete for the simple resource type.
+    <termdef
+    id="puppet_construction-types-aggr_type">A Puppet
+    resource type, called <firstterm>aggregated resource
+    type</firstterm>, is used by multiple elementary Puppet
+    modules.</termdef> As a consequence, the Puppet modules
+    need to compete for the resource type. So, care needs to
+    be taken to organize its usage.
+  </para>
+
+  <para>
+    Some practical examples clarify the terms. The
+    <filename>/etc/ntp.conf</filename> configuration file is
+    only used by the NTP server module. This file is not
+    reconfigured by, say the <application>sshd</application>
+    service. This is very different with the
+    <filename>/etc/sysconfig/iptables</filename>
+    configuration file. Every service on a node needs a port
+    opened up in the firewall. So, every Puppet module
+    providing a service needs to configure its port in
+    <filename>/etc/sysconfig/iptables</filename>. This means
+    that these services aggregate the configuration. If no
+    care is taken to organize the
+    <filename>/etc/sysconfig/iptables</filename>
+    configuration, different Puppet modules might overwrite
+    settings of eachother. The order in which Puppet runs
+    determines whichever Puppet module wins and sees its
+    configuration in
+    <filename>/etc/sysconfig/iptables</filename>. So,
+    without organization, we effectively have a race
+    condition.
+  </para>
+
+  <para>
+    If we know that we deal with simple resource types, we
+    don't need to worry about configuration. Only one Puppet
+    module tries to configure it. But, with the aggregate
+    resource types, we do need to worry. Having a closer
+    look at aggregated resource types, we need to split it
+    up in simple resource types and eventually put them
+    together, aggregate them, into an aggregated resource
+    type. So, like in mathematics, we transform the new
+    problem, the aggregated resource type, into an old
+    problem, the simple resource type, of which we already
+    have the solution for dealing with it.
+  </para>
+
+  <para>
+    So, how do we make the aggregated resource
+    <filename>/etc/sysconfig/iptables</filename> into a
+    number of simple resources? By studying the line of
+    iptables, we discovered that most services just need one
+    or more lines with destination TCP ports opened. By
+    creating a file per destination port, requested by a
+    Puppet module, we basically tell Puppet to make a number
+    of simple resources. For example, on a loadbalancer
+    node, it looks like this:
+<screen>
+&lvs1p; <userinput>ls -1 /root/iptables.filterdport.d/</userinput>
+00000_iptables_filter
+00389_tcp_lvs::ldap::server
+00539_tcp_lvs::ldap::server
+00539_udp_lvs::ldap::server
+00636_tcp_lvs::ldap::server
+</screen>
+    And, the example content of such a file:
+<screen>
+&lvs1p; <userinput>cat /root/iptables.filterdport.d/00389_tcp_lvs::ldap::server</userinput>
+-A RH-Firewall-1-INPUT -m tcp -p tcp -m state --state NEW --dport 389 -m comment --comment "LDAP" -j ACCEPT
+</screen>
+  </para>
+
+  <para>
+    At the end of the Puppet run, we <command>cat</command>
+    all the files together with:
+<screen>
+&lvs1p; <userinput>cat /root/iptables.filterdport.d/*</userinput>
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:RH-Firewall-1-INPUT - [0:0]
+-A INPUT -j RH-Firewall-1-INPUT
+-A FORWARD -j RH-Firewall-1-INPUT
+-A RH-Firewall-1-INPUT -i lo -j ACCEPT
+-A RH-Firewall-1-INPUT -m icmp -p icmp --icmp-type any -j ACCEPT
+-A RH-Firewall-1-INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A RH-Firewall-1-INPUT -m tcp -p tcp -m state --state NEW --dport 22 -m comment --comment "SSH" -j ACCEPT
+-A RH-Firewall-1-INPUT -m tcp -p tcp -m state --state NEW --dport 389 -m comment --comment "LDAP" -j ACCEPT
+-A RH-Firewall-1-INPUT -m tcp -p tcp -m state --state NEW --dport 539 -m comment --comment "PULSE" -j ACCEPT
+-A RH-Firewall-1-INPUT -m udp -p udp -m state --state NEW --dport 539 -m comment --comment "PULSE" -j ACCEPT
+-A RH-Firewall-1-INPUT -m tcp -p tcp -m state --state NEW --dport 636 -m comment --comment "LDAPS" -j ACCEPT
+</screen>
+  </para>
+
+  <para>
+    To figure out how the complete setup works for the
+    <filename>/etc/sysconfig/iptables</filename> aggregated
+    resource, have a look at <xref
+    linkend="puppet-guide-ref_material-puppet-construction"
+    />. Inside, the <code>puppet-baseinfra</code> is
+    available. In here, the <code>iptables</code> module
+    exists. It is used, for example, by the <code>lvs</code>
+    and <code>ldap</code> modules, from the same
+    <code>puppet-baseinfra</code> code.
+  </para>
+
+  <para>
+    Currently, this method has one caveat. If the iptables
+    ports inside a Puppet module or, if it is configurable,
+    in the YAML configuration, is changed, then the new
+    ports are added, but removed ports stay. Only by also
+    removing the <filename
+    class="directory">/root/iptables.filterdport.d</filename>
+    directory, one can regenerate the whole set of ports.
+    This is implemented in this way to avoid that all the
+    iptables rules are regenerated each time Puppet is run
+    and possibly also restarts the iptables service.
+  </para>
+
+</section>

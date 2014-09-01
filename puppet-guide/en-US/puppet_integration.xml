@@ -7,6 +7,96 @@
   <title>Puppet integration</title>
 
   <para>
+    In <xref linkend="puppet_construction" />, we focus on
+    an elementary Puppet module. The goal is to implement
+    the function it provides. So, we only worry about the
+    Puppet code to write to implement that function. The
+    parts that need to be configurable are parameterized.
+    All parameters come from the Puppet interface class,
+    called <code>&lt;module&gt;::params</code>. For testing
+    purposes all parameters come from a node YAML file. The
+    elementary Puppet module is tested in isolation on the
+    node.
+  </para>
+
+  <para>
+    In the Puppet integration layer, we categorize the
+    parameters that are fed into the elementary Puppet
+    modules. By categorizing the parameters we try to avoid
+    duplication of parameters. But, this is not the only
+    reason. We also want to avoid putting all parameters in
+    one big YAML file. Tempting at first, one big YAML file
+    becomes a burden when updating parts of it is needed in
+    a production environment. So, we need to pack parameters
+    together by category, but need to makes sure that we end
+    up with manageable YAML files.
+  </para>
+
+  <para>
+    The code of an elementary Puppet module is executed by
+    running its params class in a resource type way. So:
+<screen>
+class{'&lt;module&gt;::params':
+  par1 => 'val1',
+  .
+  .
+  parn => 'valn',
+}
+->
+class{'&lt;module&gt;':}
+</screen>
+    The trick in the Puppet integration layer is to search
+    for the parameters values in the right set of YAML files
+    for the goal we want to achieve.
+  </para>
+
+  <para>
+    A number of requirements are imposed on the Puppet
+    integration layer:
+    <itemizedlist>
+      <listitem>
+        <para>
+          The integration layer is independent on the phase
+          a machine is in. So, it does not change whether the
+          machine is placed in a development, test, quality
+          assurance or production environment.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A specific set of functions is provisioned on a
+          node by a profile.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A profile implements one or more elementary Puppet
+          modules with the recipe for finding the parameters
+          needed.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          If profiles are orthogonal (i.e. functionally
+          independent of eachother), the integration layer
+          must allow them to coexist on a target node.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          One or more profiles are packed together in a
+          role. It must be proven that the profiles are
+          orthogonal in the role.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          A role never is charged with the obligation to
+          find configuration parameters for profiles or
+          elementary Puppet modules.
+        </para>
+      </listitem>
+    </itemizedlist>
   </para>
 
   <xi:include href="puppet_integration/profiles.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

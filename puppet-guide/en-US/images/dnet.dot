@@ -191,11 +191,18 @@ graph cluster_dev_network {
       style     = "filled",
     ];
 
-    ds3 [
-      fillcolor = "lightblue",
-      shape     = "box",
-      style     = "filled,rounded",
-    ];
+    subgraph cluster_ldap2 {
+      fillcolor = "white";
+      label     = "ldap2 instance";
+      labelloc  = "bottom";
+      style     = "filled";
+
+      ds3 [
+	fillcolor = "lightblue",
+	shape     = "box",
+	style     = "filled,rounded",
+      ];
+    }
 
     dex1 [
       fillcolor = "lightblue",

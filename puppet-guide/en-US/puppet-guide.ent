@@ -15,6 +15,7 @@
 <!ENTITY ds1     "ds1">
 <!ENTITY ds1p    "<prompt>ds1#</prompt>">
 <!ENTITY ds2p    "<prompt>ds2#</prompt>">
+<!ENTITY ds3p    "<prompt>ds3#</prompt>">
 <!ENTITY hostp   "<prompt>host#</prompt>">
 <!ENTITY lpc     "localpc">
 <!ENTITY lpcp    "<prompt>localpc$</prompt>">

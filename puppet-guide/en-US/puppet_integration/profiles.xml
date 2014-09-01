@@ -7,6 +7,580 @@
   <title>Puppet integration with profiles</title>
 
   <para>
+    We illustrate how profiles are created by showing some
+    examples. We show a faulty example and a correct example
+    of 2 profiles. For illustration purposes, we us the
+    <emphasis>ldap::server</emphasis> and
+    <emphasis>ntp::server</emphasis> construction classes.
+    We start with a configuration in which the LDAP server
+    and NTP server run on separate nodes.
+  </para>
+
+  <para>
+    The simplified code for the LDAP service is:
+<screen>
+class profiles::ldap::single {
+  # Initialize ldap::server module parameters
+  class{'::ldap::server::params':
+    capem            => hiera('ldap::server::params::capem'),
+    ldap_domain      => hiera('ldap::client::params::ldap_domain'),
+    mmr              => 'no',
+    rhn_channel      => hiera('ldap::server::params::rhn_channel'),
+    root_dn_pwd      => hiera('ldap::server::params::root_dn_pwd'),
+    server_admin_pwd => hiera('ldap::server::params::server_admin_pwd'),
+    servers          => hiera('ldap::client::params::servers'),
+  }
+  ->
+  class{'::ldap::server':}
+}
+</screen>
+  </para>
+
+  <para>
+    Note that in the above code example, most parameters are
+    explicitly searched for via the <code>hiera</code>
+    function call. So, we need to place the parameters in
+    YAML files for hiera to find them.
+  </para>
+
+  <para>
+    So far, we have not addressed the issue of finding the
+    parameters. In what YAML files do we need to put the
+    parameters? One solution is to put all parameters in one
+    big YAML file. This gives us the following problems:
+    <itemizedlist>
+      <listitem>
+        <para>
+          Parameters not being used on a node are still seen
+          by that node. For example, if we run the NTP
+          service on a different node than the LDAP service,
+          it still sees all the LDAP parameters in the big
+          YAML file.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Deployment zone specific parameters need to be
+          changed. So, the big YAML file needs to be
+          available per deployment zone. Subzones in a
+          deployment zone also need their specific
+          variations. Consequenlty, we possibly end up with
+          many variants of the big YAML file. This does not
+          scale very well.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Because the the different variants of the big YAML
+          file, parameters that are consistent are copied
+          many times. Imagine one of these parameters needs
+          to be changed?
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The big YAML files is the opposite of being
+          modular: if a parameter needs to be changed, all
+          different parties, responsible for other parameter
+          sets, need to review the change.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    Apparantly, the one big YAML file solution is not very
+    handy. So, we split up the parameters and put them in
+    different layers of YAML files. We need to specify the
+    layers in <filename>/etc/hiera.yaml</filename>. An
+    example is given in <xref
+    linkend="puppet_configuration-layers" />. Now, if we set
+    <code>instance: ldap2</code>, <code>platform:
+    ldap</code> and <code>subzone: dmz</code>, the
+    expanded <filename>/etc/hiera.yaml</filename> (with
+    rendered parameters) becomes:
+<screen>
+---
+:backends:
+  - yaml
+:hierarchy:
+  - depzones/dmsat1/hosts/ds3.dmsat1.org
+  - depzones/dmsat1/platforms/ldap/ldap2
+  - depzones/dmsat1/platforms/ldap
+  - depzones/dmsat1/subzones/dmz
+  - depzones/dmsat1
+  - platforms/ldap/ldap2
+  - platforms/ldap
+  - base
+
+:yaml:
+# datadir is empty here, so hiera uses its defaults:
+# - /var/lib/hiera on *nix
+# - %CommonAppData%\PuppetLabs\hiera\var on Windows
+# When specifying a datadir, make sure the directory exists.
+  :datadir: /var/lib/hiera
+</screen>
+  </para>
+
+  <para>
+    Knowing the set of YAML files and the parameters from
+    the simplified LDAP code, we need to determine in which
+    YAML files we place the LDAP module parameters. Per
+    parameter we explain why it goes in a specific layer.
+    This is shown in the table below:
+    <table id="puppet_integration-profiles-table">
+      <title>Categorizing the LDAP module parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>category explanation</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>capem</entry>
+            <entry>
+              We have determined that every LDAP instance
+              has its own CA (Certificate Authority) with
+              which the server certificate is signed or
+              server certificates are signed. Because of
+              this statement this parameter is specific for
+              each LDAP instance. One could argue that a CA
+              signs server certificates, hence it is more
+              generic.  For example, it could be generic for
+              all LDAP services in a deployment zone, or
+              even generic for all SSL certificates in the
+              depzone. As said, we use a setup where each
+              LDAP instance has its own specific CA. From
+              the point of view of DTQP (Development, Test,
+              Quality assurance and Prodution), we allow
+              this parameter to already be known in the
+              provisioning phase of the target node if we
+              are in the D or T phases. This helps us speed
+              up the D and T phases of the platform life
+              cycle, since the paramter can be automatically
+              set during provisioning (a Puppet run). But,
+              because this parameter is a security risk, we
+              don't allow it to be present in the Q and P
+              phases of the platform life cycle. In the Q
+              and P phases it must be copied from a password
+              vault to the target node by hand. So, this
+              parameter is not consistent over the DTQP
+              phases. Hence it is also depzone specific.
+              Now, looking at the YAML files from
+              <filename>/etc/hiera.yaml</filename>, it must
+              be placed in
+              <filename>depzones/dmsat1/platforms/ldap/ldap2.yaml</filename>.
+              Note that in the Q and P phases, we comment
+              out this parameter to force the Puppet run to
+              fail. We fail with the message that this
+              parameter needs to be obtained from the
+              password vault. So, after the kickstart of the
+              LDAP target node, the first Puppet run fails
+              and someone needs to set the
+              <code>capem</code> parameter right.
+            </entry>
+          </row>
+          <row>
+            <entry>ldap_domain</entry>
+            <entry>
+              All clients need to know the LDAP domain in
+              order to search for information in the DIT
+              (Directory Information Tree). This means that
+              the
+              <code>ldap::server::params::ldap_domain</code>
+              parameter needs to have the same value as
+              <code>ldap::client::params::ldap_domain</code>.
+              Since we have no intention of changing it per
+              depzone, it is constant over DTQP. Since it
+              must be known by all clients, we place it in
+              <filename>base.yaml</filename>.
+            </entry>
+          </row>
+          <row>
+            <entry>mmr</entry>
+            <entry>
+              The default value is 'yes'. In our specific
+              case, for the <emphasis>ldap2</emphasis>
+              instance, we deal with a single node LDAP
+              service. So Multi-Master Replication (MMR)
+              must be switched off. This is specific for
+              this LDAP service. But since we want this LDAP
+              service to be consistent over the DTQP phases
+              of the platform, we have to place this
+              parameter in
+              <filename>platforms/ldap/ldap2.yaml</filename>.
+            </entry>
+          </row>
+          <row>
+            <entry>rhn_channel</entry>
+            <entry>
+              The Puppet code of the
+              <code>ldap::server</code> module needs to
+              install software to provide the LDAP function.
+              The software is contained in the Spacewalk or
+              Satellite server, in a specific software
+              channel. We need to provide the name of this
+              software channel via this parameter. Since, we
+              don't change the Spacewalk/Satellite setup in
+              the different phases of the platform life
+              cycle, DTQP, this parameter is independent on
+              the depzone. Since the software channel is
+              specific for LDAP, it is platform specific.
+              But, because all LDAP servers need this
+              parameter, it is independent of the instance.
+              Hence, it must be placed in
+              <filename>platforms/ldap.yaml</filename>.
+            </entry>
+          </row>
+          <row>
+            <entry>root_dn_pwd</entry>
+            <entry>
+              The root distinguished name in the LDAP server
+              configuration is the privileged account in
+              LDAP, similar to root on Linux. We don't want
+              to change it. It is kept to its default, hence
+              we don't discuss it here. But it needs a
+              password. This password is kept simple in the
+              D and T phases of the platform life cycle.
+              But, because of its security sensitive nature,
+              it is removed from the configuration files in
+              the Q and P phases. This makes this parameter
+              dependent on the depzone and specific for the
+              LDAP instance. Hence, it must be located in
+              <filename>depzones/dmsat1/platforms/ldap/ldap2</filename>.
+            </entry>
+          </row>
+          <row>
+            <entry>server_admin_pwd</entry>
+            <entry>
+              This parameter behaves similar to
+              <code>root_dn_pwd</code>. So we also place it
+              in
+              <filename>depzones/dmsat1/platforms/ldap/ldap2</filename>.
+            </entry>
+          </row>
+          <row>
+            <entry>servers</entry>
+            <entry>
+              All clients need to know to which LDAP server
+              or servers to connect. Since we define an
+              LDAP instance here, consisting of one LDAP
+              server, both the clients and the server have
+              exactly the same view upon what the LDAP
+              server is. In a MMR setup with load balancers,
+              this view can be different, which is not the
+              case here! Consequently, in this particular
+              setup, the
+              <code>ldap::server::params::servers</code> and
+              <code>ldap::client::params::servers</code>
+              parameters need to be equal.  Since we have no
+              intention of changing it per depzone, it is
+              constant over DTQP. Since it must be known by
+              all clients, we place it in
+              <filename>base.yaml</filename>.
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    We repeat the analysis from above, applied to the
+    <code>ntp::server</code> construction class. We come up
+    with the following simplified code of the NTP server
+    profile:
+<screen>
+class profiles::ntp::server {
+  # Initialize ntp::server module parameters
+  class{'::ntp::server::params':
+    clocks  => hiera('ntp::server::params::clocks'),
+    servers => hiera('ntp::client::params::servers'),
+  }
+  ->
+  class{'::ntp::server':}
+}
+</screen>
+  </para>
+
+  <para>
+    The location of the NTP server parameters is discussed
+    in this table:
+    <table id="puppet_integration-profiles-table2">
+      <title>Categorizing the NTP module parameters</title>
+      <tgroup align="left" cols="2" colsep="1" rowsep="1">
+        <colspec colname="c1" colnum="1" colwidth="1*"></colspec>
+        <colspec colname="c2" colnum="2" colwidth="1*"></colspec>
+        <thead valign="top">
+          <row>
+            <entry>parameter</entry>
+            <entry>category explanation</entry>
+          </row>
+        </thead>
+        <tbody valign="top">
+          <row>
+            <entry>clocks</entry>
+            <entry>
+              Only the NTP servers need to synchronize
+              agains an NTP clock, the stratum 1 server.
+              Since the clocks are different per depzone,
+              but in a depzone only one set of clocks is
+              used, this parameter is set in
+              <filename>depzones/dmsat1/platforms/ntp.yaml</filename>.
+              Even if we might have different NTP service
+              instances, the clocks set remains the same.
+            </entry>
+          </row>
+          <row>
+            <entry>servers</entry>
+            <entry>
+              All clients need to know to which NTP server
+              or servers to connect. Since we only use one
+              set of NTP servers to synchronize against,
+              this parameter has the same value for the the
+              NTP clients as the servers. So,
+              <code>ntp::server::params::servers</code>
+              needs to have the same value as
+              <code>ntp::client::params::servers</code>. As
+              said, it is dependent on the depzone, so it
+              must be placed in
+              <filename>depzones/dmsat1.yaml</filename>.
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    So fare, we have discussed in which layer a parameter
+    goes. But, how does a node know what the
+    <code>platform</code>, <code>instance</code> and
+    <code>subzone</code> values are? The answer is simple:
+    we need to tell it. We do so by setting these values in
+    the node YAML file. For example:
+<screen>
+---
+# ds3.dmz.dmsat1.org node YAML
+
+platform: 'ldap'
+instance: 'ldap2'
+subzone:  'dmz'
+
+profiles:
+ - profiles::ldap::single
+</screen>
+  </para>
+
+  <para>
+    Only setting these values in the node YAML file is not
+    enough. During the compilation phase, Puppet does not
+    know the values yet, but it needs them to correctly
+    interpret the <filename>/etc/hiera.yaml</filename>
+    configuration file. Puppet needs the values of
+    <code>platform</code>, <code>instance</code> and
+    <code>subzone</code> before searching in the YAML files.
+    This is done by setting:
+<screen>
+&ds3p; <userinput>cat /etc/puppet/manifest/site.pp</userinput>
+$platform = hiera('platform', '')
+$instance = hiera('instance', '')
+$subzone  = hiera('subzone', '')
+
+hiera_include('profiles')
+</screen>
+  </para>
+
+  <para>
+    So, now how does the target node, e.g. <systemitem
+    class="systemname">ds3.dmz.dmsat1.org</systemitem> become
+    the LDAP server? For now, we kickstart the node and then
+    do on the command line:
+<screen>
+&ds3p; <userinput>puppet apply /etc/puppet/manifests/site.pp</userinput>
+</screen>
+  </para>
+
+  <para>
+    As promised, we show a faulty example and a correct one.
+    So, the one above has a major problem. But, what it is?
+    As long as we configure our target nodes in such a way
+    that we only want to run one profile on it, no problem
+    arises. But, what happens if we want to run the LDAP
+    service and NTP service on one target node? We need to
+    tell it to become the LDAP service instance and the NTP
+    service instance. Let's try to do that:
+<screen>
+---
+# ds3.dmz.dmsat1.org node YAML
+
+platform:
+ - 'ldap'
+ - 'ntp'
+instance:
+ - 'ldap2'
+ - 'ntp1'
+subzone:  'dmz'
+
+profiles:
+ - profiles::ldap::single
+ - profiles::ntp::server
+</screen>
+  </para>
+
+  <para>
+    By specifying the node YAML as done above, we expect
+    that Puppet is capable of understanding that the target
+    node belongs to two platforms and instances. So, the
+    code in <filename>site.pp</filename> must be able to
+    interpret the variables as arrays:
+<screen>
+$platform = hiera('platform', '')
+$instance = hiera('instance', '')
+$subzone  = hiera('subzone', '')
+</screen>
+    Unfortunately, this construction does not work. So we
+    have to find another solution.
+  </para>
+
+  <para>
+    We stated before that the Puppet integration layer is
+    responsible for feeding the elementary Puppet modules
+    with the right set of parameters. In the
+    <code>stdlib</code> of Puppet Labs, we find two
+    functions that can help: <code>loadyaml</code> and
+    <code>merge</code>. By using these two functions, we can
+    mimic the behavior of the automatic class parameter
+    lookup of Puppet, but we can specify the set of YAML files
+    during the Puppet run. So, we can make the YAML
+    parameters lookup dynamic. Let us examine two examples,
+    <code>profiles::ldap::single</code> and
+    <code>profiles::ntp::server</code>.
+  </para>
+
+  <para>
+    The code is of the single node LDAP server is:
+<screen>
+class profiles::ldap::single {
+  include stdlib
+
+  # Parameter lookups
+  $layer1   = loadyaml("/var/lib/hiera/depzones/${depzone}/hosts/${fqdn}.yaml")
+  $instance = $layer1["ldap::single::instance"]
+  $platform = $layer1["ldap::single::platform"]
+  $subz     = $layer1["subzone"]
+  if $instance {
+    $layer2 = loadyaml("/var/lib/hiera/depzones/${depzone}/platforms/${platform}/${instance}.yaml")
+  } else {
+    $layer2 = {}
+  }
+  if $platform {
+    $layer3 = loadyaml("/var/lib/hiera/depzones/${depzone}/platforms/${platform}.yaml")
+  } else {
+    $layer3 = {}
+  }
+  if $subz {
+    $layer4 = loadyaml("/var/lib/hiera/depzones/${depzone}/subzones/${subz}.yaml")
+  } else {
+    $layer4 = {}
+  }
+  $layer5   = loadyaml("/var/lib/hiera/depzones/${depzone}.yaml")
+  $layer6   = loadyaml("/var/lib/hiera/platforms/${platform}/${instance}.yaml")
+  $layer7   = loadyaml("/var/lib/hiera/platforms/${platform}.yaml")
+  $layer8   = loadyaml("/var/lib/hiera/base.yaml")
+
+  # Parameter hash
+  $h_ldap = merge($layer8, $layer7, $layer6, $layer5, $layer4, $layer3, $layer2, $layer1)
+
+  # Skipped some client code here.
+
+  # Initialize ldap::server module parameters
+  class{'::ldap::server::params':
+    capem            => $h_ldap['ldap::server::params::capem'],
+    ldap_domain      => hiera('ldap::client::params::ldap_domain'),
+    mmr              => 'no',
+    rhn_channel      => $h_ldap['ldap::server::params::rhn_channel'],
+    root_dn_pwd      => $h_ldap['ldap::server::params::root_dn_pwd'],
+    server_admin_pwd => $h_ldap['ldap::server::params::server_admin_pwd'],
+    servers          => hiera('ldap::client::params::servers'),
+    ssl              => 'yes',
+  }
+  ->
+  class{'::ldap::server':}
+}
+</screen>
+  </para>
+
+  <para>
+    The code is of the NTP server profile is:
+<screen>
+class profiles::ntp::server {
+  include stdlib
+
+  # Parameter lookups
+  $layer1   = loadyaml("/var/lib/hiera/depzones/${depzone}/hosts/${fqdn}.yaml")
+  $instance = $layer1["ntp::server::instance"]
+  $platform = $layer1["ntp::server::platform"]
+  $subz     = $layer1["subzone"]
+  if $instance {
+    $layer2 = loadyaml("/var/lib/hiera/depzones/${depzone}/platforms/${platform}/${instance}.yaml")
+  } else {
+    $layer2 = {}
+  }
+  if $platform {
+    $layer3 = loadyaml("/var/lib/hiera/depzones/${depzone}/platforms/${platform}.yaml")
+  } else {
+    $layer3 = {}
+  }
+  if $subz {
+    $layer4 = loadyaml("/var/lib/hiera/depzones/${depzone}/subzones/${subz}.yaml")
+  } else {
+    $layer4 = {}
+  }
+  $layer5   = loadyaml("/var/lib/hiera/depzones/${depzone}.yaml")
+  $layer6   = loadyaml("/var/lib/hiera/platforms/${platform}/${instance}.yaml")
+  $layer7   = loadyaml("/var/lib/hiera/platforms/${platform}.yaml")
+  $layer8   = loadyaml("/var/lib/hiera/base.yaml")
+
+  # Parameter hash
+  $h_ntp_server = merge($layer8, $layer7, $layer6, $layer5, $layer4, $layer3, $layer2, $layer1)
+
+  class{'::ntp::server::params':
+    clocks  => $h_ntp_server['ntp::server::params::clocks'],
+    servers => $h_ntp_server['ntp::server::params::servers'],
+  }
+  ->
+  class{'::ntp::server':}
+}
+</screen>
+  </para>
+
+  <para>
+    Now, we still need to change the node YAML file to
+    specify that the node becomes an LDAP server and a NTP
+    server:
+<screen>
+---
+# ds3.dmz.dmsat1.org node YAML
+
+ldap::single::instance: 'ldap2'
+ldap::single::platform: 'ldap'
+ntp::server::instance:  'ntp1'
+ntp::server::platform:  'ntp'
+subzone:  'dmz'
+
+profiles:
+ - profiles::ldap::single
+ - profiles::ntp::server
+</screen>
+    This construction works and gives us the flexibility to
+    put together multiple functions on one target node, if
+    necessary. We only need to make sure that the profiles
+    are orthogonal, i.e. independent of eachother.
   </para>
 
 </section>
