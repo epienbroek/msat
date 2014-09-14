@@ -231,7 +231,7 @@ print '''
 msat_mk_kp.py \\'''
 
 # Set kickstart label.
-print "  --kickstart-label \"%s\" \\" % (options.kickstart_label, )
+print "  --kickstart-label '%s' \\" % (options.kickstart_label, )
 
 # Set virtualization type to none. This value is not
 # obtainable from a kickstart profile via the Satellite API.
@@ -249,7 +249,7 @@ except xmlrpclib.Fault, e:
   print >> sys.stderr, options
   sys.exit(1)
 
-print "  --kickstart-tree %s \\" % (tree, )
+print "  --kickstart-tree '%s' \\" % (tree, )
 
 # Set Satellite. We use the current Satellite since we have
 # no option via the Satellite API.
@@ -356,13 +356,13 @@ for o in order:
     if map[o]:
       if o == 'url':
         dummy = re.sub('org/\d+/', 'org/$ORGNUM/', map[o])
-        print "  --kickstart-%s \"%s\" \\" % (o, dummy)
+        print "  --kickstart-%s '%s' \\" % (o, dummy)
       elif o == 'rootpw':
-        print "  --kickstart-%s \'%s\' \\" % (o, map[o])
+        print "  --kickstart-%s '%s' \\" % (o, map[o])
       elif o == 'bootloader':
-        print "  --kickstart-%s \'%s\' \\" % (o, map[o])
+        print "  --kickstart-%s '%s' \\" % (o, map[o])
       else:
-        print "  --kickstart-%s \"%s\" \\" % (o, map[o])
+        print "  --kickstart-%s '%s' \\" % (o, map[o])
     else:
       print "  --kickstart-%s true \\" % (o, )
 
