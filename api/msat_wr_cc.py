@@ -186,7 +186,7 @@ print '''#!/bin/bash
 # HISTORY
 # LICENSE
 #   Copyright (C) ''' + y + ''' Allard Berends
-# 
+#
 #   ''' + script + ''' is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -261,7 +261,6 @@ except xmlrpclib.Fault, e:
   sys.exit(1)
 
 for f in files:
-  #print "msat_mk_cc_cf.py \\"
   if f['type'] == 'file' or f['type'] == 'directory':
     print "msat_mk_cc_cf.py \\"
   else:
@@ -269,7 +268,6 @@ for f in files:
 
   # Set configchannel label.
   print "  --configchannel-label %s \\" % (options.configchannel_label, )
-  #print "  --configpath-path %s \\" % (f['path'], )
   if f['type'] == 'file' or f['type'] == 'directory':
     print "  --configpath-path %s \\" % (f['path'], )
   else:
@@ -299,7 +297,7 @@ for f in files:
   elif f['type'] == 'directory':
     print "  --configpath-permissions %s" % (f['permissions_mode'], )
   else:
-    print "  --configpath-link %s" % (f['target_path'], )
+    print "  --configpath-target %s" % (f['target_path'], )
 
   if f['type'] == 'file':
     print "  --configpath-startdelimiter '%s' \\" % (f['macro-start-delimiter'], )
