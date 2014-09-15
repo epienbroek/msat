@@ -24,7 +24,7 @@
 #   2013-04-28 22:04, GW added support for SELinux.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_cc_cf.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -122,7 +122,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--configchannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_label",
   type = "string",
@@ -131,7 +131,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-path",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_path",
   type = "string",
@@ -140,7 +140,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-link",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_link",
   type = "string",
@@ -150,7 +150,7 @@ parser.add_option(
 parser.add_option(
   "-d",
   "--configpath-dir",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_boolean,
   dest = "configpath_dir",
   type = "string",
@@ -160,7 +160,7 @@ parser.add_option(
 parser.add_option(
   "-c",
   "--configpath-content",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_content",
   type = "string",
@@ -169,7 +169,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-user",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_user",
   type = "string",
@@ -179,7 +179,7 @@ parser.add_option(
 parser.add_option(
   "-g",
   "--configpath-group",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_group",
   type = "string",
@@ -188,7 +188,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-permissions",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_permissions",
   type = "string",
@@ -198,7 +198,7 @@ parser.add_option(
 parser.add_option(
   "-s",
   "--configpath-startdelimiter",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_startdelimiter",
   type = "string",
@@ -208,7 +208,7 @@ parser.add_option(
 parser.add_option(
   "-e",
   "--configpath-enddelimiter",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_enddelimiter",
   type = "string",
@@ -308,14 +308,14 @@ if options.satellite_version in ['5.4', '5.5', '5.6']:
 try:
   if type == 'link':
     rc = client.configchannel.createOrUpdateSymlink(
-      key, 
+      key,
       options.configchannel_label,
       options.configpath_link,
       path_info
     )
   else:
     rc = client.configchannel.createOrUpdatePath(
-      key, 
+      key,
       options.configchannel_label,
       options.configpath_path,
       options.configpath_dir,

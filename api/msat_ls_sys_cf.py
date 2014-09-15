@@ -14,7 +14,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_ls_sys_cf.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -110,7 +110,7 @@ parser.add_option(
 parser.add_option(
   "-i",
   "--system-id",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_int,
   dest = "system_id",
   type = "int",

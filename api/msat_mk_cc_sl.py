@@ -25,7 +25,7 @@
 #   2013-09-15 23:04 GW: added support for symlinks.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_cc_sl.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -123,7 +123,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--configchannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_label",
   type = "string",
@@ -132,7 +132,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-target",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_target",
   type = "string",
@@ -141,7 +141,7 @@ parser.add_option(
 )
 parser.add_option(
   "--configpath-link",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_link",
   type = "string",
@@ -180,7 +180,7 @@ if options.satellite_version in ['5.4', '5.5', '5.6']:
 
 try:
   rc = client.configchannel.createOrUpdateSymlink(
-    key, 
+    key,
     options.configchannel_label,
     options.configpath_link,
     path_info

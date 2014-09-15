@@ -36,7 +36,7 @@
 #
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_wr_sc_rpms.py is free software; you
 #   can redistribute it and/or modify it under the terms of
 #   the GNU General Public License as published by the Free
@@ -144,7 +144,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--softwarechannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "softwarechannel_label",
   type = "string",
@@ -154,7 +154,7 @@ parser.add_option(
 parser.add_option(
   "-e",
   "--softwarechannel-export",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "softwarechannel_export",
   type = "string",

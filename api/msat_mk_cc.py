@@ -22,7 +22,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_cc.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -118,7 +118,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--configchannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_label",
   type = "string",
@@ -128,7 +128,7 @@ parser.add_option(
 parser.add_option(
   "-n",
   "--configchannel-name",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_name",
   type = "string",
@@ -138,7 +138,7 @@ parser.add_option(
 parser.add_option(
   "-d",
   "--configchannel-description",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_description",
   type = "string",
@@ -160,7 +160,7 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 
 try:
   rc = client.configchannel.create(
-    key, 
+    key,
     options.configchannel_label,
     options.configchannel_name,
     options.configchannel_description,

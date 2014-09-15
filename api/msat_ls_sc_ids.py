@@ -19,7 +19,7 @@
 #                          to e:n-v-r.a output
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_ls_sc_ids.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -163,7 +163,7 @@ for i in rpms:
   if not i['epoch']:
     rpm = "%s-%s-%s.%s" % (i['name'], i['version'], i['release'], i['arch_label'])
   else:
-    rpm = "%s:%s-%s-%s.%s" % (i['epoch'], i['name'], i['version'], i['release'], i['arch_label']) 
+    rpm = "%s:%s-%s-%s.%s" % (i['epoch'], i['name'], i['version'], i['release'], i['arch_label'])
   try:
     d[rpm]
     d[rpm] = i['id']

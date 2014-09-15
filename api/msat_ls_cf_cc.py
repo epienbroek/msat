@@ -14,7 +14,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_ls_cf_cc.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -101,7 +101,7 @@ parser.add_option(
 parser.add_option(
   "-n",
   "--configpath-path",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configpath_path",
   type = "string",

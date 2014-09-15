@@ -22,7 +22,7 @@
 #   line parameters are now included.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_wr_kp_hy.py is free software; you can redistribute
 #   it and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -133,7 +133,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--kickstart-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "kickstart_label",
   type = "string",
@@ -143,7 +143,7 @@ parser.add_option(
 parser.add_option(
   "-s",
   "--save-path",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "save_path",
   type = "string",

@@ -22,7 +22,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_rm_sc.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -109,7 +109,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--softwarechannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "softwarechannel_label",
   type = "string",
@@ -128,7 +128,7 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 # create software channel
 try:
   rc = client.channel.software.delete(
-    key, 
+    key,
     options.softwarechannel_label,
   )
 except xmlrpclib.Fault, e:

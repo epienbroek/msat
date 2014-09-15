@@ -12,7 +12,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   config.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -93,7 +93,7 @@ def parse_quoted_string(option, opt_str, value, parser):
     setattr(parser.values, option.dest, value)
   else:
     return value
- 
+
 def print_name_purpose(p):
   print '''<refnamediv>
 <refname>%(name)s</refname>

@@ -20,7 +20,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_ak.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -256,7 +256,7 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 
 try:
   akey = client.activationkey.getDetails(
-    key, 
+    key,
     '1-' + options.activationkey_label,
   )
 except xmlrpclib.Fault, e:
@@ -267,7 +267,7 @@ else:
 
 try:
   akey = client.activationkey.create(
-    key, 
+    key,
     options.activationkey_label,
     options.activationkey_description,
     options.activationkey_basechannel,

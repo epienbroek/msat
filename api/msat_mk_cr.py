@@ -15,7 +15,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_cr.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -110,7 +110,7 @@ parser.add_option(
 parser.add_option(
   "-d",
   "--key-description",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "key_description",
   type = "string",
@@ -120,7 +120,7 @@ parser.add_option(
 parser.add_option(
   "-t",
   "--key-type",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "key_type",
   type = "string",
@@ -130,7 +130,7 @@ parser.add_option(
 parser.add_option(
   "-c",
   "--key-content",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "key_content",
   type = "string",

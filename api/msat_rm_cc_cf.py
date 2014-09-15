@@ -22,7 +22,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_rm_cc.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -109,7 +109,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--configchannel-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "configchannel_label",
   type = "string",
@@ -141,7 +141,7 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 # create config channel
 try:
   rc = client.configchannel.deleteFiles(
-    key, 
+    key,
     options.configchannel_label,
     paths,
   )

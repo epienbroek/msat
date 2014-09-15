@@ -153,7 +153,7 @@ parser.add_option(
 parser.add_option(
   "-s",
   "--save-path",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "save_path",
   type = "string",
@@ -217,7 +217,7 @@ for f in files:
 # HISTORY
 # LICENSE
 #   Copyright (C) ''' + y + ''' Allard Berends
-# 
+#
 #   ''' + script + ''' is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free

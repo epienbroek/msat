@@ -135,7 +135,7 @@ parser.add_option(
 parser.add_option(
   "-l",
   "--kickstart-label",
-  action = "callback", 
+  action = "callback",
   callback = config.parse_string,
   dest = "kickstart_label",
   type = "string",
@@ -195,7 +195,7 @@ print '''#!/bin/bash
 # HISTORY
 # LICENSE
 #   Copyright (C) ''' + y + ''' Allard Berends
-# 
+#
 #   ''' + script + ''' is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free

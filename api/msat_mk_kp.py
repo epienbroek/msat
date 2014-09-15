@@ -30,7 +30,7 @@
 #   2013-02-24 13:07, AB: added optionsiguration files option.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_mk_kp.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software

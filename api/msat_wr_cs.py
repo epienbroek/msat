@@ -29,7 +29,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_wr_cs.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
@@ -208,7 +208,7 @@ print '''#!/bin/bash
 # HISTORY
 # LICENSE
 #   Copyright (C) ''' + y + ''' Allard Berends
-# 
+#
 #   ''' + script + ''' is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
