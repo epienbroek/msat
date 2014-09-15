@@ -28,7 +28,7 @@
 #   parameters.
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-# 
+#
 #   msat_wr_kp.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -329,7 +329,7 @@ except xmlrpclib.Fault, e:
   sys.exit(1)
 
 klist = [i['description'] for i in keys]
-print "  --kickstart-keys '%s' \\" % (','.join(klist),)
+print "  --kickstart-keys '%s' \\" % (','.join(sorted(klist)),)
 
 # Get advanced options: Systems > Kickstart > Profiles >
 # Kickstart Details > Advanced Options
