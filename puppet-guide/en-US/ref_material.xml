@@ -31,6 +31,81 @@
         </listitem>
       </varlistentry>
 
+      <varlistentry id="puppet-guide-ref_material-augeas-puppet">
+        <term>Augeas Puppet</term>
+        <listitem>
+          <para>
+            Augeas is a lovely tool that treats config files
+            (well, anything really, but it’s mostly about
+            config files) as trees of values. You then
+            modify the tree as you like, and write the file
+            back.
+          </para>
+
+          <para>
+            <ulink
+            url="https://docs.puppetlabs.com/guides/augeas.html"><citetitle>Using the Augeas Resource Type - Documentation - Puppet Labs</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-augeas-puppetrt">
+        <term>Augeas Puppet resource type</term>
+        <listitem>
+          <para>
+            Apply a change or an array of changes to the
+            filesystem using the augeas tool.
+          </para>
+
+          <para>
+            <ulink
+            url="https://docs.puppetlabs.com/references/3.4.stable/type.html#augeas"><citetitle>Type Reference - Documentation - Puppet Labs</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-augeas_wiki">
+        <term>Augeas Wiki</term>
+        <listitem>
+          <para>
+            Wiki about Augeas on github.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/hercules-team/augeas/wiki"><citetitle>Home hercules-team/augeas Wiki</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-augeas_wiki_add">
+        <term>Augeas Wiki Adding nodes to the tree</term>
+        <listitem>
+          <para>
+            Wiki page about Augeas node tree additions.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/hercules-team/augeas/wiki/Adding-nodes-to-the-tree"><citetitle>Adding nodes to the tree hercules-team/augeas Wiki</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-augeas_wiki_path">
+        <term>Augeas Wiki Path expressions</term>
+        <listitem>
+          <para>
+            Wiki page about Augeas path expressions.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/hercules-team/augeas/wiki/Path-expressions"><citetitle>Path expressions hercules-team/augeas Wiki</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry id="puppet-guide-ref_material-puppet-construction">
         <term>git repo - puppet-construction</term>
         <listitem>
@@ -133,6 +208,21 @@
           <para>
             <ulink
             url="http://msat.disruptivefoss.org/"><citetitle>MSAT (Meta Spacewalk and Satellite)</citetitle></ulink>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry id="puppet-guide-ref_material-other-software">
+        <term>git repo - other-software</term>
+        <listitem>
+          <para>
+            Gir repository containing some custom tools,
+            used in the standard Linux environment.
+          </para>
+
+          <para>
+            <ulink
+            url="https://github.com/aberends/other-software"><citetitle>aberends/other-software</citetitle></ulink>
           </para>
         </listitem>
       </varlistentry>

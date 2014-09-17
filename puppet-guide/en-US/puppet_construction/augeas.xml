@@ -10,7 +10,644 @@
     Augeas is documented in <xref
     linkend="puppet-guide-ref_material-augeas" />. After
     some experimenting, we were able to use it for editing
-    <filename>/etc/fstab</filename>.
+    <filename>/etc/fstab</filename>. For the path
+    expressions, we needed the help of <xref
+    linkend="puppet-guide-ref_material-augeas_wiki_path" />.
+    We got some tips for manipulating the node tree from
+    <xref
+    linkend="puppet-guide-ref_material-augeas_wiki_add" />.
   </para>
+
+  <para>
+    In order to test <application>augeas</application> on
+    the command line, one needs to install the
+    <package>augeas</package> RPM:
+<screen>
+&dev1p; <userinput>yum -y install augeas</userinput>
+.. output skipped ..
+
+&dev1p; <userinput>augtool --version</userinput>
+augtool 1.0.0 &lt;http://augeas.net/&gt;
+Copyright (C) 2007-2011 David Lutterkort
+License LGPLv2+: GNU LGPL version 2.1 or later
+                 &lt;http://www.gnu.org/licenses/lgpl-2.1.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David Lutterkort
+</screen>
+  </para>
+
+  <para>
+    From the website, see <xref
+    linkend="puppet-guide-ref_material-augeas" />, we
+    studied the <filename>/etc/hosts</filename> example.
+    Since it took us quite some time to master the Augeas
+    basics, we show two examples in this section. The first
+    example is to add a host to the
+    <filename>/etc/hosts</filename> file, using the
+    <command>augtool</command> command from the command
+    line. The second example is to add an extra option to
+    the <emphasis>tmpfs</emphasis> entry in
+    <filename>/etc/fstab</filename>. We use both the
+    <command>augtool</command> command and the
+    <code>augeas</code> Puppet resource type.
+  </para>
+
+  <section id="puppet_construction-augeas-hosts">
+    <title>Example /etc/hosts</title>
+
+    <para>
+      In order to demonstrate how Augeas works with the
+      <command>augool</command>, we assign ourselves a task.
+      We want to add, directly after the localhost entries
+      of <filename>/etc/hosts</filename>, the IP address and
+      FQDN of the host itself. So, if the
+      <filename>/etc/hosts</filename> only contains the
+      localhost entries, the newly added entry will be the
+      last line. If, other other hand, we have other
+      entries, the newly added line will end up after the
+      localhost entries, but before the other entries. Of,
+      course, the starting point here is a failry standard
+      <filename>/etc/hosts</filename> file, where the
+      localhost entries are the first entries.
+    </para>
+
+    <para>
+<screen>
+&dev1p; <userinput>augtool</userinput>
+&augp; <userinput>ls /augeas/files/etc/hosts</userinput>
+path = /files/etc/hosts
+mtime = 1263302902
+lens/ = @Hosts
+</screen>
+    </para>
+
+    <para>
+<screen>
+&augp; <userinput>print /files/etc/hosts</userinput>
+/files/etc/hosts
+/files/etc/hosts/1
+/files/etc/hosts/1/ipaddr = "127.0.0.1"
+/files/etc/hosts/1/canonical = "localhost"
+/files/etc/hosts/1/alias[1] = "localhost.localdomain"
+/files/etc/hosts/1/alias[2] = "localhost4"
+/files/etc/hosts/1/alias[3] = "localhost4.localdomain4"
+/files/etc/hosts/2
+/files/etc/hosts/2/ipaddr = "::1"
+/files/etc/hosts/2/canonical = "localhost"
+/files/etc/hosts/2/alias[1] = "localhost.localdomain"
+/files/etc/hosts/2/alias[2] = "localhost6"
+/files/etc/hosts/2/alias[3] = "localhost6.localdomain6"
+</screen>
+    </para>
+
+    <para>
+<screen>
+&augp; <userinput>ls /files/etc/hosts</userinput>
+1/ = (none)
+2/ = (none)
+</screen>
+    </para>
+
+    <para>
+<screen>
+&augp; <userinput>print /files/etc/hosts/1</userinput>
+/files/etc/hosts/1
+/files/etc/hosts/1/ipaddr = "127.0.0.1"
+/files/etc/hosts/1/canonical = "localhost"
+/files/etc/hosts/1/alias[1] = "localhost.localdomain"
+/files/etc/hosts/1/alias[2] = "localhost4"
+/files/etc/hosts/1/alias[3] = "localhost4.localdomain4"
+</screen>
+    </para>
+
+    <para>
+<screen>
+&augp; <userinput>ls /files/etc/hosts/1</userinput>
+/files/etc/hosts/1
+/files/etc/hosts/1/ipaddr = "127.0.0.1"
+/files/etc/hosts/1/canonical = "localhost"
+/files/etc/hosts/1/alias[1] = "localhost.localdomain"
+/files/etc/hosts/1/alias[2] = "localhost4"
+/files/etc/hosts/1/alias[3] = "localhost4.localdomain4"
+</screen>
+    </para>
+
+    <para>
+      From the <command>augtool</command> commands above, we
+      can see the the host entries of <systemitem
+      class="systemname">localhost</systemitem> have the
+      <emphasis>canonical</emphasis> node in common. So, we
+      want to find the entries for which "canonical =
+      localhost" is true. We can accomplish this by applying
+      a so-called predicate on the node set. A predicate is
+      a path language construct in which 1 or more
+      conditions can be placed. The resulting set contains
+      only the nodes for which the condition(s) are true.
+<screen>
+&augp; <userinput>print /files/etc/hosts/*[canonical = 'localhost']</userinput>
+/files/etc/hosts/1
+/files/etc/hosts/1/ipaddr = "127.0.0.1"
+/files/etc/hosts/1/canonical = "localhost"
+/files/etc/hosts/1/alias[1] = "localhost.localdomain"
+/files/etc/hosts/1/alias[2] = "localhost4"
+/files/etc/hosts/1/alias[3] = "localhost4.localdomain4"
+/files/etc/hosts/2
+/files/etc/hosts/2/ipaddr = "::1"
+/files/etc/hosts/2/canonical = "localhost"
+/files/etc/hosts/2/alias[1] = "localhost.localdomain"
+/files/etc/hosts/2/alias[2] = "localhost6"
+/files/etc/hosts/2/alias[3] = "localhost6.localdomain6"
+</screen>
+      The statement <code>/files/etc/hosts/*</code> yields a
+      node set with all nodes under the path
+      <emphasis>/etc/hosts</emphasis>. This is what the
+      wildcard "*" means; all nodes under the specified
+      path. We add a predicate, <code>[...]</code>. The
+      condition inside the predicate is applied to the node
+      set, identified with the path expression
+      <code>/etc/hosts/*</code>. The condition means:
+      <emphasis>give the subset of the node set where the
+      attribute "canonical" equals the string
+      "localhost"</emphasis>.
+    </para>
+
+    <para>
+      Since we are only interested in the last item, we
+      apply another predicate with condition to the result
+      node set:
+<screen>
+&augp; <userinput>print /files/etc/hosts/*[canonical = 'localhost'][last()]</userinput>
+/files/etc/hosts/2
+/files/etc/hosts/2/ipaddr = "::1"
+/files/etc/hosts/2/canonical = "localhost"
+/files/etc/hosts/2/alias[1] = "localhost.localdomain"
+/files/etc/hosts/2/alias[2] = "localhost6"
+/files/etc/hosts/2/alias[3] = "localhost6.localdomain6"
+</screen>
+      Here, the <code>last()</code> function, literally
+      means the last of the node set.
+    </para>
+
+    <para>
+      At this point we want to insert a node to the tree,
+      directly after the second <systemitem
+      class="systemname">localhost</systemitem> node. We can
+      use the information from <xref
+      linkend="puppet-guide-ref_material-augeas_wiki_add"
+      />, but also the information from the online help:
+<screen>
+&augp; <userinput>help ins</userinput>
+  COMMAND
+    ins - insert new node
+
+  SYNOPSIS
+    ins &lt;LABEL&gt; &lt;WHERE&gt; &lt;PATH&gt;
+
+  DESCRIPTION
+    Insert a new node with label LABEL right before or after PATH into the
+    tree. WHERE must be either 'before' or 'after'.
+
+  OPTIONS
+     &lt;LABEL&gt;   the label for the new node
+     &lt;WHERE&gt;   either 'before' or 'after'
+     &lt;PATH&gt;    the node before/after which to insert
+</screen>
+    </para>
+
+    <para>
+      We use the label trick, <emphasis>01</emphasis>, of
+      <xref
+      linkend="puppet-guide-ref_material-augeas_wiki_add" />
+      to create a new entry:
+<screen>
+&augp; <userinput>ins 01 after /files/etc/hosts/*[canonical = 'localhost'][last()]</userinput>
+&augp; <userinput>set /files/etc/hosts/01/ipaddr 192.168.4.22</userinput>
+&augp; <userinput>set /files/etc/hosts/01/canonical dev1.core.dmsat1.org</userinput>
+&augp; <userinput>set /files/etc/hosts/01/alias[1] dev1</userinput>
+&augp; <userinput>print /files/etc/hosts/01</userinput>
+/files/etc/hosts/01
+/files/etc/hosts/01/ipaddr = "192.168.4.22"
+/files/etc/hosts/01/canonical = "dev1.core.dmsat1.org"
+/files/etc/hosts/01/alias = "dev1"
+</screen>
+      Where is <code>alias[1] = "dev1"</code>?
+    </para>
+
+    <para>
+      The answer is: it is only shown if a node has
+      siblings:
+<screen>
+&augp; <userinput>set /files/etc/hosts/01/alias[2] test1</userinput>
+&augp; <userinput>print /files/etc/hosts/01</userinput>
+/files/etc/hosts/01
+/files/etc/hosts/01/ipaddr = "192.168.4.22"
+/files/etc/hosts/01/canonical = "dev1.core.dmsat1.org"
+/files/etc/hosts/01/alias[1] = "dev1"
+/files/etc/hosts/01/alias[2] = "test1"
+&augp; <userinput>rm /files/etc/hosts/01/alias[2]</userinput>
+rm : /files/etc/hosts/01/alias[2] 1
+&augp; <userinput>print /files/etc/hosts/01</userinput>
+/files/etc/hosts/01
+/files/etc/hosts/01/ipaddr = "192.168.4.22"
+/files/etc/hosts/01/canonical = "dev1.core.dmsat1.org"
+/files/etc/hosts/01/alias = "dev1"
+&augp; <userinput>print /augeas/save</userinput>
+/augeas/save = "overwrite"
+&augp; <userinput>set /augeas/save newfile</userinput>
+&augp; <userinput>print /augeas/save</userinput>
+/augeas/save = "newfile"
+&augp; <userinput>save</userinput>
+Saved 1 file(s)
+</screen>
+    </para>
+
+    <para>
+      Now, let us examine what the result is:
+<screen>
+&augp; <userinput>cat /etc/hosts.augnew</userinput>
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.4.22  dev1.core.dmsat1.org dev1
+</screen>
+    </para>
+
+    <para>
+      Now, let us test if we can generate an extra entry via
+      the command line:
+<screen>
+&dev1p; <userinput>augtool &lt;&lt; EOF</userinput>
+<userinput>ins 01 after /files/etc/hosts/*[canonical = 'localhost'][last()]</userinput>
+<userinput>set /files/etc/hosts/01/ipaddr 192.168.4.22</userinput>
+<userinput>set /files/etc/hosts/01/canonical dev1.core.dmsat1.org</userinput>
+<userinput>set /files/etc/hosts/01/alias[1] dev1</userinput>
+<userinput>set /files/etc/hosts/01/alias[2] test1</userinput>
+<userinput>ins 02 after /files/etc/hosts/*[canonical = 'localhost'][last()]</userinput>
+<userinput>set /files/etc/hosts/02/ipaddr 192.168.4.122</userinput>
+<userinput>set /files/etc/hosts/02/canonical dev2.core.dmsat1.org</userinput>
+<userinput>set /files/etc/hosts/02/alias[1] dev2</userinput>
+<userinput>set /files/etc/hosts/02/alias[2] test2</userinput>
+<userinput>set /augeas/save newfile</userinput>
+<userinput>save</userinput>
+<userinput>EOF</userinput>
+</screen>
+    </para>
+
+    <para>
+      And the result is:
+<screen>
+&dev1p; <userinput>cat /etc/hosts.augnew</userinput>
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.4.122 dev2.core.dmsat1.org dev2 test2
+192.168.4.22  dev1.core.dmsat1.org dev1 test1
+</screen>
+    </para>
+
+  </section>
+
+  <section id="puppet_construction-augeas-fstab">
+    <title>Example /etc/fstab</title>
+
+    <para>
+      Our next task is to change the options of the
+      <code>tmpfs</code> entry in
+      <filename>/etc/fstab</filename>. First we show how to
+      do it with <command>augtool</command>. Next, we create
+      an elementary Puppet class to do the same thing.
+    </para>
+
+    <para>
+      Again, with <command>augtool</command> we analyze the
+      file and find the entry we need:
+<screen>
+&augp; <userinput>print /files/etc/fstab</userinput>
+.. output skipped ..
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs']</userinput>
+/files/etc/fstab/5
+/files/etc/fstab/5/spec = "tmpfs"
+/files/etc/fstab/5/file = "/dev/shm"
+/files/etc/fstab/5/vfstype = "tmpfs"
+/files/etc/fstab/5/opt = "defaults"
+/files/etc/fstab/5/dump = "0"
+/files/etc/fstab/5/passno = "0"
+</screen>
+    </para>
+
+    <para>
+      Besides the <code>defaults</code> option, we want a
+      <code>size</code> option for the <code>tmpfs</code>,
+      in-memory, filesystem. The new option must be set to:
+      <code>size=100m</code>. So, we want to change the
+      entry if it contains no size option or if it contains
+      a size option, but the size is not set to 100m.
+      Analyzing the output, we can define the node query:
+      <itemizedlist>
+        <listitem>
+          <para>
+            Predicate with: <code>spec = 'tmpfs'</code>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Predicate with: <code>file = '/dev/shm'</code>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Predicate with: <code>vfstype = 'tmpfs'</code>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Predicate that tells: no size option is present,
+            or, if it is present, it must not have the value
+            of 100m.
+          </para>
+        </listitem>
+      </itemizedlist>
+      All, but the last predicate, are simple to do. So, how
+      do we create the last predicate? First, we split it up
+      into two predicates. The reason is simple, we want to
+      match two different conditions.
+    </para>
+      
+    <para>
+      To search for the entry in the state where the size
+      option is not present, we search for <code>count(opt[.
+      = 'size']) = 0</code>. The search is started at the
+      node set with:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt</userinput>
+/files/etc/fstab/5/opt = "defaults"
+</screen>
+      Now, with another input:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=90m        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt</userinput>
+.. empty ..
+</screen>
+      Wo, we can conclude that matching the entries
+      containing no <code>size</code> option works
+      correctly.
+    </para>
+      
+      
+    <para>
+      If the size option is present, we see a value. This is
+      tested with:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=100m        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs']/opt</userinput>
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2] = "size"
+/files/etc/fstab/5/opt[2]/value = "100m"
+</screen>
+      The value of the size option can be matched with:
+<screen>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs']/opt[. = 'size']/value</userinput>
+/files/etc/fstab/5/opt[2]/value = "100m"
+</screen>
+      To only select the node if the value equals 100m:
+<screen>
+&augp; <userinput> print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt[. = 'size']/value = '100m']/opt/value</userinput>
+/files/etc/fstab/5/opt[2]/value = "100m"
+</screen>
+      Now, with a value that won't match:
+<screen>
+&augp; <userinput> print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt[. = 'size']/value = '90m']/opt/value</userinput>
+.. empty ..
+</screen>
+    </para>
+
+    <para>
+      If we want, we can combine both queries in one
+      statement:
+<screen>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0 or opt[. = 'size']/value != '100m']</userinput>
+</screen>
+      Although, for matching, the above statement is great,
+      it does not help us when we change the node set.
+      Changing the node set in the first case, without the
+      size option, means: adding a new opt node called
+      <code>size</code> and setting the value to
+      <code>100m</code>. In the second case it means:
+      setting the value of <code>size</code> to the correct
+      value of <code>100m</code>. Since these operations are
+      different we need to distinguish between the two.
+    </para>
+
+    <para>
+      In order to be sure if our statements are correct, we
+      test them with some sample values of the tmpfs entry
+      (note, we added <code>/opt</code>):
+      <itemizedlist>
+        <listitem>
+          <para>
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0 or opt[. = 'size']/value != '100m']/opt</userinput>
+/files/etc/fstab/5/opt = "defaults"
+.. matched because size is missing ..
+</screen>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=90m        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0 or opt[. = 'size']/value != '100m']/opt</userinput>
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2] = "size"
+/files/etc/fstab/5/opt[2]/value = "90m"
+.. matched because size value is wrong ..
+</screen>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=100m        0 0
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0 or opt[. = 'size']/value != '100m']/opt</userinput>
+.. empty ..
+</screen>
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      Now, to add the size option to the node set, we need:
+<screen>
+&augp; <userinput>ins opt after /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt[last()]</userinput>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs']/opt</userinput>
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2]
+&augp; <userinput>set /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt[last()] 'size'</userinput>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt = 'size']/opt</userinput>
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2] = "size"
+&augp; <userinput>set /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs']/opt[. = 'size']/value '100m'</userinput>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt = 'size']/opt</userinput>
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2] = "size"
+/files/etc/fstab/5/opt[2]/value = "100m"
+&augp; <userinput>save</userinput>
+Saved 1 file(s)
+</screen>
+      Analyze the result:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=100m        0 0
+</screen>
+    </para>
+
+    <para>
+      To change the value of the <code>size</code> option,
+      we do:
+<screen>
+&augp; <userinput>set /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt[. = 'size']/value != '100m']/opt[. = 'size']/value '100m'</userinput>
+&augp; <userinput>print /files/etc/fstab/*[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt = 'size']/opt/value</userinput>
+/files/etc/fstab/5/opt[2]/value = "100m"
+&augp; <userinput>save</userinput>
+Saved 1 file(s)
+</screen>
+      Analyze the result:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=100m        0 0
+</screen>
+    </para>
+
+    <para>
+      So fare, we have the recipes for two scenarios of
+      adapting the <filename>/etc/fstab</filename> file, if
+      it is not according to our specifications. How can we
+      do the same thing in Puppet, using the
+      <emphasis>augeas</emphasis> resource type? We show a
+      very basic Puppet module here. The material we used is
+      <xref
+      linkend="puppet-guide-ref_material-augeas-puppet" />
+      and <xref
+      linkend="puppet-guide-ref_material-augeas-puppetrt"
+      />.
+<screen>
+&dev1p; <userinput>cat augeas_tmpfs.pp</userinput>
+class a {
+  augeas {'ensure_tmpfs_size':
+    context    => '/files/etc/fstab',
+    changes    => [
+      "ins opt after *[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt[last()]",
+      "set *[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 0]/opt[last()] size",
+      "set *[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][count(opt[. = 'size']) = 1]/opt[last()]/value '100m'",
+    ],
+    onlyif     => "match *[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt = 'size'] size == 0",
+  }
+
+  augeas {'ensure_tmpfs_size_100m':
+    context    => '/files/etc/fstab',
+    changes    => [
+      "set *[spec = 'tmpfs'][file = '/dev/shm'][vfstype = 'tmpfs'][opt[. = 'size']/value != '100m']/opt[. = 'size']/value '100m'",
+    ],
+  }
+}
+
+include a
+</screen>
+      We run it with:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+&dev1p; <userinput>puppet apply /root/augeas_tmpfs.pp</userinput>
+Notice: Compiled catalog for dev1.core.dmsat1.org in environment production in 0.19 seconds
+Notice: /Stage[main]/A/Augeas[ensure_tmpfs_size]/returns: executed successfully
+Notice: Finished catalog run in 0.60 seconds
+&dev1p; <userinput>puppet apply /root/augeas_tmpfs.pp</userinput>
+Notice: Compiled catalog for dev1.core.dmsat1.org in environment production in 0.18 seconds
+Notice: Finished catalog run in 0.59 seconds
+</screen>
+      The scenario in which a <code>size</code> option is
+      already present:
+<screen>
+&dev1p; <userinput>grep ^tmpfs /etc/fstab</userinput>
+tmpfs                   /dev/shm                tmpfs   defaults,size=90m        0 0
+&dev1p; <userinput>puppet apply /root/augeas_tmpfs.pp</userinput>
+Notice: Compiled catalog for dev1.core.dmsat1.org in environment production in 0.19 seconds
+Notice: /Stage[main]/A/Augeas[ensure_tmpfs_size_100m]/returns: executed successfully
+Notice: Finished catalog run in 0.61 seconds
+&dev1p; <userinput>puppet apply /root/augeas_tmpfs.pp</userinput>
+Notice: Compiled catalog for dev1.core.dmsat1.org in environment production in 0.18 seconds
+Notice: Finished catalog run in 0.59 seconds
+</screen>
+    </para>
+
+    <note>
+      <title>Augeas set cannot be used if size option is
+      absent</title>
+
+      <para>
+        In <xref
+        linkend="puppet-guide-ref_material-augeas-puppet"
+        />, a section exists, called <emphasis>A Better
+        Way</emphasis>, in which the ugly
+        <code>onlyif</code> attribute is removed from the
+        Puppet Augeas resource type. Unfortunately, it does
+        not work in the scenario above. With
+        <command>augtool</command>, we can demonstrate:
+<screen>
+&augp; <userinput>print /files/etc/exports</userinput>
+/files/etc/exports
+/files/etc/exports/dir[1] = "/foo"
+/files/etc/exports/dir[1]/client = "weeble"
+/files/etc/exports/dir[1]/client/option[1] = "ro"
+/files/etc/exports/dir[1]/client/option[2] = "all_squash"
+/files/etc/exports/dir[2] = "/bar"
+/files/etc/exports/dir[2]/client = "weeble"
+/files/etc/exports/dir[2]/client/option[1] = "ro"
+/files/etc/exports/dir[2]/client/option[2] = "all_squash"
+&augp; <userinput>print /files/etc/fstab</userinput>
+.
+.
+/files/etc/fstab/4/dump = "0"
+/files/etc/fstab/4/passno = "0"
+/files/etc/fstab/5
+/files/etc/fstab/5/spec = "/tmpfs"
+/files/etc/fstab/5/file = "/dev/shm"
+/files/etc/fstab/5/vfstype = "tmpfs"
+/files/etc/fstab/5/opt[1] = "defaults"
+/files/etc/fstab/5/opt[2] = "size"
+/files/etc/fstab/5/opt[2]/value = "100m"
+/files/etc/fstab/5/dump = "0"
+/files/etc/fstab/5/passno = "0"
+/files/etc/fstab/6
+/files/etc/fstab/6/spec = "devpts"
+/files/etc/fstab/6/file = "/dev/pts"
+.
+.
+</screen>
+      </para>
+
+      <para>
+        We suspect that if the
+        <filename>/etc/fstab</filename> lense was written as
+        the <filename>/etc/exports</filename> lense, with an
+        array representation, <code>dir[...]</code>, instead
+        of unnamed node representation, <code>/.../</code>,
+        it might have been possible to just use
+        <emphasis>set</emphasis> Augeas statements and not
+        the <emphasis>ins</emphasis> statement in the
+        beginning.
+      </para>
+    </note>
+
+  </section>
 
 </section>

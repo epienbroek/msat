@@ -4,6 +4,7 @@
 <!ENTITY HOLDER "| Allard Berends |">
 
 <!ENTITY ant1p   "<prompt>ant1#</prompt>">
+<!ENTITY augp    "<prompt>augtool&gt;</prompt>">
 <!ENTITY dev1    "dev1">
 <!ENTITY dev1p   "<prompt>dev1#</prompt>">
 <!ENTITY dns1    "dns1">

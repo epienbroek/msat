@@ -10,5 +10,6 @@
   </para>
 
   <xi:include href="apdx_tools/line_sets.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="apdx_tools/me_only.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </appendix>
 

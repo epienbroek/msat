@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../puppet-guide.ent">
+%BOOK_ENTITIES;
+]>
+<section id="apdx_tools-me_only">
+  <title>Shell script synchronisation with me-only</title>
+
+  <para>
+    A common problem with shell scripting is: how can I
+    assure that my script has only one instance running? For
+    example, if you run your script every 5 minutes or so,
+    from a crontab entry, and one instance takes a very long
+    time to run, a second instance of the same script can be
+    executed, interfering with the first. This can result is
+    all sorts of drama.
+  </para>
+
+  <para>
+    One solution system administrators have found, is to
+    check if a PID (Process ID) of the script exists. For
+    example, by using <code>ps -ef | grep
+    [s]criptname</code>. Note, the square brackets are
+    needed to make grep not return the <code>grep
+    scriptname</code> process, but only the script
+    instances. What is wrong with this solution? Assume that
+    the first instance of <code>scriptname</code> is about
+    to start from a crontab entry and a system administrator
+    is also running <code>scriptname</code> from the command
+    line. In theory the scheduler of the Linux kernel can
+    switch context just before the statement <code>grep
+    [s]criptname</code> returns. Hence, the first instance
+    will receive the answer that no other instance is
+    running. The context switch makes the second instance of
+    the script run. Doing the test <code>grep
+    [s]criptname</code> in the second instance also yields
+    an empty list. So, both instances will be run.
+  </para>
+
+  <para>
+    How can the above problem be solved? The theory says
+    that we need an atomic operation in which we can test if
+    no other instance is running. In C programming
+    semaphores, or pthread_mutex mechanisms are used. In
+    shell scripting we can use the <code>mkdir</code>
+    command. By searching on the Internet, we have found
+    statements that <code>mkdir</code> is guaranteed to be
+    atomical on one node. So, the logic in the shell script
+    is:
+<screen>
+mkdir lockdir 2>/dev/null
+RC=$?
+if [ $RC -eq 0 ]; then
+  .. single instance code ..
+  rmdir lockdir
+else
+  exit 1
+fi
+</screen>
+  </para>
+
+  <para>
+    So, so far we are okay. But what happens if the
+    <emphasis>single instance code</emphasis> crashes? The
+    <code>lockdir</code> is never removed. So, the lock
+    stays forever. Even with <code>atexit</code> traps, this
+    situation occurs. Manual intervention is needed. We can
+    alarm a system administrator by implementing a polling
+    monitor from an external program, or even machine.
+  </para>
+
+  <para>
+    We want something else. We want to ask for a lock in our
+    script in an atomic way that is bound to the process. If
+    the process crashes, then the lock is also removed. If
+    the process runs correctly and finishes, the lock is
+    removed. We have implemented this in a little program,
+    called <code>me-only</code>. The signature to run a
+    shell script is:
+<screen>
+&dev1p; <userinput>me-only /var/lock/something scriptname arg</userinput>
+</screen>
+    The trick in the me-only C program is based on a Linux
+    extension of Unix domain sockets, called the abstract
+    socket address, see <code>man 7 unix</code>. Basically,
+    the filepath is not stored on the filesystem (this would
+    result in the same problem as with <code>mkdir</code>
+    and a crash of the process), but in kernel memory,
+    associated with the process. After a process finishes,
+    or after a process crashes, all the process resources,
+    including the abstract socket address, are removed.
+    Hence, this mechanism gives us the run-alone option for
+    shell scripts.
+  </para>
+
+  <para>
+    The source code and the usage of <code>me-only</code> is
+    detailed in <xref
+    linkend="puppet-guide-ref_material-other-software" />.
+    When we try to build in on <systemitem
+    class="systemname">dev1.core.dmsat1.org</systemitem>:
+<screen>
+&dev1p; <userinput>git clone git@github.com:aberends/other-software.git</userinput>
+.. output skipped ..
+&dev1p; <userinput>cd other-software/me-only</userinput>
+&dev1p; <userinput>./build.sh</userinput>
+.
+/root/rpm/tmp/rpm-tmp.iDTw8w: line 28: gcc: command not found
+.
+&dev1p; <userinput>yum install gcc</userinput>
+.. output skipped ..
+&dev1p; <userinput>./build.sh</userinput>
+.. success ..
+&dev1p; <userinput>rpm --resign /root/rpm/RPMS/x86_64/me-only-1.0.1-0.x86_64.rpm</userinput>
+Enter pass phrase: <userinput>redhat</userinput>
+Pass phrase is good.
+/root/rpm/RPMS/x86_64/me-only-1.0.1-0.x86_64.rpm:
+</screen>
+    Now, we can add this RPM to a software channel on the
+    Spacewalk server.
+  </para>
+
+</section>
