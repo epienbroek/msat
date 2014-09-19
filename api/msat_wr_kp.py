@@ -366,6 +366,22 @@ for o in order:
     else:
       print "  --kickstart-%s true \\" % (o, )
 
+# Get the software details: Systems > Kickstart > Profiles >
+# Kickstart Details > Software
+# Available in Satellite 5.7 and higher.
+if options.satellite_version >= '5.7':
+  try:
+    software_details = client.kickstart.profile.software.getSoftwareDetails(
+      key,
+      options.kickstart_label,
+    )
+  except xmlrpclib.Fault, e:
+    print >> sys.stderr, str(e)
+    print >> sys.stderr, options
+    sys.exit(1)
+  if software_details:
+    print "  --kickstart-nobase \'%s\' \\" % (software_details['noBase'],)
+
 # Get custom options: Systems > Kickstart > Profiles >
 # Kickstart Details > Advanced Options > last item (Custom
 # options)

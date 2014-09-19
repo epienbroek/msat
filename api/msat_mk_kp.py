@@ -683,6 +683,15 @@ parser.add_option(
   default  = None,
   help     = "custom kickstart option"
 )
+parser.add_option(
+  "--kickstart-nobase",
+  action   = "callback",
+  callback = config.parse_boolean,
+  dest     = "kickstart_nobase",
+  type     = "string",
+  default  = None,
+  help     = "custom kickstart option"
+)
 
 (options, args) = config.get_conf(parser)
 
@@ -921,11 +930,12 @@ if options.kickstart_software:
 if options.kickstart_activationkey:
   activationkey_list = options.kickstart_activationkey.split(',')
 
+# create kickstart profile
+
 # Get session key via auth namespace.
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
-# create kickstart profile
 try:
   rc = client.kickstart.createProfile(
     key,
@@ -1067,6 +1077,22 @@ if options.kickstart_software:
     print >> sys.stderr, options
     sys.exit(1)
 
+if options.kickstart_nobase:
+  if options.satellite_version >= '5.7':
+    try:
+      rc = client.kickstart.profile.software.setSoftwareDetails(
+        key,
+  			options.kickstart_label,
+  			{
+  				'noBase': options.kickstart_nobase,
+  			  'ignoreMissing': False
+  			}
+      )
+    except xmlrpclib.Fault, e:
+      print >> sys.stderr, str(e)
+      print >> sys.stderr, options
+      sys.exit(1)
+
 if options.satellite_version == '5.5':
   if options.kickstart_prescript:
     try:
@@ -1113,13 +1139,13 @@ if options.satellite_version == '5.5':
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
       sys.exit(1)
-elif options.satellite_version == '5.6':
+elif options.satellite_version >= '5.6':
   if options.kickstart_prescript:
     try:
       rc = client.kickstart.profile.addScript(
         key,
         options.kickstart_label,
-        '1',
+        'pre-script',
         options.kickstart_prescript,
         '',
         'pre',
@@ -1135,7 +1161,7 @@ elif options.satellite_version == '5.6':
       rc = client.kickstart.profile.addScript(
         key,
         options.kickstart_label,
-        '1',
+        'post-script',
         options.kickstart_postscript,
         '',
         'post',
@@ -1162,24 +1188,7 @@ elif options.satellite_version == '5.6':
       print >> sys.stderr, str(e)
       print >> sys.stderr, options
       sys.exit(1)
-else:
-  if options.kickstart_script:
-    try:
-      rc = client.kickstart.profile.addScript(
-        key,
-        options.kickstart_label,
-        options.kickstart_script,
-        '',
-        'post',
-        True
-      )
-    except xmlrpclib.Fault, e:
-      print >> sys.stderr, str(e)
-      print >> sys.stderr, options
-      sys.exit(1)
 
-# Due to bug 679846 we run this one always to force the
-# client.kickstart.profile.addScript to function!
 try:
   rc = client.kickstart.profile.system.enableRemoteCommands(
     key,
@@ -1188,16 +1197,7 @@ try:
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
   print >> sys.stderr, options
-if not options.kickstart_remotecmds:
-  try:
-    rc = client.kickstart.profile.system.disableRemoteCommands(
-      key,
-      options.kickstart_label,
-    )
-  except xmlrpclib.Fault, e:
-    print >> sys.stderr, str(e)
-    print >> sys.stderr, options
-    sys.exit(1)
+
 try:
   rc = client.kickstart.profile.system.setRegistrationType(
     key,
