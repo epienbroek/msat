@@ -143,6 +143,15 @@ parser.add_option(
   help = "snippet name option"
 )
 
+parser.add_option(
+  "--snippet-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "snippet_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 
 if options.satellite_url is None:
@@ -182,8 +191,9 @@ if not found:
 script = 'cs-' + options.snippet_name + '.sh'
 t = time.strftime("%Y-%m-%d %H:%M", time.localtime())
 y = time.strftime("%Y", time.localtime())
-print '''#!/bin/bash
-#
+print '#!/bin/bash'
+if options.snippet_banner:
+  print '''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -226,9 +236,9 @@ print '''#!/bin/bash
 #   the Free Software Foundation, Inc., 59 Temple Place -
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
-#
+#'''
 
-msat_mk_cs.py \\'''
+print '\nmsat_mk_cs.py \\'
 
 # Set cobbler snippet name.
 print "  --snippet-name \"%s\" \\" % (options.snippet_name, )

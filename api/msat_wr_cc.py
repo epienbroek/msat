@@ -155,6 +155,15 @@ parser.add_option(
   default = None,
   help = "test for configchannel existence in regeneration script"
 )
+parser.add_option(
+  "--configchannel-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "configchannel_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 
 if options.configchannel_label is None:
@@ -167,8 +176,9 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 script = 'cc-' + options.configchannel_label + '.sh'
 t = time.strftime("%Y-%m-%d %H:%M", time.localtime())
 y = time.strftime("%Y", time.localtime())
-print '''#!/bin/bash
-#
+print '#!/bin/bash'
+if options.configchannel_banner:
+  print '''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -204,18 +214,17 @@ print '''#!/bin/bash
 #   the Free Software Foundation, Inc., 59 Temple Place -
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
-#
-
-'''
+#'''
 
 if options.configchannel_existence:
-  print  '''if [ -n "$(msat_ls_cc.py | /bin/grep '^%s$')" ]; then
+  print  '''
+if [ -n "$(msat_ls_cc.py | /bin/grep '^%s$')" ]; then
   /bin/echo "INFO: %s already exists! Bailing out."
   exit 0
-fi
-''' % (options.configchannel_label, options.configchannel_label)
+fi''' % (options.configchannel_label, options.configchannel_label)
 
-print '''msat_mk_cc.py \\'''
+print '''
+msat_mk_cc.py \\'''
 
 # Set configchannel label.
 print "  --configchannel-label %s \\" % (options.configchannel_label, )

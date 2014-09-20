@@ -253,18 +253,6 @@ if options.activationkey_node:
 client = xmlrpclib.ServerProxy(options.satellite_url, verbose=0)
 key = client.auth.login(options.satellite_login, options.satellite_password)
 
-
-try:
-  akey = client.activationkey.getDetails(
-    key,
-    '1-' + options.activationkey_label,
-  )
-except xmlrpclib.Fault, e:
-  pass
-else:
-  print >> sys.stderr, "%s already exists, skipping" % (options.activationkey_label, )
-  sys.exit(1)
-
 try:
   akey = client.activationkey.create(
     key,

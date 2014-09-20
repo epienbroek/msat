@@ -134,6 +134,15 @@ parser.add_option(
   default = None,
   help = "test for activationkey existence in regeneration script"
 )
+parser.add_option(
+  "--activationkey-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "activationkey_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 
 if options.satellite_url is None:
@@ -152,8 +161,10 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 script = 'ak-' + re.sub('\d+-', '', options.activationkey_label, 1) + '.sh'
 t = time.strftime("%Y-%m-%d %H:%M", time.localtime())
 y = time.strftime("%Y", time.localtime())
-print '''#!/bin/bash
-#
+print '#!/bin/bash'
+
+if options.activationkey_banner:
+  print '''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -191,9 +202,7 @@ print '''#!/bin/bash
 #   the Free Software Foundation, Inc., 59 Temple Place -
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
-#
-
-'''
+#'''
 
 ak_label = re.sub('\d+-', '', options.activationkey_label, 1)
 
@@ -204,7 +213,8 @@ if options.activationkey_existence:
 fi
 ''' % (ak_label, ak_label)
 
-print '''msat_mk_ak.py \\'''
+print '''
+msat_mk_ak.py \\'''
 
 # Set activationkey label.
 print "  --activationkey-label %s \\" % (ak_label, )

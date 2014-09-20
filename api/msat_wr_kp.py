@@ -152,6 +152,15 @@ parser.add_option(
   default = None,
   help = "test for kickstart existence in regeneration script"
 )
+parser.add_option(
+  "--kickstart-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "kickstart_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 if options.satellite_url is None:
   parser.error('Error: specify URL, -u or --satellite-url')
@@ -169,8 +178,9 @@ key = client.auth.login(options.satellite_login, options.satellite_password)
 script = 'kp-' + options.kickstart_label + '.sh'
 t = time.strftime("%Y-%m-%d %H:%M", time.localtime())
 y = time.strftime("%Y", time.localtime())
-print '''#!/bin/bash
-#
+print '#!/bin/bash'
+if options.kickstart_banner:
+  print '''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -213,18 +223,17 @@ print '''#!/bin/bash
 #   the Free Software Foundation, Inc., 59 Temple Place -
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
-#
-
-'''
+#'''
 
 if options.kickstart_existence:
-  print  '''if [ -n "$(msat_ls_kp.py | /bin/grep '^%s$')" ]; then
+  print  '''
+if [ -n "$(msat_ls_kp.py | /bin/grep '^%s$')" ]; then
   /bin/echo "INFO: %s already exists! Bailing out."
   exit 0
 fi
 ''' % (options.kickstart_label, options.kickstart_label)
 
-print "ORGNUM=$(msat_ls_org.py)"
+print "\nORGNUM=$(msat_ls_org.py)"
 print
 print "SATELLITE=$(msat_ls_sn.py)"
 print '''

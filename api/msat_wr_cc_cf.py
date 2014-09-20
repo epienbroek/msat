@@ -160,6 +160,15 @@ parser.add_option(
   default = None,
   help = "path to save all information to"
 )
+parser.add_option(
+  "--configchannel-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "configchannel_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 
 if options.configchannel_label is None:
@@ -198,8 +207,9 @@ for f in files:
   os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
   t = time.strftime("%Y-%m-%d %H:%M", time.localtime())
   y = time.strftime("%Y", time.localtime())
-  fd.write('''#!/bin/bash
-#
+  fd.write('#!/bin/bash\n')
+  if options.configchannel_banner:
+    fd.write('''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -236,7 +246,9 @@ for f in files:
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
 #
+''')
 
+  fd.write('''
 msat_mk_cc_cf.py \\
 ''')
 

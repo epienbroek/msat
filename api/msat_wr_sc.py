@@ -148,6 +148,15 @@ parser.add_option(
   default = False,
   help = "if set, RPM's are included"
 )
+parser.add_option(
+  "--softwarechannel-banner",
+  action = "callback",
+  callback = config.parse_boolean,
+  dest = "softwarechannel_banner",
+  type = "string",
+  default = 'yes',
+  help = "output bash script banner, default is yes"
+)
 (options, args) = config.get_conf(parser)
 
 if options.softwarechannel_label is None:
@@ -183,8 +192,9 @@ y = time.strftime("%Y", time.localtime())
 script_path = os.path.join(export_path, script)
 fd = open(script_path, 'w')
 os.chmod(script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-print >> fd, '''#!/bin/bash
-#
+print >> fd, '''#!/bin/bash'''
+if options.softwarechannel_banner:
+  print >> fd, '''#
 # SCRIPT
 #   ''' + script + '''
 # DESCRIPTION
@@ -227,9 +237,9 @@ print >> fd, '''#!/bin/bash
 #   the Free Software Foundation, Inc., 59 Temple Place -
 #   Suite 330, Boston, MA 02111-1307, USA.
 # DESIGN
-#
+#'''
 
-msat_mk_sc.py \\'''
+print >> fd, '''\nmsat_mk_sc.py \\'''
 
 # Set software channel label, name and summary.
 print >> fd, "  --softwarechannel-label \"%s\" \\" % (details['label'], )
