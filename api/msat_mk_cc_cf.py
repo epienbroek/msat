@@ -301,9 +301,8 @@ else:
   if type == 'file':
     path_info['contents'] = xmlrpclib.Binary(content)
 
-if options.satellite_version in ['5.4', '5.5', '5.6']:
-  if options.configpath_context:
-    path_info['selinux_ctx'] = options.configpath_context
+if options.configpath_context:
+  path_info['selinux_ctx'] = options.configpath_context
 
 try:
   if type == 'link':
