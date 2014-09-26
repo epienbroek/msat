@@ -14,7 +14,7 @@
 # HISTORY
 # LICENSE
 #   Copyright (C) 2013 Allard Berends
-#
+# 
 #   msat_ls_sc_rpms.py is free software; you can
 #   redistribute it and/or modify it under the terms of the
 #   GNU General Public License as published by the Free
@@ -149,9 +149,15 @@ except xmlrpclib.Fault, e:
 
 if options.rpm_id:
   for i in rpms:
-    print "%8d: %s %s %s %s" % (i['id'], i['name'], i['version'], i['release'], i['arch_label'])
+    if i['epoch']:
+      print "%8d: %s %s %s %s %s" % (i['id'], i['name'], i['version'], i['release'], i['epoch'], i['arch_label'])
+    else:
+      print "%8d: %s %s %s %s" % (i['id'], i['name'], i['version'], i['release'], i['arch_label'])
 else:
   for i in rpms:
-    print "%s %s %s %s" % (i['name'], i['version'], i['release'], i['arch_label'])
+    if i['epoch']:
+      print "%s %s %s %s %s" % (i['name'], i['version'], i['release'], i['epoch'], i['arch_label'])
+    else:
+      print "%s %s %s %s" % (i['name'], i['version'], i['release'], i['arch_label'])
 
 client.auth.logout(key)
