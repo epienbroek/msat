@@ -1,5 +1,5 @@
 Name:		   msat
-Version:   1.0.0
+Version:   1.0.1
 Release:   1%{?dist}
 Summary:   MSAT (Meta Spacewalk and Satellite). A collection of scripts for managing a Satellite or Spacewalk through the API.
 Group:		 System/Scripts
@@ -43,5 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) /usr/local/bin/msat
 
 %changelog
+* Fri Sep 26 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.1-1
+- Fix listing of RPMs with an epoch number.
 * Mon Sep 22 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.0-1
 - Initial creation of package based on commit cc50e04.
