@@ -1,5 +1,5 @@
 Name:		   msat
-Version:   1.0.3
+Version:   1.0.4
 Release:   1%{?dist}
 Summary:   MSAT (Meta Spacewalk and Satellite). A collection of scripts for managing a Satellite or Spacewalk through the API.
 Group:		 System/Scripts
@@ -23,7 +23,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 mkdir -p $RPM_BUILD_ROOT/usr/local/bin/msat
 
-install msat.sh $RPM_BUILD_ROOT/etc/profile.d
+install api/msat.sh $RPM_BUILD_ROOT/etc/profile.d
 install api/*.py $RPM_BUILD_ROOT/usr/local/bin/msat
 install api/*.sh $RPM_BUILD_ROOT/usr/local/bin/msat
 install api/sat.conf $RPM_BUILD_ROOT/usr/local/bin/msat
@@ -43,6 +43,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) /usr/local/bin/msat
 
 %changelog
+* Thu Oct 9 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.4-1
+- Add msat_mk_er.py
+- Change directory to better match other packages.
 * Mon Sep 29 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.3-1
 - Remove msat_wr_sc_rpms.py. Functionality is already provided
   by msat_wr_sc.py.
