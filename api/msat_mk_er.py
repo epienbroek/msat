@@ -2,7 +2,7 @@
 
 #
 # SCRIPT
-#   msat_wr_er.py
+#   msat_mk_er.py
 # DESCRIPTION
 # DEPENDENCIES
 #   You need a Satellite server running to which this client
@@ -15,13 +15,13 @@
 # LICENSE
 #   Copyright (C) 2014 Gerben Welter
 #
-#   msat_wr_er.py is free software; you can redistribute it
+#   msat_mk_er.py is free software; you can redistribute it
 #   and/or modify it under the terms of the GNU General
 #   Public License as published by the Free Software
 #   Foundation; either version 3 of the License, or (at your
 #   option) any later version.
 #
-#   msat_wr_er.py is distributed in the hope that it will be
+#   msat_mk_er.py is distributed in the hope that it will be
 #   useful, but WITHOUT ANY WARRANTY; without even the
 #   implied warranty of MERCHANTABILITY or FITNESS FOR A
 #   PARTICULAR PURPOSE. See the GNU General Public License
