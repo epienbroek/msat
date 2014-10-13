@@ -684,13 +684,23 @@ parser.add_option(
   help     = "custom kickstart option"
 )
 parser.add_option(
+  "--kickstart-regtype",
+  action = "callback",
+  callback = config.parse_string,
+  dest = "kickstart_regtype",
+  type = "string",
+  default = "deletion",
+  help = "registration type of kickstart"
+)
+
+parser.add_option(
   "--kickstart-nobase",
   action   = "callback",
   callback = config.parse_boolean,
   dest     = "kickstart_nobase",
   type     = "string",
   default  = None,
-  help     = "custom kickstart option"
+  help     = "kickstart software no base option"
 )
 
 (options, args) = config.get_conf(parser)
@@ -1202,7 +1212,7 @@ try:
   rc = client.kickstart.profile.system.setRegistrationType(
     key,
     options.kickstart_label,
-    options.kickstart_registrationtype,
+    options.kickstart_regtype,
   )
 except xmlrpclib.Fault, e:
   print >> sys.stderr, str(e)
