@@ -1,5 +1,5 @@
 Name:		   msat
-Version:   1.0.5
+Version:   1.0.6
 Release:   1%{?dist}
 Summary:   MSAT (Meta Spacewalk and Satellite). A collection of scripts for managing a Satellite or Spacewalk through the API.
 Group:		 System/Scripts
@@ -43,6 +43,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) /usr/local/bin/msat
 
 %changelog
+* Mon Oct 13 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.6-1
+- Fix removal of Configuration Channels in msat_rm_kp_hy.sh.
 * Mon Oct 13 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.5-1
 - Fix kickstart registration type
 * Thu Oct 9 2014 Gerben Welter <gerben.welter@prorail.nl> - 1.0.4-1
