@@ -198,10 +198,17 @@ ORGNUM=$(msat_ls_org.py)
 # Since the '-' character may be part of the <name>, we can
 # only deduce the name by chopping of the part
 # -<r>u<m>-<x_y_z>.
-#AK_NAME=$(echo ${L_OPTION} | cut -f1 -d-)
-AK_NAME=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}w\?u[0-9]\{1,\}.*$//' | awk -F'-' {'print $1'})
-AK_MACH=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}w\?u[0-9]\{1,\}.*$//' | awk -F'-' {'print $2'})
-#AK_VERSION=$(echo ${L_OPTION} | cut -f4 -d-)
+#
+# GW: Only we also want to be able to split the machine type
+#     from the name so we can delete both the generic application
+#     config channel and the machine specific
+#     application config channel. This why the out put from sed
+#     is split again, keeping in mind that the application
+#     name may also contain the '-' character. With AK_NAME
+#     we additionally need to strip the extra '-' character
+#     because awk always prints the FS even if $NF is made empty.
+AK_NAME=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}w\?u[0-9]\{1,\}.*$//' | awk 'BEGIN{FS="-";OFS="-"}{$NF=""; print $0}' | sed 's/.$//')
+AK_MACH=$(echo ${L_OPTION} | sed 's/-[0-9]\{1,\}w\?u[0-9]\{1,\}.*$//' | awk 'BEGIN{FS="-"}{print $NF}')
 AK_VERSION=$(echo ${L_OPTION} | sed 's/^.*-[0-9]\{1,\}w\?u[0-9]\{1,\}-//')
 
 # Deduce name of Config Channel to remove
@@ -209,7 +216,6 @@ AK_VERSION=$(echo ${L_OPTION} | sed 's/^.*-[0-9]\{1,\}w\?u[0-9]\{1,\}-//')
 # AB: deducing major version is not 100%. One can have
 # <number>u in the app name!
 RHEL_MAJOR=$(echo ${L_OPTION} | sed 's/^.*-\([0-9]\{1,\}w\?\)u[0-9]\{1,\}-.*/\1/')
-#CC_NAME=$(echo ${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION})
 CC_NAME="${AK_NAME}-${RHEL_MAJOR}-${AK_VERSION}"
 CC_MACH="${AK_NAME}-${AK_MACH}-${RHEL_MAJOR}-${AK_VERSION}"
 
