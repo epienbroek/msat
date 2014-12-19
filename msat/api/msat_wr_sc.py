@@ -42,6 +42,7 @@ import stat
 import sys
 import time
 import xmlrpclib
+import urllib2
 
 usage = '''save specified software channel'''
 
@@ -266,20 +267,21 @@ if options.rpms_included:
     sys.exit(1)
 
   for pkg in list:
-    id = pkg.get('id')
-
     try:
-      details = client.packages.getDetails(
+      pkg_url = client.packages.getPackageUrl(
         key,
-        id,
+        pkg['id'],
       )
     except xmlrpclib.Fault, e:
       print >> sys.stderr, str(e)
       print >> sys.stderr, id
-      sys.exit(1)
 
-    shutil.copy(os.path.join(options.satellite_rpmpath, details['path']),
-                rpms)
+    filename = pkg['name'] + '-' + pkg['version'] + '-' + pkg['release'] + '.' + pkg['arch_label'] + '.rpm'
+    data = urllib2.urlopen(pkg_url)
+    fd = open(rpms + '/' + filename, 'wb')
+    fd.write(data.read())
+    fd.close
+
   print >> fd, "P=$(/usr/bin/dirname $0)"
   print >> fd, "# To push the RPM's with rhnpush"
   print >> fd, "/usr/bin/rhnpush --username=$(msat_ls_sl.py) --password=$(msat_ls_sp.py) --dir=$P/rpms --channel=%s" % (options.softwarechannel_label, )
